@@ -1,0 +1,85 @@
+﻿@model IEnumerable<InventarioWeb.Core.Entities.Almacen>
+@{
+    ViewData["Title"] = "Gestión de Almacenes";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-shop"></i> Almacenes y Mercados</h2>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Nuevo Almacén
+    </a>
+</div>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        <i class="bi bi-check-circle"></i> @TempData["Mensaje"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-header @(item.Tipo == "ALMACEN" ? "bg-primary" : "bg-success") text-white">
+                    <h5 class="mb-0">
+                        <i class="bi @(item.Tipo == "ALMACEN" ? "bi-building" : "bi-shop")"></i>
+                        @item.Nombre
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        <span class="badge @(item.Tipo == "ALMACEN" ? "bg-primary" : "bg-success")">
+                            @item.Tipo
+                        </span>
+                        @if (!string.IsNullOrEmpty(item.Codigo))
+                        {
+                            <code>@item.Codigo</code>
+                        }
+                    </p>
+
+                    @if (!string.IsNullOrEmpty(item.Direccion))
+                    {
+                        <p><i class="bi bi-geo-alt"></i> @item.Direccion</p>
+                    }
+
+                    @if (!string.IsNullOrEmpty(item.Encargado))
+                    {
+                        <p><i class="bi bi-person"></i> @item.Encargado</p>
+                    }
+
+                    @if (!string.IsNullOrEmpty(item.Telefono))
+                    {
+                        <p><i class="bi bi-telephone"></i> @item.Telefono</p>
+                    }
+
+                    <p>
+                        <strong>Productos:</strong>
+                        <span class="badge bg-info">@(item.Stocks?.Count ?? 0)</span>
+                    </p>
+                </div>
+                <div class="card-footer">
+                    <div class="btn-group btn-group-sm w-100">
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">
+                            <i class="bi bi-eye"></i> Ver
+                        </a>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Gerente"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                        }
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

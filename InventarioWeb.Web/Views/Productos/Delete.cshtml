@@ -1,0 +1,46 @@
+﻿@model InventarioWeb.Core.DTOs.ProductoDto
+@{
+    ViewData["Title"] = "Eliminar Producto";
+}
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Confirmar Eliminación</h4>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-circle"></i>
+                    ¿Está seguro que desea eliminar este producto? Esta acción no se puede deshacer.
+                </div>
+
+                <dl class="row">
+                    <dt class="col-sm-4">Código</dt>
+                    <dd class="col-sm-8"><code>@Model.Codigo</code></dd>
+
+                    <dt class="col-sm-4">Nombre</dt>
+                    <dd class="col-sm-8">@Model.Nombre</dd>
+
+                    <dt class="col-sm-4">Categoría</dt>
+                    <dd class="col-sm-8">@Model.CategoriaNombre</dd>
+
+                    <dt class="col-sm-4">Stock Total</dt>
+                    <dd class="col-sm-8">@Model.StockTotal unidades</dd>
+                </dl>
+
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Eliminar Permanentemente
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

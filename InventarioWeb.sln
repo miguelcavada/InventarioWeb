@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36414.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventarioWeb.Core", "InventarioWeb.Core\InventarioWeb.Core.csproj", "{0BBFA14A-D5AE-4339-86E2-E1E688DDDB33}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventarioWeb.Infrastructure", "InventarioWeb.Infrastructure\InventarioWeb.Infrastructure.csproj", "{D354C311-6303-4731-92FD-03045383E223}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventarioWeb.Web", "InventarioWeb.Web\InventarioWeb.Web.csproj", "{E09781F0-EF15-430C-B629-976A10E50782}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0BBFA14A-D5AE-4339-86E2-E1E688DDDB33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BBFA14A-D5AE-4339-86E2-E1E688DDDB33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BBFA14A-D5AE-4339-86E2-E1E688DDDB33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BBFA14A-D5AE-4339-86E2-E1E688DDDB33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D354C311-6303-4731-92FD-03045383E223}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D354C311-6303-4731-92FD-03045383E223}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D354C311-6303-4731-92FD-03045383E223}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D354C311-6303-4731-92FD-03045383E223}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E09781F0-EF15-430C-B629-976A10E50782}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E09781F0-EF15-430C-B629-976A10E50782}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E09781F0-EF15-430C-B629-976A10E50782}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E09781F0-EF15-430C-B629-976A10E50782}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2AF893CA-82D7-4539-9DC3-D725547F68EC}
+	EndGlobalSection
+EndGlobal

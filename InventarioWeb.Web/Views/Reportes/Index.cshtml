@@ -1,0 +1,113 @@
+﻿@{
+    ViewData["Title"] = "Reportes";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-file-earmark-bar-graph"></i> Centro de Reportes</h2>
+</div>
+
+<div class="row">
+    <!-- Reportes de Productos -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-box-seam"></i> Reportes de Productos</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Exporte el catálogo completo de productos con detalles de stock y precios.</p>
+                <div class="d-grid gap-2">
+                    <a asp-action="ProductosExcel" class="btn btn-success">
+                        <i class="bi bi-file-earmark-excel"></i> Exportar a Excel
+                    </a>
+                    <a asp-action="ProductosPdf" class="btn btn-danger">
+                        <i class="bi bi-file-earmark-pdf"></i> Exportar a PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reportes de Stock Bajo -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Stock Bajo</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Productos que están por debajo del stock mínimo permitido.</p>
+                <div class="d-grid gap-2">
+                    <a asp-action="StockBajoExcel" class="btn btn-success">
+                        <i class="bi bi-file-earmark-excel"></i> Exportar a Excel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventario por Almacén (NUEVO) -->
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-shop"></i> Inventario Actual por Almacén</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Consulte el inventario actual de productos en cada almacén o mercado.</p>
+                <form asp-action="InventarioAlmacen" method="get" class="row g-2">
+                    <div class="col-md-8">
+                        <select name="id" class="form-select" required>
+                            <option value="">-- Seleccione un almacén o mercado --</option>
+                            @if (ViewBag.Almacenes != null)
+                            {
+                                foreach (var almacen in ViewBag.Almacenes)
+                                {
+                                    <option value="@almacen.Value">@almacen.Text</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-info w-100">
+                            <i class="bi bi-eye"></i> Ver Inventario
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reportes de Movimientos -->
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="bi bi-arrow-left-right"></i> Reportes de Movimientos</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Exporte el historial de entradas y salidas del inventario.</p>
+
+                <form asp-action="MovimientosExcel" method="get" class="mb-3">
+                    <div class="row g-2">
+                        <div class="col-md-3">
+                            <select name="tipo" class="form-select">
+                                <option value="TODOS">Todos los tipos</option>
+                                <option value="ENTRADA">Solo Entradas</option>
+                                <option value="SALIDA">Solo Salidas</option>
+                                <option value="TRASLADO">Solo Traslados</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="date" name="desde" class="form-control" placeholder="Desde" />
+                        </div>
+                        <div class="col-md-3">
+                            <input type="date" name="hasta" class="form-control" placeholder="Hasta" />
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-file-earmark-excel"></i> Exportar Excel
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

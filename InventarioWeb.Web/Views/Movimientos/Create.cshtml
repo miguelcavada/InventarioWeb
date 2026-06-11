@@ -1,0 +1,174 @@
+﻿@model InventarioWeb.Core.DTOs.MovimientoDto
+@{
+    var esEntrada = Model.Tipo == "ENTRADA";
+    var esSalida = Model.Tipo == "SALIDA";
+    var esTraslado = Model.Tipo == "TRASLADO";
+
+    ViewData["Title"] = esEntrada ? "Nueva Entrada" : esSalida ? "Nueva Salida" : "Nuevo Traslado";
+}
+
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="card">
+            <div class="card-header @(esEntrada ? "bg-success" : esSalida ? "bg-danger" : "bg-info") text-white">
+                <h4 class="mb-0">
+                    <i class="bi @(esEntrada ? "bi-box-arrow-in-down" : esSalida ? "bi-box-arrow-up" : "bi-arrow-left-right")"></i>
+                    @ViewData["Title"]
+                </h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create" id="formMovimiento">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <input type="hidden" asp-for="Tipo" />
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label asp-for="NumeroDocumento" class="form-label"></label>
+                            <input asp-for="NumeroDocumento" class="form-control"
+                                   placeholder="DOC-001" required />
+                            <span asp-validation-for="NumeroDocumento" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="FechaMovimiento" class="form-label"></label>
+                            <input asp-for="FechaMovimiento" class="form-control" type="datetime-local" />
+                            <span asp-validation-for="FechaMovimiento" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Observacion" class="form-label"></label>
+                            <input asp-for="Observacion" class="form-control"
+                                   placeholder="Observaciones..." />
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="AlmacenOrigenId" class="form-label">
+                                @(esTraslado ? "Almacén Origen" : "Almacén") <span class="text-danger">*</span>
+                            </label>
+                            <select asp-for="AlmacenOrigenId" class="form-select" asp-items="ViewBag.Almacenes" required>
+                                <option value="">-- Seleccione un almacén --</option>
+                            </select>
+                        </div>
+                        @if (esTraslado)
+                        {
+                            <div class="col-md-6">
+                                <label asp-for="AlmacenDestinoId" class="form-label">
+                                    Almacén Destino <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="AlmacenDestinoId" class="form-select" asp-items="ViewBag.Almacenes" required>
+                                    <option value="">-- Seleccione almacén destino --</option>
+                                </select>
+                            </div>
+                        }
+                    </div>
+
+                    <hr />
+                    <h5>Detalles del Movimiento</h5>
+
+                    <div id="detallesContainer">
+                        <!-- Los detalles se agregan dinámicamente -->
+                    </div>
+
+                    <button type="button" id="btnAgregarDetalle" class="btn btn-outline-secondary mb-3">
+                        <i class="bi bi-plus-circle"></i> Agregar Producto
+                    </button>
+
+                    <div class="text-end mb-3">
+                        <h4>Total: <span id="totalMovimiento">$0.00</span></h4>
+                    </div>
+
+                    <hr />
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </a>
+                        <button type="submit" class="btn @(esEntrada ? "btn-success" : esSalida ? "btn-danger" : "btn-info")">
+                            <i class="bi bi-save"></i> Registrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        let detalleIndex = 0;
+
+        function agregarDetalle() {
+            const template = `
+                <div class="detalle-item mb-3 border p-3 rounded">
+                    <div class="row g-2">
+                        <div class="col-md-5">
+                            <label class="form-label">Producto</label>
+                            <select name="Detalles[${detalleIndex}].ProductoId" class="form-select producto-select" required>
+                                <option value="">-- Seleccione un producto --</option>
+                                @foreach (var item in ViewBag.Productos)
+                                {
+                                        <option value="@item.Value">@item.Text</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Cantidad</label>
+                            <input name="Detalles[${detalleIndex}].Cantidad" class="form-control cantidad-input"
+                                   type="number" step="0.01" min="0.01" required />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Precio Unitario</label>
+                            <input name="Detalles[${detalleIndex}].PrecioUnitario" class="form-control precio-input"
+                                   type="number" step="0.01" min="0.01" required />
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label">Subtotal</label>
+                            <input class="form-control subtotal-input" readonly />
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="button" class="btn btn-danger btn-remove-detalle">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+
+            $('#detallesContainer').append(template);
+            detalleIndex++;
+            toggleRemoveButtons();
+        }
+
+        function actualizarSubtotales() {
+            let total = 0;
+            $('.detalle-item').each(function() {
+                const cantidad = parseFloat($(this).find('.cantidad-input').val()) || 0;
+                const precio = parseFloat($(this).find('.precio-input').val()) || 0;
+                const subtotal = cantidad * precio;
+                $(this).find('.subtotal-input').val('$' + subtotal.toFixed(2));
+                total += subtotal;
+            });
+            $('#totalMovimiento').text('$' + total.toFixed(2));
+        }
+
+        function toggleRemoveButtons() {
+            const items = $('.detalle-item');
+            items.find('.btn-remove-detalle').toggleClass('d-none', items.length === 1);
+        }
+
+        $(document).on('input', '.cantidad-input, .precio-input', actualizarSubtotales);
+        $(document).on('click', '.btn-remove-detalle', function() {
+            $(this).closest('.detalle-item').remove();
+            toggleRemoveButtons();
+            actualizarSubtotales();
+        });
+
+        $('#btnAgregarDetalle').click(agregarDetalle);
+
+        // Agregar primer detalle al cargar
+        $(document).ready(function() {
+            agregarDetalle();
+        });
+    </script>
+}

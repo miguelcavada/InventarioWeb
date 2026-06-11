@@ -1,0 +1,103 @@
+﻿@model InventarioWeb.Core.Entities.Almacen
+@{
+    ViewData["Title"] = "Detalles del Almacén";
+}
+
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="card">
+            <div class="card-header @(Model.Tipo == "ALMACEN" ? "bg-primary" : "bg-success") text-white">
+                <h4 class="mb-0">
+                    <i class="bi @(Model.Tipo == "ALMACEN" ? "bi-building" : "bi-shop")"></i>
+                    @Model.Nombre
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <dl>
+                            <dt>Código</dt>
+                            <dd><code>@Model.Codigo</code></dd>
+                            <dt>Tipo</dt>
+                            <dd><span class="badge @(Model.Tipo == "ALMACEN" ? "bg-primary" : "bg-success")">@Model.Tipo</span></dd>
+                            <dt>Dirección</dt>
+                            <dd>@Model.Direccion</dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl>
+                            <dt>Encargado</dt>
+                            <dd>@Model.Encargado</dd>
+                            <dt>Teléfono</dt>
+                            <dd>@Model.Telefono</dd>
+                            <dt>Descripción</dt>
+                            <dd>@Model.Descripcion</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <h5><i class="bi bi-box-seam"></i> Productos en este almacén</h5>
+                @if (Model.Stocks != null && Model.Stocks.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Producto</th>
+                                    <th class="text-center">Stock</th>
+                                    <th class="text-center">Mínimo</th>
+                                    <th class="text-center">Máximo</th>
+                                    <th>Ubicación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var stock in Model.Stocks)
+                                {
+                                    <tr class="@(stock.StockActual <= stock.StockMinimo ? "table-danger" : "")">
+                                        <td><code>@stock.Producto?.Codigo</code></td>
+                                        <td>@stock.Producto?.Nombre</td>
+                                        <td class="text-center">@stock.StockActual</td>
+                                        <td class="text-center">@stock.StockMinimo</td>
+                                        <td class="text-center">@stock.StockMaximo</td>
+                                        <td>@stock.Ubicacion</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> No hay productos asignados a este almacén.
+                    </div>
+                }
+
+                <hr />
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <div>
+                        <a asp-controller="Reportes" asp-action="InventarioAlmacen" asp-route-id="@Model.Id"
+                           class="btn btn-info">
+                            <i class="bi bi-clipboard-check"></i> Ver Inventario
+                        </a>
+                        <a asp-controller="Reportes" asp-action="InventarioAlmacenExcel" asp-route-id="@Model.Id"
+                           class="btn btn-success">
+                            <i class="bi bi-file-earmark-excel"></i> Excel
+                        </a>
+                        <a asp-controller="Reportes" asp-action="InventarioAlmacenPdf" asp-route-id="@Model.Id"
+                           class="btn btn-danger">
+                            <i class="bi bi-file-earmark-pdf"></i> PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

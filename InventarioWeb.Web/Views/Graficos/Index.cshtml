@@ -1,0 +1,308 @@
+﻿@{
+    ViewData["Title"] = "Gráficos y Estadísticas";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-bar-chart"></i> Análisis Estadístico</h2>
+</div>
+
+<!-- KPIs -->
+<div class="row mb-4" id="kpiContainer">
+</div>
+
+<!-- Primera fila de gráficos -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-pie-chart"></i> Productos por Categoría</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="graficoCategorias" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-shop"></i> Stock por Almacén</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="graficoAlmacenes" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Segunda fila de gráficos -->
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-graph-up"></i> Movimientos Mensuales - @DateTime.Now.Year</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="graficoMovimientos" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-exclamation-triangle"></i> Estado del Inventario</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="graficoEstadoInventario" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top productos -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-trophy"></i> Top 10 Productos Más Movidos</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="graficoTopProductos" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/chart.js/chart.umd.min.js"></script>
+    <script>
+        // Colores
+        const colores = [
+            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+            '#FF9F40', '#FF6384', '#C9CBCF', '#7BC8A4', '#E8C3B9',
+            '#1ABC9C', '#3498DB', '#9B59B6', '#E74C3C', '#F39C12'
+        ];
+
+        // Cargar KPIs
+        async function cargarKPIs() {
+            const response = await fetch('/Graficos/ResumenInventario');
+            const data = await response.json();
+
+            const kpis = [
+                { titulo: 'Stock Normal', valor: data.stockNormal, color: 'bg-success', icono: 'bi-check-circle' },
+                { titulo: 'Stock Bajo', valor: data.stockBajo, color: 'bg-warning', icono: 'bi-exclamation-triangle' },
+                { titulo: 'Sin Stock', valor: data.sinStock, color: 'bg-danger', icono: 'bi-x-circle' },
+                { titulo: 'Inactivos', valor: data.inactivos, color: 'bg-secondary', icono: 'bi-pause-circle' }
+            ];
+
+            let html = '';
+            kpis.forEach(kpi => {
+                html += `
+                    <div class="col-md-3 mb-3">
+                        <div class="card ${kpi.color} text-white">
+                            <div class="card-body text-center">
+                                <i class="bi ${kpi.icono} display-6"></i>
+                                <h5 class="mt-2">${kpi.titulo}</h5>
+                                <h2>${kpi.valor}</h2>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+
+            document.getElementById('kpiContainer').innerHTML = html;
+        }
+
+        // Gráfico de Categorías (Dona)
+        async function cargarGraficoCategorias() {
+            const response = await fetch('/Graficos/ProductosPorCategoria');
+            const data = await response.json();
+
+            new Chart(document.getElementById('graficoCategorias'), {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(d => d.categoria),
+                    datasets: [{
+                        data: data.map(d => d.cantidad),
+                        backgroundColor: colores,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Distribución de productos por categoría'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Gráfico de Almacenes (Barras Horizontal)
+        async function cargarGraficoAlmacenes() {
+            const response = await fetch('/Graficos/StockPorAlmacen');
+            const data = await response.json();
+
+            new Chart(document.getElementById('graficoAlmacenes'), {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.almacen),
+                    datasets: [{
+                        label: 'Stock Total',
+                        data: data.map(d => d.stockTotal),
+                        backgroundColor: data.map(d => d.tipo === 'ALMACEN' ? '#36A2EB' : '#4BC0C0'),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Unidades'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Gráfico de Movimientos (Líneas)
+        async function cargarGraficoMovimientos() {
+            const response = await fetch('/Graficos/MovimientosPorMes?año=2024');
+            const data = await response.json();
+
+            new Chart(document.getElementById('graficoMovimientos'), {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Entradas',
+                            data: data.entradas,
+                            borderColor: '#4BC0C0',
+                            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Salidas',
+                            data: data.salidas,
+                            borderColor: '#FF6384',
+                            backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Valor ($)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Gráfico de Estado Inventario (Dona)
+        async function cargarGraficoEstadoInventario() {
+            const response = await fetch('/Graficos/ResumenInventario');
+            const data = await response.json();
+
+            new Chart(document.getElementById('graficoEstadoInventario'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Stock Normal', 'Stock Bajo', 'Sin Stock', 'Inactivos'],
+                    datasets: [{
+                        data: [data.stockNormal, data.stockBajo, data.sinStock, data.inactivos],
+                        backgroundColor: ['#4BC0C0', '#FFCE56', '#FF6384', '#C9CBCF'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Gráfico Top Productos (Barras)
+        async function cargarGraficoTopProductos() {
+            const response = await fetch('/Graficos/TopProductosMovidos');
+            const data = await response.json();
+
+            new Chart(document.getElementById('graficoTopProductos'), {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.codigo),
+                    datasets: [{
+                        label: 'Cantidad Total Movida',
+                        data: data.map(d => d.cantidadTotal),
+                        backgroundColor: '#36A2EB',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return data[context[0].dataIndex].producto;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Unidades'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Cargar todos los gráficos
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarKPIs();
+            cargarGraficoCategorias();
+            cargarGraficoAlmacenes();
+            cargarGraficoMovimientos();
+            cargarGraficoEstadoInventario();
+            cargarGraficoTopProductos();
+        });
+    </script>
+}

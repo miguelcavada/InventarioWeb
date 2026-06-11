@@ -1,0 +1,97 @@
+﻿@model InventarioWeb.Core.DTOs.MovimientoDto
+@{
+    var esEntrada = Model.Tipo == "ENTRADA";
+    var esSalida = Model.Tipo == "SALIDA";
+    var esTraslado = Model.Tipo == "TRASLADO";
+    ViewData["Title"] = $"Movimiento #{Model.NumeroDocumento}";
+}
+
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="card">
+            <div class="card-header @(esEntrada ? "bg-success" : esSalida ? "bg-danger" : "bg-info") text-white">
+                <h4 class="mb-0">
+                    <i class="bi @(esEntrada ? "bi-box-arrow-in-down" : esSalida ? "bi-box-arrow-up" : "bi-arrow-left-right")"></i>
+                    @Model.Tipo - @Model.NumeroDocumento
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <strong>Documento:</strong>
+                        <code>@Model.NumeroDocumento</code>
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Fecha:</strong>
+                        @Model.FechaMovimiento.ToString("dd/MM/yyyy HH:mm")
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Origen:</strong>
+                        @Model.AlmacenOrigenNombre
+                    </div>
+                    @if (esTraslado)
+                    {
+                        <div class="col-md-3">
+                            <strong>Destino:</strong>
+                            @Model.AlmacenDestinoNombre
+                        </div>
+                    }
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Observacion))
+                {
+                    <div class="alert alert-info">
+                        <strong>Observación:</strong> @Model.Observacion
+                    </div>
+                }
+
+                <hr />
+                <h5>Productos</h5>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Código</th>
+                                <th>Producto</th>
+                                <th class="text-end">Cantidad</th>
+                                <th class="text-end">Precio Unitario</th>
+                                <th class="text-end">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var detalle in Model.Detalles)
+                            {
+                                <tr>
+                                    <td><code>@detalle.ProductoCodigo</code></td>
+                                    <td>@detalle.ProductoNombre</td>
+                                    <td class="text-end">@detalle.Cantidad.ToString("F2")</td>
+                                    <td class="text-end">@detalle.PrecioUnitario.ToString("C2")</td>
+                                    <td class="text-end">
+                                        <strong>@detalle.Subtotal.ToString("C2")</strong>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr class="table-dark">
+                                <th colspan="4" class="text-end">Total:</th>
+                                <th class="text-end">@Model.Total.ToString("C2")</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <hr />
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                    <a asp-controller="Reportes" asp-action="MovimientoPdf" asp-route-id="@Model.Id"
+                       class="btn btn-danger">
+                        <i class="bi bi-file-earmark-pdf"></i> Descargar PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

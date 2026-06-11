@@ -1,0 +1,175 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="row">
+    <div class="col-12">
+        <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+        <hr />
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Productos</h5>
+                        <h2>@ViewBag.TotalProductos</h2>
+                    </div>
+                    <i class="bi bi-box-seam display-4"></i>
+                </div>
+                <a asp-controller="Productos" asp-action="Index" class="text-white stretched-link"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Entradas</h5>
+                        <h2>@ViewBag.TotalEntradas</h2>
+                    </div>
+                    <i class="bi bi-box-arrow-in-down display-4"></i>
+                </div>
+                <a asp-controller="Movimientos" asp-action="Create" asp-route-tipo="ENTRADA" class="text-white stretched-link"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-danger">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Salidas</h5>
+                        <h2>@ViewBag.TotalSalidas</h2>
+                    </div>
+                    <i class="bi bi-box-arrow-up display-4"></i>
+                </div>
+                <a asp-controller="Movimientos" asp-action="Create" asp-route-tipo="SALIDA" class="text-white stretched-link"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Stock Bajo</h5>
+                        <h2>@ViewBag.StockBajo</h2>
+                    </div>
+                    <i class="bi bi-exclamation-triangle display-4"></i>
+                </div>
+                <a asp-controller="Productos" asp-action="Index" asp-route-orden="stock" class="text-white stretched-link"></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Almacenes</h5>
+                        <h2>@ViewBag.TotalAlmacenes</h2>
+                    </div>
+                    <i class="bi bi-shop display-4"></i>
+                </div>
+                <a asp-controller="Almacenes" asp-action="Index" class="text-white stretched-link"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-secondary">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h5 class="card-title">Traslados</h5>
+                        <h2>@ViewBag.TotalTraslados</h2>
+                    </div>
+                    <i class="bi bi-arrow-left-right display-4"></i>
+                </div>
+                <a asp-controller="Movimientos" asp-action="Create" asp-route-tipo="TRASLADO" class="text-white stretched-link"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5><i class="bi bi-cash-stack"></i> Valor del Inventario</h5>
+            </div>
+            <div class="card-body text-center">
+                <h2 class="text-success">@ViewBag.ValorInventario.ToString("C2")</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-list-check"></i> Acciones Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a asp-controller="Productos" asp-action="Create" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-circle"></i> Nuevo Producto
+                    </a>
+                    <a asp-controller="Movimientos" asp-action="Create" asp-route-tipo="ENTRADA" class="btn btn-outline-success">
+                        <i class="bi bi-box-arrow-in-down"></i> Registrar Entrada
+                    </a>
+                    <a asp-controller="Movimientos" asp-action="Create" asp-route-tipo="SALIDA" class="btn btn-outline-danger">
+                        <i class="bi bi-box-arrow-up"></i> Registrar Salida
+                    </a>
+                    <a asp-controller="Almacenes" asp-action="Create" class="btn btn-outline-info">
+                        <i class="bi bi-building"></i> Nuevo Almacén
+                    </a>
+                    <a asp-controller="Graficos" asp-action="Index" class="btn btn-outline-info">
+                        <i class="bi bi-bar-chart"></i> Ver Gráficos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-clock-history"></i> Últimos Movimientos</h5>
+            </div>
+            <div class="card-body">
+                @if (ViewBag.UltimosMovimientos != null)
+                {
+                    <div class="list-group">
+                        @foreach (var mov in ViewBag.UltimosMovimientos)
+                        {
+                            <a asp-controller="Movimientos" asp-action="Details" asp-route-id="@mov.Id"
+                               class="list-group-item list-group-item-action">
+                                <div class="d-flex justify-content-between">
+                                    <span>
+                                        <span class="badge @(mov.Tipo == "ENTRADA" ? "bg-success" : mov.Tipo == "SALIDA" ? "bg-danger" : "bg-info")">
+                                            @mov.Tipo
+                                        </span>
+                                        <code>@mov.NumeroDocumento</code>
+                                    </span>
+                                    <small class="text-muted">@mov.FechaMovimiento.ToString("dd/MM/yyyy")</small>
+                                </div>
+                                <small class="text-end d-block">@mov.Total.ToString("C2")</small>
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

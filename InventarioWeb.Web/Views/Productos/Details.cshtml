@@ -1,0 +1,144 @@
+﻿@model InventarioWeb.Core.DTOs.ProductoDto
+@{
+    ViewData["Title"] = "Detalles del Producto";
+}
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0"><i class="bi bi-eye"></i> Detalles del Producto</h4>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Código</dt>
+                    <dd class="col-sm-8"><code>@Model.Codigo</code></dd>
+
+                    <dt class="col-sm-4">Nombre</dt>
+                    <dd class="col-sm-8">@Model.Nombre</dd>
+
+                    <dt class="col-sm-4">Descripción</dt>
+                    <dd class="col-sm-8">@Model.Descripcion</dd>
+
+                    <dt class="col-sm-4">Categoría</dt>
+                    <dd class="col-sm-8"><span class="badge bg-info">@Model.CategoriaNombre</span></dd>
+
+                    <dt class="col-sm-4">Precio de Costo</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.PrecioCosto.HasValue)
+                        {
+                            @Model.PrecioCosto.Value.ToString("C2")
+                        }
+                        else
+                        {
+                            <span class="text-muted">No especificado</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4">Precio de Venta</dt>
+                    <dd class="col-sm-8">@Model.PrecioVenta.ToString("C2")</dd>
+
+                    <dt class="col-sm-4">Margen de Ganancia</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.MargenGanancia.HasValue)
+                        {
+                            <span class="badge @(Model.MargenGanancia >= 30 ? "bg-success" : Model.MargenGanancia >= 15 ? "bg-warning" : "bg-danger")">
+                                @Model.MargenGanancia.Value.ToString("F1")%
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Sin costo</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4">Stock Total</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge @(Model.StockTotal <= Model.StockMinimoTotal ? "bg-danger" : "bg-success") fs-6">
+                            @Model.StockTotal unidades
+                        </span>
+                    </dd>
+
+                    <dt class="col-sm-4">Stock Mínimo Total</dt>
+                    <dd class="col-sm-8">@Model.StockMinimoTotal unidades</dd>
+
+                    <dt class="col-sm-4">Valor del Inventario</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.ValorInventario.HasValue)
+                        {
+                            @Model.ValorInventario.Value.ToString("C2")
+                        }
+                        else
+                        {
+                            <span class="text-muted">No disponible (sin costo)</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4">Estado</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.Activo)
+                        {
+                            <span class="badge bg-success">Activo</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inactivo</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4">Fecha de Creación</dt>
+                    <dd class="col-sm-8">@Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</dd>
+                </dl>
+
+                @if (Model.Stocks != null && Model.Stocks.Any())
+                {
+                    <hr />
+                    <h5><i class="bi bi-shop"></i> Stock por Almacén</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Almacén</th>
+                                    <th class="text-center">Stock</th>
+                                    <th class="text-center">Mínimo</th>
+                                    <th class="text-center">Máximo</th>
+                                    <th>Ubicación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var stock in Model.Stocks)
+                                {
+                                    <tr class="@(stock.StockActual <= stock.StockMinimo ? "table-danger" : "")">
+                                        <td>@stock.AlmacenNombre</td>
+                                        <td class="text-center">@stock.StockActual</td>
+                                        <td class="text-center">@stock.StockMinimo</td>
+                                        <td class="text-center">@stock.StockMaximo</td>
+                                        <td>@stock.Ubicacion</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+                <hr />
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                    <div>
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <a asp-action="CambioPrecio" asp-route-id="@Model.Id" class="btn btn-info">
+                            <i class="bi bi-currency-dollar"></i> Cambiar Precios
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

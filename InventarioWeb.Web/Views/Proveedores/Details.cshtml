@@ -1,0 +1,100 @@
+﻿@model InventarioWeb.Core.DTOs.ProveedorDto
+@{
+    ViewData["Title"] = "Detalles del Proveedor";
+}
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0"><i class="bi bi-eye"></i> Detalles del Proveedor</h4>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Nombre</dt>
+                    <dd class="col-sm-8">
+                        <i class="bi bi-building"></i> @Model.Nombre
+                    </dd>
+
+                    <dt class="col-sm-4">RUC</dt>
+                    <dd class="col-sm-8">
+                        @if (!string.IsNullOrEmpty(Model.RUC))
+                        {
+                            <code>@Model.RUC</code>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No registrado</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4">Dirección</dt>
+                    <dd class="col-sm-8">
+                        @if (!string.IsNullOrEmpty(Model.Direccion))
+                        {
+                            <i class="bi bi-geo-alt"></i> 
+                            @Model.Direccion
+                        }
+                        else
+                        {
+                            <span class="text-muted">No registrada</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4">Teléfono</dt>
+                    <dd class="col-sm-8">
+                        @if (!string.IsNullOrEmpty(Model.Telefono))
+                        {
+                            <i class="bi bi-telephone"></i>
+                            <a href="tel:@Model.Telefono">@Model.Telefono</a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No registrado</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4">Email</dt>
+                    <dd class="col-sm-8">
+                        @if (!string.IsNullOrEmpty(Model.Email))
+                        {
+                            <i class="bi bi-envelope"></i>
+                            <a href="mailto:@Model.Email">@Model.Email</a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No registrado</span>
+                        }
+                    </dd>
+
+                    <dt class="col-sm-4">Estado</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.Activo)
+                        {
+                            <span class="badge bg-success">Activo</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inactivo</span>
+                        }
+                    </dd>
+                </dl>
+
+                <hr />
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                    <div>
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
