@@ -12,6 +12,8 @@ public class UnitOfWork : IUnitOfWork
     private IHistorialPrecioRepository? _historialPrecios;
     private IAlmacenRepository? _almacenes;
     private IStockAlmacenRepository? _stockAlmacenes;
+    private IConsignacionRepository? _consignaciones;
+    private IConsignacionDetalleRepository? _consignacionDetalles;
 
     public UnitOfWork(AppDbContext context)
     {
@@ -38,6 +40,12 @@ public class UnitOfWork : IUnitOfWork
 
     public IStockAlmacenRepository StockAlmacenes =>
         _stockAlmacenes ??= new StockAlmacenRepository(_context);
+
+    public IConsignacionRepository Consignaciones =>
+    _consignaciones ??= new ConsignacionRepository(_context);
+
+    public IConsignacionDetalleRepository ConsignacionDetalles =>
+        _consignacionDetalles ??= new ConsignacionDetalleRepository(_context);
 
     public async Task<int> CompleteAsync()
     {

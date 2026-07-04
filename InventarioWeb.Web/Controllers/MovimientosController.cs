@@ -83,49 +83,62 @@ public class MovimientosController : Controller
 
             foreach (var detalle in movimiento.Detalles)
             {
+                // Buscar stock existente
                 var stock = await _unitOfWork.StockAlmacenes
                     .GetStockAsync(detalle.ProductoId, movimiento.AlmacenOrigenId);
 
-                if (stock == null && (movimiento.Tipo == "ENTRADA" || movimiento.Tipo == "TRASLADO"))
-                {
-                    stock = new StockAlmacen
-                    {
-                        ProductoId = detalle.ProductoId,
-                        AlmacenId = movimiento.AlmacenOrigenId,
-                        StockActual = 0,
-                        StockMinimo = 5,
-                        StockMaximo = 100,
-                        FechaCreacion = DateTime.Now,
-                        Activo = true
-                    };
-                    await _unitOfWork.StockAlmacenes.AddAsync(stock);
-                }
-
                 if (movimiento.Tipo == "ENTRADA")
                 {
-                    stock!.StockActual += (int)detalle.Cantidad;
+                    if (stock == null)
+                    {
+                        // Crear nuevo stock
+                        stock = new StockAlmacen
+                        {
+                            ProductoId = detalle.ProductoId,
+                            AlmacenId = movimiento.AlmacenOrigenId,
+                            StockActual = (int)detalle.Cantidad,
+                            StockMinimo = 5,
+                            StockMaximo = 100,
+                            FechaCreacion = DateTime.Now,
+                            Activo = true
+                        };
+                        await _unitOfWork.StockAlmacenes.AddAsync(stock);
+                        await _unitOfWork.CompleteAsync(); // Guardar para obtener ID
+                    }
+                    else
+                    {
+                        stock.StockActual += (int)detalle.Cantidad;
+                        stock.FechaModificacion = DateTime.Now;
+                        await _unitOfWork.StockAlmacenes.UpdateAsync(stock);
+                    }
                 }
                 else if (movimiento.Tipo == "SALIDA")
                 {
                     if (stock == null || stock.StockActual < detalle.Cantidad)
                     {
-                        ModelState.AddModelError("", $"Stock insuficiente en el almacén seleccionado");
+                        ModelState.AddModelError("", $"Stock insuficiente en el almacén seleccionado para {detalle.Producto?.Nombre}");
                         await CargarListasAsync();
                         return View(movimientoDto);
                     }
                     stock.StockActual -= (int)detalle.Cantidad;
+                    stock.FechaModificacion = DateTime.Now;
+                    await _unitOfWork.StockAlmacenes.UpdateAsync(stock);
                 }
                 else if (movimiento.Tipo == "TRASLADO")
                 {
                     if (stock == null || stock.StockActual < detalle.Cantidad)
                     {
-                        ModelState.AddModelError("", "Stock insuficiente para traslado");
+                        ModelState.AddModelError("", $"Stock insuficiente para traslado");
                         await CargarListasAsync();
                         return View(movimientoDto);
                     }
 
+                    // Descontar del origen
                     stock.StockActual -= (int)detalle.Cantidad;
+                    stock.FechaModificacion = DateTime.Now;
+                    await _unitOfWork.StockAlmacenes.UpdateAsync(stock);
 
+                    // Agregar al destino
                     var stockDestino = await _unitOfWork.StockAlmacenes
                         .GetStockAsync(detalle.ProductoId, movimiento.AlmacenDestinoId!.Value);
 
@@ -142,17 +155,14 @@ public class MovimientosController : Controller
                             Activo = true
                         };
                         await _unitOfWork.StockAlmacenes.AddAsync(stockDestino);
+                        await _unitOfWork.CompleteAsync(); // Guardar para obtener ID
                     }
                     else
                     {
                         stockDestino.StockActual += (int)detalle.Cantidad;
+                        stockDestino.FechaModificacion = DateTime.Now;
+                        await _unitOfWork.StockAlmacenes.UpdateAsync(stockDestino);
                     }
-                }
-
-                if (stock != null)
-                {
-                    stock.FechaModificacion = DateTime.Now;
-                    await _unitOfWork.StockAlmacenes.UpdateAsync(stock);
                 }
             }
 

@@ -17,6 +17,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
     public DbSet<HistorialPrecio> HistorialPrecios { get; set; }
     public DbSet<Almacen> Almacenes { get; set; }
     public DbSet<StockAlmacen> StockAlmacenes { get; set; }
+    public DbSet<Consignacion> Consignaciones { get; set; }
+    public DbSet<ConsignacionDetalle> ConsignacionDetalles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -105,6 +107,29 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
 
             entity.HasIndex(h => h.ProductoId);
             entity.HasIndex(h => h.FechaCambio);
+        });
+
+        modelBuilder.Entity<Consignacion>(entity =>
+        {
+            entity.HasIndex(c => c.NumeroConsignacion).IsUnique();
+
+            entity.HasOne(c => c.AlmacenOrigen)
+                  .WithMany()
+                  .HasForeignKey(c => c.AlmacenOrigenId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<ConsignacionDetalle>(entity =>
+        {
+            entity.HasOne(d => d.Consignacion)
+                  .WithMany(c => c.Detalles)
+                  .HasForeignKey(d => d.ConsignacionId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(d => d.Producto)
+                  .WithMany()
+                  .HasForeignKey(d => d.ProductoId)
+                  .OnDelete(DeleteBehavior.Restrict);
         });
 
         // Datos semilla

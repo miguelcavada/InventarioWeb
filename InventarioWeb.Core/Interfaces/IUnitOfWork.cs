@@ -9,5 +9,7 @@ public interface IUnitOfWork : IDisposable
     IHistorialPrecioRepository HistorialPrecios { get; }
     IAlmacenRepository Almacenes { get; }
     IStockAlmacenRepository StockAlmacenes { get; }
+    IConsignacionRepository Consignaciones { get; }
+    IConsignacionDetalleRepository ConsignacionDetalles { get; }
     Task<int> CompleteAsync();
 }
