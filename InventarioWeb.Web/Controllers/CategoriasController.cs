@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using InventarioWeb.Core.Entities;
+﻿using InventarioWeb.Core.Constants;
 using InventarioWeb.Core.DTOs;
+using InventarioWeb.Core.Entities;
 using InventarioWeb.Core.Interfaces;
 using InventarioWeb.Core.Mappings;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace InventarioWeb.Web.Controllers;
 
-[Authorize]
+[Authorize(Roles = Roles.AllRoles)]
 public class CategoriasController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -26,6 +27,7 @@ public class CategoriasController : Controller
     }
 
     // GET: Categorias/Details/5
+    // GET: Categorias/Details/5
     public async Task<IActionResult> Details(int id)
     {
         var categoria = await _unitOfWork.Categorias.GetCategoriaConProductosAsync(id);
@@ -41,7 +43,7 @@ public class CategoriasController : Controller
     }
 
     // GET: Categorias/Create
-    [Authorize(Roles = "Admin,Gerente")]
+    [Authorize(Roles = Roles.AdminOrGerente)]
     public IActionResult Create()
     {
         return View(new CategoriaDto());
@@ -50,7 +52,7 @@ public class CategoriasController : Controller
     // POST: Categorias/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,Gerente")]
+    [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> Create(CategoriaDto categoriaDto)
     {
         if (ModelState.IsValid)
@@ -69,7 +71,7 @@ public class CategoriasController : Controller
     }
 
     // GET: Categorias/Edit/5
-    [Authorize(Roles = "Admin,Gerente")]
+    [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> Edit(int id)
     {
         var categoria = await _unitOfWork.Categorias.GetByIdAsync(id);
@@ -81,7 +83,7 @@ public class CategoriasController : Controller
     // POST: Categorias/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,Gerente")]
+    [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> Edit(int id, CategoriaDto categoriaDto)
     {
         if (id != categoriaDto.Id) return NotFound();
@@ -103,7 +105,7 @@ public class CategoriasController : Controller
     }
 
     // GET: Categorias/Delete/5
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> Delete(int id)
     {
         var categoria = await _unitOfWork.Categorias.GetCategoriaConProductosAsync(id);
@@ -115,7 +117,7 @@ public class CategoriasController : Controller
     // POST: Categorias/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         var categoria = await _unitOfWork.Categorias.GetByIdAsync(id);

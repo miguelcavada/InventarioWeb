@@ -5,6 +5,7 @@ using InventarioWeb.Infrastructure.Services;
 
 namespace InventarioWeb.Web.Controllers;
 
+[AllowAnonymous]
 public class AccountController : Controller
 {
     private readonly IAuthService _authService;

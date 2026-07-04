@@ -16,34 +16,15 @@
                     <div class="alert alert-warning">
                         <h5><i class="bi bi-box"></i> @producto.Nombre</h5>
                         <div class="row">
-                            <div class="col-md-6">
-                                <strong>Precio Costo Actual:</strong>
-                                @if (producto.PrecioCosto.HasValue)
-                                {
-                                    <span class="text-primary">@producto.PrecioCosto.Value.ToString("C2")</span>
-                                }
-                                else
-                                {
-                                    <span class="text-muted">No especificado</span>
-                                }
+                            <div class="col-md-4">
+                                <strong>Costo:</strong> @(producto.PrecioCosto?.ToString("C2") ?? "N/A")
                             </div>
-                            <div class="col-md-6">
-                                <strong>Precio Venta Actual:</strong>
-                                <span class="text-success">@producto.PrecioVenta.ToString("C2")</span>
+                            <div class="col-md-4">
+                                <strong>Minorista:</strong> @producto.PrecioVentaMinorista.ToString("C2")
                             </div>
-                        </div>
-                        <div class="mt-2">
-                            <strong>Margen Actual:</strong>
-                            @if (producto.MargenGanancia.HasValue)
-                            {
-                                <span class="badge @(producto.MargenGanancia >= 30 ? "bg-success" : producto.MargenGanancia >= 15 ? "bg-warning" : "bg-danger")">
-                                    @producto.MargenGanancia.Value.ToString("F1")%
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-secondary">Sin costo</span>
-                            }
+                            <div class="col-md-4">
+                                <strong>Mayorista:</strong> @(producto.PrecioVentaMayorista?.ToString("C2") ?? "N/A")
+                            </div>
                         </div>
                     </div>
                 }
@@ -53,38 +34,32 @@
                     <input type="hidden" asp-for="ProductoId" />
 
                     <div class="mb-3">
-                        <label asp-for="PrecioCostoNuevo" class="form-label">
-                            Nuevo Precio de Costo <small class="text-muted">(opcional)</small>
-                        </label>
+                        <label asp-for="PrecioCostoNuevo" class="form-label">Nuevo Precio de Costo</label>
                         <div class="input-group">
                             <span class="input-group-text">$</span>
-                            <input asp-for="PrecioCostoNuevo" class="form-control" type="number" step="0.01"
-                                   oninput="calcularMargen()" id="precioCosto" placeholder="0.00" />
+                            <input asp-for="PrecioCostoNuevo" class="form-control" type="number" step="0.01" />
                         </div>
-                        <span asp-validation-for="PrecioCostoNuevo" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="PrecioVentaNuevo" class="form-label"></label>
+                        <label asp-for="PrecioVentaMinoristaNuevo" class="form-label">Nuevo Precio Minorista <span class="text-danger">*</span></label>
                         <div class="input-group">
                             <span class="input-group-text">$</span>
-                            <input asp-for="PrecioVentaNuevo" class="form-control" type="number" step="0.01"
-                                   oninput="calcularMargen()" id="precioVenta" />
-                        </div>
-                        <span asp-validation-for="PrecioVentaNuevo" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-3">
-                        <div class="alert alert-info" id="margenInfo">
-                            <strong>Nuevo Margen:</strong> <span id="nuevoMargen">0%</span>
+                            <input asp-for="PrecioVentaMinoristaNuevo" class="form-control" type="number" step="0.01" required />
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="Motivo" class="form-label"></label>
-                        <textarea asp-for="Motivo" class="form-control" rows="3"
-                                  placeholder="Ej: Ajuste por inflación, nuevo proveedor, etc."></textarea>
-                        <span asp-validation-for="Motivo" class="text-danger"></span>
+                        <label asp-for="PrecioVentaMayoristaNuevo" class="form-label">Nuevo Precio Mayorista</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input asp-for="PrecioVentaMayoristaNuevo" class="form-control" type="number" step="0.01" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Motivo" class="form-label">Motivo del Cambio</label>
+                        <textarea asp-for="Motivo" class="form-control" rows="2" placeholder="Ej: Ajuste por inflación"></textarea>
                     </div>
 
                     <hr />
@@ -104,26 +79,4 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script>
-                function calcularMargen() {
-            const costo = parseFloat(document.getElementById('precioCosto').value) || 0;
-            const venta = parseFloat(document.getElementById('precioVenta').value) || 0;
-
-            const margenElement = document.getElementById('nuevoMargen');
-            const margenInfo = document.getElementById('margenInfo');
-
-            if (costo > 0) {
-                const margen = ((venta - costo) / costo * 100);
-                margenElement.textContent = margen.toFixed(1) + '%';
-                margenInfo.className = 'alert ' + (margen >= 30 ? 'alert-success' :
-                                                   margen >= 15 ? 'alert-warning' : 'alert-danger');
-            } else {
-                margenElement.textContent = 'Sin costo';
-                margenInfo.className = 'alert alert-secondary';
-            }
-        }
-
-        // Calcular al cargar
-        calcularMargen();
-    </script>
 }

@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using InventarioWeb.Core.Entities;
+﻿using InventarioWeb.Core.Constants;
 using InventarioWeb.Core.DTOs;
+using InventarioWeb.Core.Entities;
 using InventarioWeb.Core.Interfaces;
 using InventarioWeb.Core.Mappings;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace InventarioWeb.Web.Controllers;
 
-[Authorize]
+[Authorize(Roles = Roles.AllRoles)]
 public class AlmacenesController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -34,7 +35,7 @@ public class AlmacenesController : Controller
     }
 
     // GET: Almacenes/Create
-    [Authorize(Roles = "Admin,Gerente")]
+    [Authorize(Roles = Roles.AdminOrGerente)]
     public IActionResult Create()
     {
         return View(new AlmacenDto());
@@ -43,7 +44,7 @@ public class AlmacenesController : Controller
     // POST: Almacenes/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,Gerente")]
+    [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> Create(AlmacenDto model)
     {
         if (ModelState.IsValid)
@@ -62,7 +63,7 @@ public class AlmacenesController : Controller
     }
 
     // GET: Almacenes/Edit/5
-    [Authorize(Roles = "Admin,Gerente")]
+    [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> Edit(int id)
     {
         var almacen = await _unitOfWork.Almacenes.GetByIdAsync(id);
@@ -75,7 +76,7 @@ public class AlmacenesController : Controller
     // POST: Almacenes/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,Gerente")]
+    [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> Edit(int id, AlmacenDto model)
     {
         if (id != model.Id) return NotFound();
@@ -97,7 +98,7 @@ public class AlmacenesController : Controller
     }
 
     // GET: Almacenes/Delete/5
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> Delete(int id)
     {
         var almacen = await _unitOfWork.Almacenes.GetByIdAsync(id);
@@ -109,7 +110,7 @@ public class AlmacenesController : Controller
     // POST: Almacenes/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         var almacen = await _unitOfWork.Almacenes.GetByIdAsync(id);

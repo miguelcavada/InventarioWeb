@@ -19,6 +19,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
     public DbSet<StockAlmacen> StockAlmacenes { get; set; }
     public DbSet<Consignacion> Consignaciones { get; set; }
     public DbSet<ConsignacionDetalle> ConsignacionDetalles { get; set; }
+    public DbSet<UnidadMedida> UnidadesMedida { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -29,11 +30,17 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
         {
             entity.HasIndex(p => p.Codigo).IsUnique();
             entity.Property(p => p.PrecioCosto).HasColumnType("decimal(18,2)");
-            entity.Property(p => p.PrecioVenta).HasColumnType("decimal(18,2)");
+            entity.Property(p => p.PrecioVentaMinorista).HasColumnType("decimal(18,2)");
+            entity.Property(p => p.PrecioVentaMayorista).HasColumnType("decimal(18,2)");
 
             entity.HasOne(p => p.Categoria)
                   .WithMany(c => c.Productos)
                   .HasForeignKey(p => p.CategoriaId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(p => p.UnidadMedida)
+                  .WithMany(u => u.Productos)
+                  .HasForeignKey(p => p.UnidadMedidaId)
                   .OnDelete(DeleteBehavior.Restrict);
         });
 
@@ -147,8 +154,10 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
                 Nombre = "Laptop HP",
                 Descripcion = "Laptop HP 15 pulgadas",
                 PrecioCosto = 800.00m,
-                PrecioVenta = 1200.00m,
+                PrecioVentaMinorista = 1200.00m,
+                PrecioVentaMayorista = 1100.00m,
                 CategoriaId = 1,
+                UnidadMedidaId = 1,
                 Activo = true,
                 FechaCreacion = DateTime.Now
             },
@@ -159,8 +168,10 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
                 Nombre = "Escritorio",
                 Descripcion = "Escritorio ejecutivo",
                 PrecioCosto = 300.00m,
-                PrecioVenta = 500.00m,
+                PrecioVentaMinorista = 500.00m,
+                PrecioVentaMayorista = 450.00m,
                 CategoriaId = 2,
+                UnidadMedidaId = 1,
                 Activo = true,
                 FechaCreacion = DateTime.Now
             }
@@ -171,6 +182,15 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
             new Almacen { Id = 1, Nombre = "Almacén Central", Codigo = "ALM-CENTRAL", Tipo = "ALMACEN", Direccion = "Calle Principal #123", Activo = true, FechaCreacion = DateTime.Now },
             new Almacen { Id = 2, Nombre = "Mercado Norte", Codigo = "MER-NORTE", Tipo = "MERCADO", Direccion = "Av. Norte #456", Activo = true, FechaCreacion = DateTime.Now },
             new Almacen { Id = 3, Nombre = "Mercado Sur", Codigo = "MER-SUR", Tipo = "MERCADO", Direccion = "Av. Sur #789", Activo = true, FechaCreacion = DateTime.Now }
+        );
+
+        modelBuilder.Entity<UnidadMedida>().HasData(
+            new UnidadMedida { Id = 1, Nombre = "Unidad", Abreviatura = "U", Descripcion = "Unidad individual", Activo = true, FechaCreacion = DateTime.Now },
+            new UnidadMedida { Id = 2, Nombre = "Kilogramo", Abreviatura = "Kg", Descripcion = "Peso en kilogramos", Activo = true, FechaCreacion = DateTime.Now },
+            new UnidadMedida { Id = 3, Nombre = "Litro", Abreviatura = "L", Descripcion = "Volumen en litros", Activo = true, FechaCreacion = DateTime.Now },
+            new UnidadMedida { Id = 4, Nombre = "Metro", Abreviatura = "m", Descripcion = "Longitud en metros", Activo = true, FechaCreacion = DateTime.Now },
+            new UnidadMedida { Id = 5, Nombre = "Caja", Abreviatura = "Cja", Descripcion = "Caja o paquete", Activo = true, FechaCreacion = DateTime.Now },
+            new UnidadMedida { Id = 6, Nombre = "Docena", Abreviatura = "Doc", Descripcion = "Conjunto de 12 unidades", Activo = true, FechaCreacion = DateTime.Now }
         );
     }
 }

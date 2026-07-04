@@ -32,20 +32,20 @@ public class ReportService : IReportService
         // Encabezados
         worksheet.Cell(1, 1).Value = "CÓDIGO";
         worksheet.Cell(1, 2).Value = "NOMBRE";
-        worksheet.Cell(1, 3).Value = "CATEGORÍA";
-        worksheet.Cell(1, 4).Value = "PRECIO COSTO";
-        worksheet.Cell(1, 5).Value = "PRECIO VENTA";
-        worksheet.Cell(1, 6).Value = "STOCK TOTAL";
-        worksheet.Cell(1, 7).Value = "ESTADO";
+        worksheet.Cell(1, 3).Value = "UNIDAD";
+        worksheet.Cell(1, 4).Value = "CATEGORÍA";
+        worksheet.Cell(1, 5).Value = "PRECIO COSTO";
+        worksheet.Cell(1, 6).Value = "PRECIO MINORISTA";
+        worksheet.Cell(1, 7).Value = "PRECIO MAYORISTA";
+        worksheet.Cell(1, 8).Value = "STOCK TOTAL";
+        worksheet.Cell(1, 9).Value = "ESTADO";
 
-        // Estilo de encabezados
-        var headerRange = worksheet.Range(1, 1, 1, 7);
+        var headerRange = worksheet.Range(1, 1, 1, 9);
         headerRange.Style.Font.Bold = true;
         headerRange.Style.Fill.BackgroundColor = XLColor.FromArgb(52, 58, 64);
         headerRange.Style.Font.FontColor = XLColor.White;
         headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-        // Datos
         int row = 2;
         foreach (var producto in productos)
         {
@@ -54,29 +54,28 @@ public class ReportService : IReportService
 
             worksheet.Cell(row, 1).Value = producto.Codigo ?? "";
             worksheet.Cell(row, 2).Value = producto.Nombre ?? "";
-            worksheet.Cell(row, 3).Value = producto.Categoria?.Nombre ?? "Sin categoría";
-            worksheet.Cell(row, 4).Value = producto.PrecioCosto ?? 0;
-            worksheet.Cell(row, 5).Value = producto.PrecioVenta;
-            worksheet.Cell(row, 6).Value = stockTotal;
-            worksheet.Cell(row, 7).Value = producto.Activo ? "Activo" : "Inactivo";
+            worksheet.Cell(row, 3).Value = producto.UnidadMedida?.Abreviatura ?? "";
+            worksheet.Cell(row, 4).Value = producto.Categoria?.Nombre ?? "Sin categoría";
+            worksheet.Cell(row, 5).Value = producto.PrecioCosto ?? 0;
+            worksheet.Cell(row, 6).Value = producto.PrecioVentaMinorista;
+            worksheet.Cell(row, 7).Value = producto.PrecioVentaMayorista ?? 0;
+            worksheet.Cell(row, 8).Value = stockTotal;
+            worksheet.Cell(row, 9).Value = producto.Activo ? "Activo" : "Inactivo";
 
-            // Formato moneda
-            worksheet.Cell(row, 4).Style.NumberFormat.Format = "$ #,##0.00";
             worksheet.Cell(row, 5).Style.NumberFormat.Format = "$ #,##0.00";
+            worksheet.Cell(row, 6).Style.NumberFormat.Format = "$ #,##0.00";
+            worksheet.Cell(row, 7).Style.NumberFormat.Format = "$ #,##0.00";
 
-            // Colorear stock bajo
             if (stockTotal <= stockMinimo && stockTotal > 0)
             {
-                worksheet.Cell(row, 6).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 200, 200);
+                worksheet.Cell(row, 8).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 200, 200);
             }
 
             row++;
         }
 
-        // Ajustar columnas
         worksheet.Columns().AdjustToContents();
 
-        // Totales
         int totalRow = row + 1;
         worksheet.Cell(totalRow, 1).Value = "TOTAL PRODUCTOS:";
         worksheet.Cell(totalRow, 2).Value = productos.Count();
@@ -96,12 +95,14 @@ public class ReportService : IReportService
                 page.Size(PageSizes.A4);
                 page.Margin(2, Unit.Centimetre);
                 page.PageColor(Colors.White);
-                page.DefaultTextStyle(x => x.FontSize(10));
+                page.DefaultTextStyle(x => x.FontSize(9));
 
                 page.Header()
                     .AlignCenter()
                     .Text("REPORTE DE PRODUCTOS")
-                    .SemiBold().FontSize(20).FontColor(Colors.Blue.Medium);
+                    .SemiBold()
+                    .FontSize(18)
+                    .FontColor(Colors.Blue.Medium);
 
                 page.Content()
                     .PaddingVertical(1, Unit.Centimetre)
@@ -109,42 +110,37 @@ public class ReportService : IReportService
                     {
                         table.ColumnsDefinition(columns =>
                         {
-                            columns.RelativeColumn(1.5f);
-                            columns.RelativeColumn(3);
-                            columns.RelativeColumn(2);
-                            columns.RelativeColumn(2);
-                            columns.RelativeColumn(1.5f);
+                            columns.RelativeColumn(1.5f); // Código
+                            columns.RelativeColumn(2.5f); // Nombre
+                            columns.RelativeColumn(1);    // Unidad
+                            columns.RelativeColumn(1.5f); // Categoría
+                            columns.RelativeColumn(1.5f); // Precio Minorista
+                            columns.RelativeColumn(1.5f); // Precio Mayorista
+                            columns.RelativeColumn(1);    // Stock
                         });
 
                         table.Header(header =>
                         {
-                            header.Cell().Element(CellStyle).Text("CÓDIGO");
-                            header.Cell().Element(CellStyle).Text("NOMBRE");
-                            header.Cell().Element(CellStyle).Text("CATEGORÍA");
-                            header.Cell().Element(CellStyle).AlignRight().Text("PRECIO");
-                            header.Cell().Element(CellStyle).AlignCenter().Text("STOCK");
-
-                            static IContainer CellStyle(IContainer container)
-                            {
-                                return container
-                                    .DefaultTextStyle(x => x.SemiBold())
-                                    .PaddingVertical(5)
-                                    .BorderBottom(1)
-                                    .BorderColor(Colors.Black);
-                            }
+                            header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).Text("CÓDIGO");
+                            header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).Text("NOMBRE");
+                            header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).Text("UNI");
+                            header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).Text("CATEGORÍA");
+                            header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).AlignRight().Text("MINORISTA");
+                            header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).AlignRight().Text("MAYORISTA");
+                            header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).AlignCenter().Text("STOCK");
                         });
 
                         foreach (var producto in productos)
                         {
                             var stockTotal = producto.Stocks?.Sum(s => s.StockActual) ?? 0;
 
-                            table.Cell().PaddingVertical(3).Text(producto.Codigo ?? "");
-                            table.Cell().PaddingVertical(3).Text(producto.Nombre ?? "");
-                            table.Cell().PaddingVertical(3).Text(producto.Categoria?.Nombre ?? "N/A");
-                            table.Cell().PaddingVertical(3).AlignRight()
-                                .Text($"${producto.PrecioVenta:N2}");
-                            table.Cell().PaddingVertical(3).AlignCenter()
-                                .Text(stockTotal.ToString());
+                            table.Cell().PaddingVertical(2).Text(producto.Codigo ?? "");
+                            table.Cell().PaddingVertical(2).Text(producto.Nombre ?? "");
+                            table.Cell().PaddingVertical(2).Text(producto.UnidadMedida?.Abreviatura ?? "");
+                            table.Cell().PaddingVertical(2).Text(producto.Categoria?.Nombre ?? "N/A");
+                            table.Cell().PaddingVertical(2).AlignRight().Text($"${producto.PrecioVentaMinorista:N2}");
+                            table.Cell().PaddingVertical(2).AlignRight().Text(producto.PrecioVentaMayorista.HasValue ? $"${producto.PrecioVentaMayorista:N2}" : "N/A");
+                            table.Cell().PaddingVertical(2).AlignCenter().Text(stockTotal.ToString());
                         }
                     });
 

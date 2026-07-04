@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using InventarioWeb.Core.Entities;
+﻿using InventarioWeb.Core.Constants;
 using InventarioWeb.Core.DTOs;
+using InventarioWeb.Core.Entities;
 using InventarioWeb.Core.Interfaces;
 using InventarioWeb.Core.Mappings;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace InventarioWeb.Web.Controllers;
 
-[Authorize]
+[Authorize(Roles = Roles.AdminGerenteOperador)]
 public class ConsignacionesController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -36,7 +37,7 @@ public class ConsignacionesController : Controller
     }
 
     // GET: Consignaciones/Create
-    [Authorize(Roles = "Admin,Gerente,Operador")]
+    [Authorize(Roles = Roles.AdminGerenteOperador)]
     public async Task<IActionResult> Create()
     {
         await CargarListasAsync();
@@ -52,7 +53,7 @@ public class ConsignacionesController : Controller
     // POST: Consignaciones/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,Gerente,Operador")]
+    [Authorize(Roles = Roles.AdminGerenteOperador)]
     public async Task<IActionResult> Create(ConsignacionDto model)
     {
         if (ModelState.IsValid)
@@ -129,7 +130,7 @@ public class ConsignacionesController : Controller
     // POST: Consignaciones/RegistrarVenta
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,Gerente,Operador")]
+    [Authorize(Roles = Roles.AdminGerenteOperador)]
     public async Task<IActionResult> RegistrarVenta(RegistrarVentaDto model)
     {
         var detalle = await _unitOfWork.ConsignacionDetalles.GetByIdAsync(model.ConsignacionDetalleId);
@@ -170,7 +171,7 @@ public class ConsignacionesController : Controller
     // POST: Consignaciones/RegistrarDevolucion
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,Gerente,Operador")]
+    [Authorize(Roles = Roles.AdminGerenteOperador)]
     public async Task<IActionResult> RegistrarDevolucion(RegistrarDevolucionDto model)
     {
         var detalle = await _unitOfWork.ConsignacionDetalles.GetByIdAsync(model.ConsignacionDetalleId);

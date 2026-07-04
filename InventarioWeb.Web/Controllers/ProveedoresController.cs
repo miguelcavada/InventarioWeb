@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using InventarioWeb.Core.Entities;
+﻿using InventarioWeb.Core.Constants;
 using InventarioWeb.Core.DTOs;
+using InventarioWeb.Core.Entities;
 using InventarioWeb.Core.Interfaces;
 using InventarioWeb.Core.Mappings;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace InventarioWeb.Web.Controllers;
 
+[Authorize(Roles = Roles.AllRoles)]
 public class ProveedoresController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -43,6 +46,7 @@ public class ProveedoresController : Controller
     }
 
     // GET: Proveedores/Create
+    [Authorize(Roles = Roles.AdminOrGerente)]
     public IActionResult Create()
     {
         return View(new ProveedorDto());
@@ -51,6 +55,7 @@ public class ProveedoresController : Controller
     // POST: Proveedores/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> Create(ProveedorDto proveedorDto)
     {
         if (!string.IsNullOrEmpty(proveedorDto.RUC))
@@ -77,6 +82,7 @@ public class ProveedoresController : Controller
     }
 
     // GET: Proveedores/Edit/5
+    [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> Edit(int id)
     {
         var proveedor = await _unitOfWork.Proveedores.GetByIdAsync(id);
@@ -88,6 +94,7 @@ public class ProveedoresController : Controller
     // POST: Proveedores/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> Edit(int id, ProveedorDto proveedorDto)
     {
         if (id != proveedorDto.Id) return NotFound();
@@ -117,6 +124,7 @@ public class ProveedoresController : Controller
     }
 
     // GET: Proveedores/Delete/5
+    [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> Delete(int id)
     {
         var proveedor = await _unitOfWork.Proveedores.GetByIdAsync(id);
@@ -128,6 +136,7 @@ public class ProveedoresController : Controller
     // POST: Proveedores/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         var proveedor = await _unitOfWork.Proveedores.GetByIdAsync(id);

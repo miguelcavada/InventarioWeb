@@ -56,8 +56,11 @@
                                     <tr>
                                         <th>Código</th>
                                         <th>Producto</th>
-                                        <th class="text-end">Precio Venta</th>
-                                        <th class="text-center">Stock Total</th>
+                                        <th>Unidad</th>
+                                        <th class="text-end">Costo</th>
+                                        <th class="text-end">Minorista</th>
+                                        <th class="text-end">Mayorista</th>
+                                        <th class="text-center">Stock</th>
                                         <th>Estado</th>
                                         <th class="text-center">Acciones</th>
                                     </tr>
@@ -68,10 +71,19 @@
                                         <tr>
                                             <td><code>@producto.Codigo</code></td>
                                             <td>@producto.Nombre</td>
-                                            <td class="text-end">@producto.PrecioVenta.ToString("C2")</td>
+                                            <td><span class="badge bg-secondary">@producto.UnidadMedidaAbreviatura</span></td>
+                                            <td class="text-end">
+                                                @(producto.PrecioCosto?.ToString("C2") ?? "-")
+                                            </td>
+                                            <td class="text-end">
+                                                <strong>@producto.PrecioVentaMinorista.ToString("C2")</strong>
+                                            </td>
+                                            <td class="text-end">
+                                                @(producto.PrecioVentaMayorista?.ToString("C2") ?? "-")
+                                            </td>
                                             <td class="text-center">
                                                 <span class="badge @(producto.StockTotal <= producto.StockMinimoTotal ? "bg-danger" : "bg-success")">
-                                                    @producto.StockTotal
+                                                    @producto.StockTotal @producto.UnidadMedidaAbreviatura
                                                 </span>
                                             </td>
                                             <td>

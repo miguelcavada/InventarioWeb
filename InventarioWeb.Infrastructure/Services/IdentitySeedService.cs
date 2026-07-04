@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using InventarioWeb.Core.Constants;
 using InventarioWeb.Core.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventarioWeb.Infrastructure.Services;
 
@@ -25,7 +26,7 @@ public class IdentitySeedService : IIdentitySeedService
     public async Task SeedAsync()
     {
         // Crear roles si no existen
-        var roles = new[] { "Admin", "Gerente", "Operador", "Consulta" };
+        var roles = new[] { Roles.Admin, Roles.Gerente, Roles.Operador, Roles.Consulta };
 
         foreach (var roleName in roles)
         {
@@ -59,7 +60,7 @@ public class IdentitySeedService : IIdentitySeedService
             var result = await _userManager.CreateAsync(adminUser, "Admin123!");
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(adminUser, "Admin");
+                await _userManager.AddToRoleAsync(adminUser, Roles.Admin);
             }
         }
 
@@ -82,7 +83,7 @@ public class IdentitySeedService : IIdentitySeedService
             var result = await _userManager.CreateAsync(gerenteUser, "Gerente123!");
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(gerenteUser, "Gerente");
+                await _userManager.AddToRoleAsync(gerenteUser, Roles.Gerente);
             }
         }
 
@@ -105,7 +106,7 @@ public class IdentitySeedService : IIdentitySeedService
             var result = await _userManager.CreateAsync(operadorUser, "Operador123!");
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(operadorUser, "Operador");
+                await _userManager.AddToRoleAsync(operadorUser, Roles.Operador);
             }
         }
 
@@ -128,7 +129,7 @@ public class IdentitySeedService : IIdentitySeedService
             var result = await _userManager.CreateAsync(consultaUser, "Consulta123!");
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(consultaUser, "Consulta");
+                await _userManager.AddToRoleAsync(consultaUser, Roles.Consulta);
             }
         }
     }

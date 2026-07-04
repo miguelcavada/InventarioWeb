@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using InventarioWeb.Core.Entities;
+﻿using InventarioWeb.Core.Constants;
 using InventarioWeb.Core.DTOs;
+using InventarioWeb.Core.Entities;
 using InventarioWeb.Core.Interfaces;
 using InventarioWeb.Core.Mappings;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace InventarioWeb.Web.Controllers;
 
-[Authorize]
+[Authorize(Roles = Roles.AdminGerenteOperador)]
 public class MovimientosController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;

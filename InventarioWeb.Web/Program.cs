@@ -1,3 +1,4 @@
+using InventarioWeb.Core.Constants;
 using InventarioWeb.Core.Entities;
 using InventarioWeb.Core.Interfaces;
 using InventarioWeb.Infrastructure.Data;
@@ -38,9 +39,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 // ===== POLÍTICAS DE AUTORIZACIÓN =====
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("RequireGerenteRole", policy => policy.RequireRole("Admin", "Gerente"));
-    options.AddPolicy("RequireOperadorRole", policy => policy.RequireRole("Admin", "Gerente", "Operador"));
+    options.AddPolicy(Policies.RequireAdmin, policy => policy.RequireRole(Roles.Admin));
+    options.AddPolicy(Policies.RequireGerente, policy => policy.RequireRole(Roles.Admin, Roles.Gerente));
+    options.AddPolicy(Policies.RequireOperador, policy => policy.RequireRole(Roles.Admin, Roles.Gerente, Roles.Operador));
+    options.AddPolicy(Policies.RequireConsulta, policy => policy.RequireRole(Roles.Admin, Roles.Gerente, Roles.Operador, Roles.Consulta));
 });
 
 // ===== MVC =====

@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using InventarioWeb.Core.Constants;
 using InventarioWeb.Core.DTOs;
 using InventarioWeb.Infrastructure.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace InventarioWeb.Web.Controllers;
 
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = Roles.AdminOnly)]
 public class AdminController : Controller
 {
     private readonly IAuthService _authService;

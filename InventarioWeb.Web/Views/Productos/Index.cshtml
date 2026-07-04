@@ -76,10 +76,12 @@
                     <tr>
                         <th>Código</th>
                         <th>Nombre</th>
+                        <th>Unidad</th>
                         <th>Categoría</th>
-                        <th class="text-end">Precio Costo</th>
-                        <th class="text-end">Precio Venta</th>
-                        <th class="text-center">Stock Total</th>
+                        <th class="text-end">Costo</th>
+                        <th class="text-end">Minorista</th>
+                        <th class="text-end">Mayorista</th>
+                        <th class="text-center">Stock</th>
                         <th>Estado</th>
                         <th class="text-center">Acciones</th>
                     </tr>
@@ -87,63 +89,27 @@
                 <tbody>
                     @foreach (var item in Model)
                     {
-                        var stockClass = item.StockTotal <= item.StockMinimoTotal && item.StockTotal > 0 ? "table-danger" : "";
-                        <tr class="@stockClass">
+                        <tr class="@(item.StockTotal <= item.StockMinimoTotal && item.StockTotal > 0 ? "table-danger" : "")">
                             <td><code>@item.Codigo</code></td>
                             <td>@item.Nombre</td>
+                            <td><span class="badge bg-secondary">@item.UnidadMedidaAbreviatura</span></td>
                             <td><span class="badge bg-info">@item.CategoriaNombre</span></td>
-                            <td class="text-end">
-                                @if (item.PrecioCosto.HasValue)
-                                {
-                                    @item.PrecioCosto.Value.ToString("C2")
-                                }
-                                else
-                                {
-                                    <span class="text-muted">-</span>
-                                }
-                            </td>
-                            <td class="text-end">@item.PrecioVenta.ToString("C2")</td>
+                            <td class="text-end">@(item.PrecioCosto?.ToString("C2") ?? "-")</td>
+                            <td class="text-end">@item.PrecioVentaMinorista.ToString("C2")</td>
+                            <td class="text-end">@(item.PrecioVentaMayorista?.ToString("C2") ?? "-")</td>
                             <td class="text-center">
-                                <span class="badge @(item.StockTotal <= item.StockMinimoTotal ? "bg-danger" : "bg-success") fs-6">
-                                    @item.StockTotal
+                                <span class="badge @(item.StockTotal <= item.StockMinimoTotal ? "bg-danger" : "bg-success")">
+                                    @item.StockTotal @item.UnidadMedidaAbreviatura
                                 </span>
-                                @if (item.StockTotal <= item.StockMinimoTotal && item.StockTotal > 0)
-                                {
-                                    <i class="bi bi-exclamation-triangle-fill text-warning" title="Stock bajo"></i>
-                                }
                             </td>
-                            <td>
-                                @if (item.Activo)
-                                {
-                                    <span class="badge bg-success">Activo</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">Inactivo</span>
-                                }
-                            </td>
+                            <td>@(item.Activo ? "Activo" : "Inactivo")</td>
                             <td class="text-center">
                                 <div class="btn-group btn-group-sm">
-                                    <a asp-action="Details" asp-route-id="@item.Id"
-                                       class="btn btn-info" title="Ver detalles">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    <a asp-action="Edit" asp-route-id="@item.Id"
-                                       class="btn btn-warning" title="Editar">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <a asp-action="CambioPrecio" asp-route-id="@item.Id"
-                                       class="btn btn-info" title="Cambiar Precio">
-                                        <i class="bi bi-currency-dollar"></i>
-                                    </a>
-                                    <a asp-action="HistorialPrecios" asp-route-id="@item.Id"
-                                       class="btn btn-outline-info" title="Historial">
-                                        <i class="bi bi-clock-history"></i>
-                                    </a>
-                                    <a asp-action="Delete" asp-route-id="@item.Id"
-                                       class="btn btn-danger" title="Eliminar">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info" title="Ver"><i class="bi bi-eye"></i></a>
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning" title="Editar"><i class="bi bi-pencil"></i></a>
+                                    <a asp-action="CambioPrecio" asp-route-id="@item.Id" class="btn btn-info" title="Cambiar Precio"><i class="bi bi-currency-dollar"></i></a>
+                                    <a asp-action="HistorialPrecios" asp-route-id="@item.Id" class="btn btn-outline-info" title="Historial"><i class="bi bi-clock-history"></i></a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" title="Eliminar"><i class="bi bi-trash"></i></a>
                                 </div>
                             </td>
                         </tr>

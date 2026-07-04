@@ -11,10 +11,14 @@ public class CambioPrecioDto
     [Column(TypeName = "decimal(18,2)")]
     public decimal? PrecioCostoNuevo { get; set; }
 
-    [Required(ErrorMessage = "El precio de venta es obligatorio")]
-    [Display(Name = "Nuevo Precio de Venta")]
+    [Required(ErrorMessage = "El precio de venta minorista es obligatorio")]
+    [Display(Name = "Nuevo Precio Venta Minorista")]
     [Column(TypeName = "decimal(18,2)")]
-    public decimal PrecioVentaNuevo { get; set; }
+    public decimal PrecioVentaMinoristaNuevo { get; set; }
+
+    [Display(Name = "Nuevo Precio Venta Mayorista")]
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal? PrecioVentaMayoristaNuevo { get; set; }
 
     [StringLength(500)]
     [Display(Name = "Motivo del Cambio")]

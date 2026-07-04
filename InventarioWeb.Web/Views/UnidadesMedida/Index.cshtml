@@ -1,0 +1,59 @@
+﻿@model IEnumerable<InventarioWeb.Core.DTOs.UnidadMedidaDto>
+@{
+    ViewData["Title"] = "Unidades de Medida";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-rulers"></i> Unidades de Medida</h2>
+    @if (User.IsInRole("Admin") || User.IsInRole("Gerente"))
+    {
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Nueva Unidad
+        </a>
+    }
+</div>
+
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        <i class="bi bi-check-circle"></i> @TempData["Mensaje"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="row">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h1 class="display-4 text-primary">@item.Abreviatura</h1>
+                    <h5 class="card-title">@item.Nombre</h5>
+                    @if (!string.IsNullOrEmpty(item.Descripcion))
+                    {
+                        <p class="card-text text-muted">@item.Descripcion</p>
+                    }
+                    <span class="badge bg-info">@item.TotalProductos productos</span>
+                    @if (item.Activo)
+                    {
+                        <span class="badge bg-success">Activo</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Inactivo</span>
+                    }
+                </div>
+                @if (User.IsInRole("Admin") || User.IsInRole("Gerente"))
+                {
+                    <div class="card-footer">
+                        <div class="btn-group btn-group-sm w-100">
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

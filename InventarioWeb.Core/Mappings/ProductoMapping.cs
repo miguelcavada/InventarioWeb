@@ -16,24 +16,22 @@ public static class ProductoMapping
             Nombre = producto.Nombre,
             Descripcion = producto.Descripcion,
             PrecioCosto = producto.PrecioCosto,
-            PrecioVenta = producto.PrecioVenta,
+            PrecioVentaMinorista = producto.PrecioVentaMinorista,
+            PrecioVentaMayorista = producto.PrecioVentaMayorista,
             CategoriaId = producto.CategoriaId,
             CategoriaNombre = producto.Categoria?.Nombre,
+            UnidadMedidaId = producto.UnidadMedidaId,
+            UnidadMedidaNombre = producto.UnidadMedida?.Nombre,
+            UnidadMedidaAbreviatura = producto.UnidadMedida?.Abreviatura,
             FechaCreacion = producto.FechaCreacion,
             Activo = producto.Activo,
-
-            // Calcular desde los stocks
             StockTotal = producto.Stocks?.Sum(s => s.StockActual) ?? 0,
             StockMinimoTotal = producto.Stocks?.Sum(s => s.StockMinimo) ?? 0,
-
-            MargenGanancia = producto.PrecioCosto.HasValue && producto.PrecioCosto > 0
-                ? ((producto.PrecioVenta - producto.PrecioCosto.Value) / producto.PrecioCosto.Value * 100)
-                : null,
-
+            MargenGananciaMinorista = producto.MargenGananciaMinorista,
+            MargenGananciaMayorista = producto.MargenGananciaMayorista,
             ValorInventario = producto.PrecioCosto.HasValue
                 ? (producto.Stocks?.Sum(s => s.StockActual) ?? 0) * producto.PrecioCosto.Value
                 : null,
-
             Stocks = producto.Stocks?.Select(s => s.ToDto()).ToList()
         };
     }
@@ -47,8 +45,10 @@ public static class ProductoMapping
             Nombre = dto.Nombre,
             Descripcion = dto.Descripcion,
             PrecioCosto = dto.PrecioCosto,
-            PrecioVenta = dto.PrecioVenta,
+            PrecioVentaMinorista = dto.PrecioVentaMinorista,
+            PrecioVentaMayorista = dto.PrecioVentaMayorista,
             CategoriaId = dto.CategoriaId,
+            UnidadMedidaId = dto.UnidadMedidaId,
             FechaCreacion = dto.FechaCreacion,
             Activo = dto.Activo
         };
@@ -60,8 +60,10 @@ public static class ProductoMapping
         producto.Nombre = dto.Nombre;
         producto.Descripcion = dto.Descripcion;
         producto.PrecioCosto = dto.PrecioCosto;
-        producto.PrecioVenta = dto.PrecioVenta;
+        producto.PrecioVentaMinorista = dto.PrecioVentaMinorista;
+        producto.PrecioVentaMayorista = dto.PrecioVentaMayorista;
         producto.CategoriaId = dto.CategoriaId;
+        producto.UnidadMedidaId = dto.UnidadMedidaId;
         producto.FechaModificacion = DateTime.Now;
     }
 }

@@ -18,6 +18,7 @@ namespace InventarioWeb.Infrastructure.Repositories
         {
             return await _context.Productos
                 .Include(p => p.Categoria)
+                .Include(p => p.UnidadMedida)
                 .Include(p => p.Stocks)
                     .ThenInclude(s => s.Almacen)
                 .ToListAsync();
@@ -27,6 +28,7 @@ namespace InventarioWeb.Infrastructure.Repositories
         {
             return await _context.Productos
                 .Include(p => p.Categoria)
+                .Include(p => p.UnidadMedida)
                 .Include(p => p.Stocks)
                     .ThenInclude(s => s.Almacen)
                 .FirstOrDefaultAsync(p => p.Id == id);

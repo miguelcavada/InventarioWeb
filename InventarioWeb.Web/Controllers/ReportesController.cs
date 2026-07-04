@@ -3,9 +3,12 @@ using InventarioWeb.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using InventarioWeb.Core.Mappings;
+using Microsoft.AspNetCore.Authorization;
+using InventarioWeb.Core.Constants;
 
 namespace InventarioWeb.Web.Controllers;
 
+[Authorize(Roles = Roles.AllRoles)]
 public class ReportesController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;

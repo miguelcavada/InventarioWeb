@@ -1,15 +1,16 @@
-﻿using System.Security.Claims;
+﻿using InventarioWeb.Core.Constants;
+using InventarioWeb.Core.DTOs;
+using InventarioWeb.Core.Entities;
+using InventarioWeb.Core.Interfaces;
+using InventarioWeb.Core.Mappings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using InventarioWeb.Core.Entities;
-using InventarioWeb.Core.DTOs;
-using InventarioWeb.Core.Interfaces;
-using InventarioWeb.Core.Mappings;
+using System.Security.Claims;
 
 namespace InventarioWeb.Web.Controllers;
 
-[Authorize]
+[Authorize(Roles = Roles.AllRoles)]
 public class ProductosController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;
@@ -35,7 +36,7 @@ public class ProductosController : Controller
         {
             "codigo" => productos.OrderBy(p => p.Codigo),
             "stock" => productos.OrderByDescending(p => p.Stocks.Sum(s => s.StockActual)),
-            "precio" => productos.OrderBy(p => p.PrecioVenta),
+            "precio" => productos.OrderBy(p => p.PrecioVentaMinorista),
             _ => productos.OrderBy(p => p.Nombre),
         };
 
@@ -53,17 +54,17 @@ public class ProductosController : Controller
     }
 
     // GET: Productos/Create
-    [Authorize(Roles = "Admin,Gerente")]
+    [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> Create()
     {
-        await CargarCategoriasAsync();
+        await CargarListasAsync();
         return View(new ProductoDto());
     }
 
     // POST: Productos/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,Gerente")]
+    [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> Create(ProductoDto productoDto)
     {
         if (await _unitOfWork.Productos.CodigoExisteAsync(productoDto.Codigo))
@@ -82,25 +83,25 @@ public class ProductosController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        await CargarCategoriasAsync();
+        await CargarListasAsync();
         return View(productoDto);
     }
 
     // GET: Productos/Edit/5
-    [Authorize(Roles = "Admin,Gerente")]
+    [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> Edit(int id)
     {
         var producto = await _unitOfWork.Productos.GetByIdAsync(id);
         if (producto == null) return NotFound();
 
-        await CargarCategoriasAsync(producto.CategoriaId);
+        await CargarListasAsync(producto.CategoriaId, producto.UnidadMedidaId);
         return View(producto.ToDto());
     }
 
     // POST: Productos/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,Gerente")]
+    [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> Edit(int id, ProductoDto productoDto)
     {
         if (id != productoDto.Id) return NotFound();
@@ -122,12 +123,12 @@ public class ProductosController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        await CargarCategoriasAsync(productoDto.CategoriaId);
+        await CargarListasAsync(productoDto.CategoriaId, productoDto.UnidadMedidaId);
         return View(productoDto);
     }
 
     // GET: Productos/Delete/5
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> Delete(int id)
     {
         var producto = await _unitOfWork.Productos.GetProductoConCategoriaAsync(id);
@@ -139,7 +140,7 @@ public class ProductosController : Controller
     // POST: Productos/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         var producto = await _unitOfWork.Productos.GetByIdAsync(id);
@@ -156,7 +157,7 @@ public class ProductosController : Controller
     }
 
     // GET: Productos/CambioPrecio/5
-    [Authorize(Roles = "Admin,Gerente")]
+    [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> CambioPrecio(int id)
     {
         var producto = await _unitOfWork.Productos.GetByIdAsync(id);
@@ -166,7 +167,8 @@ public class ProductosController : Controller
         {
             ProductoId = producto.Id,
             PrecioCostoNuevo = producto.PrecioCosto,
-            PrecioVentaNuevo = producto.PrecioVenta
+            PrecioVentaMinoristaNuevo = producto.PrecioVentaMinorista,
+            PrecioVentaMayoristaNuevo = producto.PrecioVentaMayorista
         };
 
         ViewBag.Producto = producto;
@@ -176,7 +178,7 @@ public class ProductosController : Controller
     // POST: Productos/CambioPrecio/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin,Gerente")]
+    [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> CambioPrecio(CambioPrecioDto model)
     {
         if (ModelState.IsValid)
@@ -184,16 +186,20 @@ public class ProductosController : Controller
             var producto = await _unitOfWork.Productos.GetByIdAsync(model.ProductoId);
             if (producto == null) return NotFound();
 
-            if (producto.PrecioCosto != model.PrecioCostoNuevo ||
-                producto.PrecioVenta != model.PrecioVentaNuevo)
+            // Verificar si hubo cambios
+            bool huboCambio = producto.PrecioCosto != model.PrecioCostoNuevo ||
+                             producto.PrecioVentaMinorista != model.PrecioVentaMinoristaNuevo ||
+                             producto.PrecioVentaMayorista != model.PrecioVentaMayoristaNuevo;
+
+            if (huboCambio)
             {
                 var historial = new HistorialPrecio
                 {
                     ProductoId = producto.Id,
                     PrecioCostoAnterior = producto.PrecioCosto,
                     PrecioCostoNuevo = model.PrecioCostoNuevo,
-                    PrecioVentaAnterior = producto.PrecioVenta,
-                    PrecioVentaNuevo = model.PrecioVentaNuevo,
+                    PrecioVentaAnterior = producto.PrecioVentaMinorista,
+                    PrecioVentaNuevo = model.PrecioVentaMinoristaNuevo,
                     Motivo = model.Motivo,
                     FechaCambio = DateTime.Now,
                     UsuarioCambio = User.FindFirst(ClaimTypes.Name)?.Value ?? User.Identity?.Name ?? "Sistema",
@@ -204,8 +210,10 @@ public class ProductosController : Controller
                 await _unitOfWork.HistorialPrecios.AddAsync(historial);
             }
 
+            // Actualizar precios
             producto.PrecioCosto = model.PrecioCostoNuevo;
-            producto.PrecioVenta = model.PrecioVentaNuevo;
+            producto.PrecioVentaMinorista = model.PrecioVentaMinoristaNuevo;
+            producto.PrecioVentaMayorista = model.PrecioVentaMayoristaNuevo;
             producto.FechaModificacion = DateTime.Now;
 
             await _unitOfWork.Productos.UpdateAsync(producto);
@@ -233,23 +241,12 @@ public class ProductosController : Controller
         return View(historialDto);
     }
 
-    // GET: Productos/Stock/5
-    [Authorize(Roles = "Admin,Gerente,Operador")]
-    public async Task<IActionResult> GestionarStock(int id)
-    {
-        var producto = await _unitOfWork.Productos.GetByIdAsync(id);
-        if (producto == null) return NotFound();
-
-        var stocks = await _unitOfWork.StockAlmacenes.GetStocksPorProductoAsync(id);
-        var stocksDto = stocks.Select(s => s.ToDto()).ToList();
-
-        ViewBag.Producto = producto;
-        return View(stocksDto);
-    }
-
-    private async Task CargarCategoriasAsync(int? selectedId = null)
+    private async Task CargarListasAsync(int? categoriaId = null, int? unidadMedidaId = null)
     {
         var categorias = await _unitOfWork.Categorias.GetAllAsync();
-        ViewBag.Categorias = new SelectList(categorias.Where(c => c.Activo), "Id", "Nombre", selectedId);
+        ViewBag.Categorias = new SelectList(categorias.Where(c => c.Activo), "Id", "Nombre", categoriaId);
+
+        var unidades = await _unitOfWork.UnidadesMedida.GetAllAsync();
+        ViewBag.UnidadesMedida = new SelectList(unidades.Where(u => u.Activo), "Id", "Abreviatura", unidadMedidaId);
     }
 }
