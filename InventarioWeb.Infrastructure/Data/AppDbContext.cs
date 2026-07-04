@@ -140,57 +140,6 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
         });
 
         // Datos semilla
-        modelBuilder.Entity<Categoria>().HasData(
-            new Categoria { Id = 1, Nombre = "Electrónicos", Descripcion = "Productos electrónicos", Activo = true, FechaCreacion = DateTime.Now },
-            new Categoria { Id = 2, Nombre = "Muebles", Descripcion = "Muebles de oficina", Activo = true, FechaCreacion = DateTime.Now },
-            new Categoria { Id = 3, Nombre = "Suministros", Descripcion = "Suministros de oficina", Activo = true, FechaCreacion = DateTime.Now }
-        );
-
-        modelBuilder.Entity<Producto>().HasData(
-            new Producto
-            {
-                Id = 1,
-                Codigo = "PROD-001",
-                Nombre = "Laptop HP",
-                Descripcion = "Laptop HP 15 pulgadas",
-                PrecioCosto = 800.00m,
-                PrecioVentaMinorista = 1200.00m,
-                PrecioVentaMayorista = 1100.00m,
-                CategoriaId = 1,
-                UnidadMedidaId = 1,
-                Activo = true,
-                FechaCreacion = DateTime.Now
-            },
-            new Producto
-            {
-                Id = 2,
-                Codigo = "PROD-002",
-                Nombre = "Escritorio",
-                Descripcion = "Escritorio ejecutivo",
-                PrecioCosto = 300.00m,
-                PrecioVentaMinorista = 500.00m,
-                PrecioVentaMayorista = 450.00m,
-                CategoriaId = 2,
-                UnidadMedidaId = 1,
-                Activo = true,
-                FechaCreacion = DateTime.Now
-            }
-        );
-
-        // Datos semilla de almacenes
-        modelBuilder.Entity<Almacen>().HasData(
-            new Almacen { Id = 1, Nombre = "Almacén Central", Codigo = "ALM-CENTRAL", Tipo = "ALMACEN", Direccion = "Calle Principal #123", Activo = true, FechaCreacion = DateTime.Now },
-            new Almacen { Id = 2, Nombre = "Mercado Norte", Codigo = "MER-NORTE", Tipo = "MERCADO", Direccion = "Av. Norte #456", Activo = true, FechaCreacion = DateTime.Now },
-            new Almacen { Id = 3, Nombre = "Mercado Sur", Codigo = "MER-SUR", Tipo = "MERCADO", Direccion = "Av. Sur #789", Activo = true, FechaCreacion = DateTime.Now }
-        );
-
-        modelBuilder.Entity<UnidadMedida>().HasData(
-            new UnidadMedida { Id = 1, Nombre = "Unidad", Abreviatura = "U", Descripcion = "Unidad individual", Activo = true, FechaCreacion = DateTime.Now },
-            new UnidadMedida { Id = 2, Nombre = "Kilogramo", Abreviatura = "Kg", Descripcion = "Peso en kilogramos", Activo = true, FechaCreacion = DateTime.Now },
-            new UnidadMedida { Id = 3, Nombre = "Litro", Abreviatura = "L", Descripcion = "Volumen en litros", Activo = true, FechaCreacion = DateTime.Now },
-            new UnidadMedida { Id = 4, Nombre = "Metro", Abreviatura = "m", Descripcion = "Longitud en metros", Activo = true, FechaCreacion = DateTime.Now },
-            new UnidadMedida { Id = 5, Nombre = "Caja", Abreviatura = "Cja", Descripcion = "Caja o paquete", Activo = true, FechaCreacion = DateTime.Now },
-            new UnidadMedida { Id = 6, Nombre = "Docena", Abreviatura = "Doc", Descripcion = "Conjunto de 12 unidades", Activo = true, FechaCreacion = DateTime.Now }
-        );
+        SeedData.Seed(modelBuilder);        
     }
 }

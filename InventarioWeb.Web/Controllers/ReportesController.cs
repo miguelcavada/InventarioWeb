@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using InventarioWeb.Core.Mappings;
 using Microsoft.AspNetCore.Authorization;
 using InventarioWeb.Core.Constants;
+using InventarioWeb.Core.DTOs;
 
 namespace InventarioWeb.Web.Controllers;
 
@@ -143,6 +144,93 @@ public class ReportesController : Controller
             pdfBytes,
             "application/pdf",
             $"Inventario_{almacen.Nombre}_{DateTime.Now:yyyyMMdd}.pdf"
+        );
+    }
+
+    // GET: Reportes/InventarioDiario
+    public async Task<IActionResult> InventarioDiario(int almacenId, DateTime? fecha = null)
+    {
+        if (!fecha.HasValue) fecha = DateTime.Today;
+
+        var almacen = await _unitOfWork.Almacenes.GetAlmacenConStocksAsync(almacenId);
+        if (almacen == null) return NotFound();
+
+        ViewBag.AlmacenId = almacenId;
+        ViewBag.AlmacenNombre = almacen.Nombre;
+        ViewBag.Fecha = fecha.Value;
+
+        // Preparar datos para la vista
+        var resumen = new List<InventarioDiarioResumenDto>();
+
+        if (almacen.Stocks != null)
+        {
+            foreach (var stock in almacen.Stocks.OrderBy(s => s.Producto?.Nombre))
+            {
+                var producto = stock.Producto;
+                if (producto == null) continue;
+
+                var existenciaFinal = stock.StockActual;
+
+                var movimientosDia = producto.MovimientosDetalle?
+                    .Where(d => d.FechaCreacion.Date == fecha.Value.Date
+                             && d.Movimiento?.AlmacenOrigenId == almacen.Id)
+                    .ToList() ?? new();
+
+                var entradasDia = (int)movimientosDia.Where(d => d.Movimiento?.Tipo == "ENTRADA").Sum(d => d.Cantidad);
+                var salidasDia = (int)movimientosDia.Where(d => d.Movimiento?.Tipo == "SALIDA").Sum(d => d.Cantidad);
+                var existenciaInicial = existenciaFinal - entradasDia + salidasDia;
+
+                resumen.Add(new InventarioDiarioResumenDto
+                {
+                    ProductoId = producto.Id,
+                    Codigo = producto.Codigo,
+                    Producto = producto.Nombre,
+                    Unidad = producto.UnidadMedida?.Abreviatura ?? "",
+                    ExistenciaInicial = existenciaInicial,
+                    Entradas = entradasDia,
+                    Salidas = salidasDia,
+                    ExistenciaFinal = existenciaFinal,
+                    PrecioMinorista = producto.PrecioVentaMinorista,
+                    PrecioMayorista = producto.PrecioVentaMayorista,
+                    ValorInventario = existenciaFinal * producto.PrecioVentaMinorista
+                });
+            }
+        }
+
+        return View(resumen);
+    }
+
+    // GET: Reportes/InventarioDiarioExcel
+    public async Task<IActionResult> InventarioDiarioExcel(int almacenId, DateTime? fecha = null)
+    {
+        if (!fecha.HasValue) fecha = DateTime.Today;
+
+        var almacen = await _unitOfWork.Almacenes.GetAlmacenConStocksAsync(almacenId);
+        if (almacen == null) return NotFound();
+
+        var excelBytes = _reportService.GenerarExcelInventarioDiario(almacen, fecha.Value);
+
+        return File(
+            excelBytes,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            $"InventarioDiario_{almacen.Nombre}_{fecha:yyyyMMdd}.xlsx"
+        );
+    }
+
+    // GET: Reportes/InventarioDiarioPdf
+    public async Task<IActionResult> InventarioDiarioPdf(int almacenId, DateTime? fecha = null)
+    {
+        if (!fecha.HasValue) fecha = DateTime.Today;
+
+        var almacen = await _unitOfWork.Almacenes.GetAlmacenConStocksAsync(almacenId);
+        if (almacen == null) return NotFound();
+
+        var pdfBytes = _reportService.GenerarPdfInventarioDiario(almacen, fecha.Value);
+
+        return File(
+            pdfBytes,
+            "application/pdf",
+            $"InventarioDiario_{almacen.Nombre}_{fecha:yyyyMMdd}.pdf"
         );
     }
 }

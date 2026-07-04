@@ -15,6 +15,8 @@ public interface IReportService
     byte[] GenerarExcelStockBajo(IEnumerable<Producto> productos);
     byte[] GenerarExcelInventarioPorAlmacen(Almacen almacen);
     byte[] GenerarPdfInventarioPorAlmacen(Almacen almacen);
+    byte[] GenerarExcelInventarioDiario(Almacen almacen, DateTime fecha);
+    byte[] GenerarPdfInventarioDiario(Almacen almacen, DateTime fecha);
 }
 
 public class ReportService : IReportService
@@ -599,6 +601,225 @@ public class ReportService : IReportService
                             row.RelativeItem().Text($"Total productos: {almacen.Stocks?.Count ?? 0}");
                             row.RelativeItem().Text($"Total unidades: {almacen.Stocks?.Sum(s => s.StockActual) ?? 0}");
                             row.RelativeItem().Text($"Stock bajo: {almacen.Stocks?.Count(s => s.StockActual <= s.StockMinimo && s.StockActual > 0) ?? 0}");
+                        });
+                    });
+
+                page.Footer()
+                    .AlignCenter()
+                    .Text(x =>
+                    {
+                        x.Span("Página ");
+                        x.CurrentPageNumber();
+                    });
+            });
+        }).GeneratePdf();
+    }
+
+    public byte[] GenerarExcelInventarioDiario(Almacen almacen, DateTime fecha)
+    {
+        using var workbook = new XLWorkbook();
+        var worksheet = workbook.Worksheets.Add("Inventario Diario");
+
+        // Título
+        worksheet.Cell(1, 1).Value = $"INVENTARIO DIARIO - {almacen.Nombre.ToUpper()}";
+        var titleRange = worksheet.Range(1, 1, 1, 10);
+        titleRange.Merge();
+        titleRange.Style.Font.Bold = true;
+        titleRange.Style.Font.FontSize = 14;
+        titleRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+        // Información
+        worksheet.Cell(2, 1).Value = "Fecha:";
+        worksheet.Cell(2, 2).Value = fecha.ToString("dd/MM/yyyy");
+        worksheet.Cell(2, 3).Value = "Tipo:";
+        worksheet.Cell(2, 4).Value = almacen.Tipo;
+        worksheet.Cell(2, 5).Value = "Encargado:";
+        worksheet.Cell(2, 6).Value = almacen.Encargado ?? "N/A";
+
+        // Encabezados
+        worksheet.Cell(4, 1).Value = "CÓDIGO";
+        worksheet.Cell(4, 2).Value = "PRODUCTO";
+        worksheet.Cell(4, 3).Value = "UNIDAD";
+        worksheet.Cell(4, 4).Value = "EXISTENCIA INICIAL";
+        worksheet.Cell(4, 5).Value = "ENTRADAS";
+        worksheet.Cell(4, 6).Value = "SALIDAS";
+        worksheet.Cell(4, 7).Value = "EXISTENCIA FINAL";
+        worksheet.Cell(4, 8).Value = "PRECIO MINORISTA";
+        worksheet.Cell(4, 9).Value = "PRECIO MAYORISTA";
+        worksheet.Cell(4, 10).Value = "VALOR INVENTARIO";
+
+        var headerRange = worksheet.Range(4, 1, 4, 10);
+        headerRange.Style.Font.Bold = true;
+        headerRange.Style.Fill.BackgroundColor = XLColor.FromArgb(52, 58, 64);
+        headerRange.Style.Font.FontColor = XLColor.White;
+        headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+        // Obtener movimientos del día
+        var inicioDia = fecha.Date;
+        var finDia = fecha.Date.AddDays(1).AddSeconds(-1);
+
+        int row = 5;
+        if (almacen.Stocks != null && almacen.Stocks.Any())
+        {
+            foreach (var stock in almacen.Stocks.OrderBy(s => s.Producto?.Nombre))
+            {
+                var producto = stock.Producto;
+                if (producto == null) continue;
+
+                // Calcular existencias
+                var existenciaFinal = stock.StockActual;
+
+                // Movimientos del día
+                var movimientosDia = producto.MovimientosDetalle?
+                    .Where(d => d.FechaCreacion.Date == fecha.Date
+                             && d.Movimiento?.AlmacenOrigenId == almacen.Id)
+                    .ToList() ?? new();
+
+                var entradasDia = movimientosDia
+                    .Where(d => d.Movimiento?.Tipo == "ENTRADA")
+                    .Sum(d => d.Cantidad);
+
+                var salidasDia = movimientosDia
+                    .Where(d => d.Movimiento?.Tipo == "SALIDA")
+                    .Sum(d => d.Cantidad);
+
+                var existenciaInicial = existenciaFinal - entradasDia + salidasDia;
+
+                // Valor del inventario (usando precio minorista)
+                var valorInventario = existenciaFinal * producto.PrecioVentaMinorista;
+
+                worksheet.Cell(row, 1).Value = producto.Codigo ?? "";
+                worksheet.Cell(row, 2).Value = producto.Nombre ?? "";
+                worksheet.Cell(row, 3).Value = producto.UnidadMedida?.Abreviatura ?? "";
+                worksheet.Cell(row, 4).Value = (int)existenciaInicial;
+                worksheet.Cell(row, 5).Value = (int)entradasDia;
+                worksheet.Cell(row, 6).Value = (int)salidasDia;
+                worksheet.Cell(row, 7).Value = (int)existenciaFinal;
+                worksheet.Cell(row, 8).Value = producto.PrecioVentaMinorista;
+                worksheet.Cell(row, 9).Value = producto.PrecioVentaMayorista ?? 0;
+                worksheet.Cell(row, 10).Value = valorInventario;
+
+                // Formato moneda
+                worksheet.Cell(row, 8).Style.NumberFormat.Format = "$ #,##0.00";
+                worksheet.Cell(row, 9).Style.NumberFormat.Format = "$ #,##0.00";
+                worksheet.Cell(row, 10).Style.NumberFormat.Format = "$ #,##0.00";
+
+                // Colorear stock bajo
+                if (existenciaFinal <= stock.StockMinimo && existenciaFinal > 0)
+                {
+                    worksheet.Cell(row, 7).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 200, 200);
+                }
+                else if (existenciaFinal <= 0)
+                {
+                    worksheet.Cell(row, 7).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 100, 100);
+                }
+
+                row++;
+            }
+        }
+
+        // Totales
+        int totalRow = row + 1;
+        worksheet.Cell(totalRow, 1).Value = "TOTALES:";
+        worksheet.Cell(totalRow, 1).Style.Font.Bold = true;
+        worksheet.Cell(totalRow, 4).FormulaA1 = $"=SUM(E5:E{row - 1})";
+        worksheet.Cell(totalRow, 5).FormulaA1 = $"=SUM(F5:F{row - 1})";
+        worksheet.Cell(totalRow, 6).FormulaA1 = $"=SUM(G5:G{row - 1})";
+        worksheet.Cell(totalRow, 7).FormulaA1 = $"=SUM(H5:H{row - 1})";
+
+        worksheet.Columns().AdjustToContents();
+
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        return stream.ToArray();
+    }
+
+    public byte[] GenerarPdfInventarioDiario(Almacen almacen, DateTime fecha)
+    {
+        return Document.Create(container =>
+        {
+            container.Page(page =>
+            {
+                page.Size(PageSizes.A4);
+                page.Margin(2, Unit.Centimetre);
+                page.PageColor(Colors.White);
+                page.DefaultTextStyle(x => x.FontSize(8));
+
+                page.Header()
+                    .AlignCenter()
+                    .Text($"INVENTARIO DIARIO - {almacen.Nombre.ToUpper()}")
+                    .SemiBold()
+                    .FontSize(16)
+                    .FontColor(Colors.Blue.Medium);
+
+                page.Content()
+                    .PaddingVertical(1, Unit.Centimetre)
+                    .Column(column =>
+                    {
+                        column.Item().Row(row =>
+                        {
+                            row.RelativeItem().Text($"Fecha: {fecha:dd/MM/yyyy}");
+                            row.RelativeItem().Text($"Tipo: {almacen.Tipo}");
+                            row.RelativeItem().Text($"Encargado: {almacen.Encargado ?? "N/A"}");
+                        });
+
+                        column.Item().PaddingVertical(10).Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn(1.5f);  // Código
+                                columns.RelativeColumn(2.5f);  // Producto
+                                columns.RelativeColumn(1);     // Unidad
+                                columns.RelativeColumn(1.5f);  // Exist. Inicial
+                                columns.RelativeColumn(1.5f);  // Entradas
+                                columns.RelativeColumn(1.5f);  // Salidas
+                                columns.RelativeColumn(1.5f);  // Exist. Final
+                                columns.RelativeColumn(2);     // Precio Minorista
+                                columns.RelativeColumn(2);     // Precio Mayorista
+                            });
+
+                            table.Header(header =>
+                            {
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(3).BorderBottom(1).BorderColor(Colors.Black).Text("CÓDIGO");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(3).BorderBottom(1).BorderColor(Colors.Black).Text("PRODUCTO");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(3).BorderBottom(1).BorderColor(Colors.Black).Text("UNI");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(3).BorderBottom(1).BorderColor(Colors.Black).AlignCenter().Text("INICIAL");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(3).BorderBottom(1).BorderColor(Colors.Black).AlignCenter().Text("ENTRADAS");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(3).BorderBottom(1).BorderColor(Colors.Black).AlignCenter().Text("SALIDAS");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(3).BorderBottom(1).BorderColor(Colors.Black).AlignCenter().Text("FINAL");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(3).BorderBottom(1).BorderColor(Colors.Black).AlignRight().Text("MINORISTA");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(3).BorderBottom(1).BorderColor(Colors.Black).AlignRight().Text("MAYORISTA");
+                            });
+
+                            if (almacen.Stocks != null)
+                            {
+                                foreach (var stock in almacen.Stocks.OrderBy(s => s.Producto?.Nombre))
+                                {
+                                    var producto = stock.Producto;
+                                    if (producto == null) continue;
+
+                                    var existenciaFinal = stock.StockActual;
+
+                                    var movimientosDia = producto.MovimientosDetalle?
+                                        .Where(d => d.FechaCreacion.Date == fecha.Date
+                                                 && d.Movimiento?.AlmacenOrigenId == almacen.Id)
+                                        .ToList() ?? new();
+
+                                    var entradasDia = movimientosDia.Where(d => d.Movimiento?.Tipo == "ENTRADA").Sum(d => d.Cantidad);
+                                    var salidasDia = movimientosDia.Where(d => d.Movimiento?.Tipo == "SALIDA").Sum(d => d.Cantidad);
+                                    var existenciaInicial = existenciaFinal - entradasDia + salidasDia;
+
+                                    table.Cell().PaddingVertical(2).Text(producto.Codigo ?? "");
+                                    table.Cell().PaddingVertical(2).Text(producto.Nombre ?? "");
+                                    table.Cell().PaddingVertical(2).Text(producto.UnidadMedida?.Abreviatura ?? "");
+                                    table.Cell().PaddingVertical(2).AlignCenter().Text(((int)existenciaInicial).ToString());
+                                    table.Cell().PaddingVertical(2).AlignCenter().Text(((int)entradasDia).ToString());
+                                    table.Cell().PaddingVertical(2).AlignCenter().Text(((int)salidasDia).ToString());
+                                    table.Cell().PaddingVertical(2).AlignCenter().Text(((int)existenciaFinal).ToString());
+                                    table.Cell().PaddingVertical(2).AlignRight().Text($"${producto.PrecioVentaMinorista:N2}");
+                                    table.Cell().PaddingVertical(2).AlignRight().Text(producto.PrecioVentaMayorista.HasValue ? $"${producto.PrecioVentaMayorista:N2}" : "N/A");
+                                }
+                            }
                         });
                     });
 
