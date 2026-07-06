@@ -1,8 +1,8 @@
-﻿using InventarioWeb.Core.Constants;
+﻿using InventarioWeb.Application.Common;
+using InventarioWeb.Application.Services;
+using InventarioWeb.Core.Constants;
 using InventarioWeb.Core.DTOs;
-using InventarioWeb.Core.Entities;
 using InventarioWeb.Core.Interfaces;
-using InventarioWeb.Core.Mappings;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,47 +13,35 @@ namespace InventarioWeb.Web.Controllers;
 [Authorize(Roles = Roles.AllRoles)]
 public class ProductosController : Controller
 {
+    private readonly IProductoService _productoService;
     private readonly IUnitOfWork _unitOfWork;
 
-    public ProductosController(IUnitOfWork unitOfWork)
+    public ProductosController(IProductoService productoService, IUnitOfWork unitOfWork)
     {
+        _productoService = productoService;
         _unitOfWork = unitOfWork;
     }
 
-    // GET: Productos
-    public async Task<IActionResult> Index(string buscar, string orden = "nombre")
+    public async Task<IActionResult> Index(string buscar, string orden = "nombre", int pagina = 1)
     {
-        var productos = await _unitOfWork.Productos.GetProductosConCategoriaAsync();
+        var result = await _productoService.GetProductosPaginadosAsync(buscar, orden, pagina);
 
-        if (!string.IsNullOrEmpty(buscar))
+        if (result.IsFailure)
         {
-            productos = productos.Where(p =>
-                p.Nombre.Contains(buscar, StringComparison.OrdinalIgnoreCase) ||
-                p.Codigo.Contains(buscar, StringComparison.OrdinalIgnoreCase));
+            TempData["Error"] = result.ErrorMessage;
+            return View(new PagedResult<ProductoDto>());
         }
 
-        productos = orden switch
-        {
-            "codigo" => productos.OrderBy(p => p.Codigo),
-            "stock" => productos.OrderByDescending(p => p.Stocks.Sum(s => s.StockActual)),
-            "precio" => productos.OrderBy(p => p.PrecioVentaMinorista),
-            _ => productos.OrderBy(p => p.Nombre),
-        };
-
-        var productosDto = productos.Select(p => p.ToDto()).ToList();
-        return View(productosDto);
+        return View(result.Data);
     }
 
-    // GET: Productos/Details/5
     public async Task<IActionResult> Details(int id)
     {
-        var producto = await _unitOfWork.Productos.GetProductoConCategoriaAsync(id);
-        if (producto == null) return NotFound();
-
-        return View(producto.ToDto());
+        var result = await _productoService.GetProductoByIdAsync(id);
+        if (result.IsFailure) return NotFound();
+        return View(result.Data);
     }
 
-    // GET: Productos/Create
     [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> Create()
     {
@@ -61,184 +49,135 @@ public class ProductosController : Controller
         return View(new ProductoDto());
     }
 
-    // POST: Productos/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = Roles.AdminOrGerente)]
-    public async Task<IActionResult> Create(ProductoDto productoDto)
+    public async Task<IActionResult> Create(ProductoDto dto)
     {
-        if (await _unitOfWork.Productos.CodigoExisteAsync(productoDto.Codigo))
-            ModelState.AddModelError("Codigo", "El código ya existe");
-
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            var producto = productoDto.ToEntity();
-            producto.FechaCreacion = DateTime.Now;
-            producto.Activo = true;
-
-            await _unitOfWork.Productos.AddAsync(producto);
-            await _unitOfWork.CompleteAsync();
-
-            TempData["Mensaje"] = "Producto creado exitosamente. Asigne stock en los almacenes.";
-            return RedirectToAction(nameof(Index));
+            await CargarListasAsync();
+            return View(dto);
         }
 
-        await CargarListasAsync();
-        return View(productoDto);
+        var result = await _productoService.CreateProductoAsync(dto);
+        if (result.IsFailure)
+        {
+            ModelState.AddModelError("", result.ErrorMessage!);
+            await CargarListasAsync();
+            return View(dto);
+        }
+
+        TempData["Mensaje"] = result.SuccessMessage;
+        return RedirectToAction(nameof(Index));
     }
 
-    // GET: Productos/Edit/5
     [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> Edit(int id)
     {
-        var producto = await _unitOfWork.Productos.GetByIdAsync(id);
-        if (producto == null) return NotFound();
+        var result = await _productoService.GetProductoByIdAsync(id);
+        if (result.IsFailure) return NotFound();
 
-        await CargarListasAsync(producto.CategoriaId, producto.UnidadMedidaId);
-        return View(producto.ToDto());
+        await CargarListasAsync(result.Data!.CategoriaId, result.Data.UnidadMedidaId);
+        return View(result.Data);
     }
 
-    // POST: Productos/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = Roles.AdminOrGerente)]
-    public async Task<IActionResult> Edit(int id, ProductoDto productoDto)
+    public async Task<IActionResult> Edit(int id, ProductoDto dto)
     {
-        if (id != productoDto.Id) return NotFound();
+        if (id != dto.Id) return NotFound();
 
-        if (await _unitOfWork.Productos.CodigoExisteAsync(productoDto.Codigo, id))
-            ModelState.AddModelError("Codigo", "El código ya existe");
-
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            var producto = await _unitOfWork.Productos.GetByIdAsync(id);
-            if (producto == null) return NotFound();
-
-            productoDto.UpdateEntity(producto);
-
-            await _unitOfWork.Productos.UpdateAsync(producto);
-            await _unitOfWork.CompleteAsync();
-
-            TempData["Mensaje"] = "Producto actualizado exitosamente";
-            return RedirectToAction(nameof(Index));
+            await CargarListasAsync(dto.CategoriaId, dto.UnidadMedidaId);
+            return View(dto);
         }
 
-        await CargarListasAsync(productoDto.CategoriaId, productoDto.UnidadMedidaId);
-        return View(productoDto);
+        var result = await _productoService.UpdateProductoAsync(id, dto);
+        if (result.IsFailure)
+        {
+            ModelState.AddModelError("", result.ErrorMessage!);
+            await CargarListasAsync(dto.CategoriaId, dto.UnidadMedidaId);
+            return View(dto);
+        }
+
+        TempData["Mensaje"] = result.SuccessMessage;
+        return RedirectToAction(nameof(Index));
     }
 
-    // GET: Productos/Delete/5
     [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> Delete(int id)
     {
-        var producto = await _unitOfWork.Productos.GetProductoConCategoriaAsync(id);
-        if (producto == null) return NotFound();
-
-        return View(producto.ToDto());
+        var result = await _productoService.GetProductoByIdAsync(id);
+        if (result.IsFailure) return NotFound();
+        return View(result.Data);
     }
 
-    // POST: Productos/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var producto = await _unitOfWork.Productos.GetByIdAsync(id);
-        if (producto == null) return NotFound();
+        var result = await _productoService.DeleteProductoAsync(id);
+        if (result.IsFailure)
+        {
+            TempData["Error"] = result.ErrorMessage;
+            return RedirectToAction(nameof(Index));
+        }
 
-        producto.Activo = false;
-        producto.FechaModificacion = DateTime.Now;
-
-        await _unitOfWork.Productos.UpdateAsync(producto);
-        await _unitOfWork.CompleteAsync();
-
-        TempData["Mensaje"] = "Producto eliminado exitosamente";
+        TempData["Mensaje"] = result.SuccessMessage;
         return RedirectToAction(nameof(Index));
     }
 
-    // GET: Productos/CambioPrecio/5
     [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> CambioPrecio(int id)
     {
-        var producto = await _unitOfWork.Productos.GetByIdAsync(id);
-        if (producto == null) return NotFound();
+        var result = await _productoService.GetCambioPrecioAsync(id);
+        if (result.IsFailure) return NotFound();
 
-        var model = new CambioPrecioDto
-        {
-            ProductoId = producto.Id,
-            PrecioCostoNuevo = producto.PrecioCosto,
-            PrecioVentaMinoristaNuevo = producto.PrecioVentaMinorista,
-            PrecioVentaMayoristaNuevo = producto.PrecioVentaMayorista
-        };
-
-        ViewBag.Producto = producto;
-        return View(model);
+        var prodResult = await _productoService.GetProductoByIdAsync(id);
+        ViewBag.Producto = prodResult.Data;
+        return View(result.Data);
     }
 
-    // POST: Productos/CambioPrecio/5
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> CambioPrecio(CambioPrecioDto model)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
-            var producto = await _unitOfWork.Productos.GetByIdAsync(model.ProductoId);
-            if (producto == null) return NotFound();
-
-            // Verificar si hubo cambios
-            bool huboCambio = producto.PrecioCosto != model.PrecioCostoNuevo ||
-                             producto.PrecioVentaMinorista != model.PrecioVentaMinoristaNuevo ||
-                             producto.PrecioVentaMayorista != model.PrecioVentaMayoristaNuevo;
-
-            if (huboCambio)
-            {
-                var historial = new HistorialPrecio
-                {
-                    ProductoId = producto.Id,
-                    PrecioCostoAnterior = producto.PrecioCosto,
-                    PrecioCostoNuevo = model.PrecioCostoNuevo,
-                    PrecioVentaAnterior = producto.PrecioVentaMinorista,
-                    PrecioVentaNuevo = model.PrecioVentaMinoristaNuevo,
-                    Motivo = model.Motivo,
-                    FechaCambio = DateTime.Now,
-                    UsuarioCambio = User.FindFirst(ClaimTypes.Name)?.Value ?? User.Identity?.Name ?? "Sistema",
-                    Activo = true,
-                    FechaCreacion = DateTime.Now
-                };
-
-                await _unitOfWork.HistorialPrecios.AddAsync(historial);
-            }
-
-            // Actualizar precios
-            producto.PrecioCosto = model.PrecioCostoNuevo;
-            producto.PrecioVentaMinorista = model.PrecioVentaMinoristaNuevo;
-            producto.PrecioVentaMayorista = model.PrecioVentaMayoristaNuevo;
-            producto.FechaModificacion = DateTime.Now;
-
-            await _unitOfWork.Productos.UpdateAsync(producto);
-            await _unitOfWork.CompleteAsync();
-
-            TempData["Mensaje"] = "Precios actualizados exitosamente";
-            return RedirectToAction(nameof(Index));
+            var prodResult = await _productoService.GetProductoByIdAsync(model.ProductoId);
+            ViewBag.Producto = prodResult.IsSuccess ? prodResult.Data : null;
+            return View(model);
         }
 
-        var prod = await _unitOfWork.Productos.GetByIdAsync(model.ProductoId);
-        ViewBag.Producto = prod;
-        return View(model);
+        var usuario = User.FindFirst(ClaimTypes.Name)?.Value ?? "Sistema";
+        var result = await _productoService.CambiarPrecioAsync(model, usuario);
+
+        if (result.IsFailure)
+        {
+            ModelState.AddModelError("", result.ErrorMessage!);
+            var prodResult = await _productoService.GetProductoByIdAsync(model.ProductoId);
+            ViewBag.Producto = prodResult.IsSuccess ? prodResult.Data : null;
+            return View(model);
+        }
+
+        TempData["Mensaje"] = result.SuccessMessage;
+        return RedirectToAction(nameof(Index));
     }
 
-    // GET: Productos/HistorialPrecios/5
     public async Task<IActionResult> HistorialPrecios(int id)
     {
-        var producto = await _unitOfWork.Productos.GetByIdAsync(id);
-        if (producto == null) return NotFound();
+        var productoResult = await _productoService.GetProductoByIdAsync(id);
+        if (productoResult.IsFailure) return NotFound();
 
-        var historial = await _unitOfWork.HistorialPrecios.GetHistorialPorProductoAsync(id);
-        var historialDto = historial.Select(h => h.ToDto());
+        var historialResult = await _productoService.GetHistorialPreciosAsync(id);
 
-        ViewBag.Producto = producto;
-        return View(historialDto);
+        ViewBag.Producto = productoResult.Data;
+        return View(historialResult.IsSuccess ? historialResult.Data : Enumerable.Empty<HistorialPrecioDto>());
     }
 
     private async Task CargarListasAsync(int? categoriaId = null, int? unidadMedidaId = null)

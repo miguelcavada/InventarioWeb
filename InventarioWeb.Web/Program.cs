@@ -1,3 +1,4 @@
+using InventarioWeb.Application.Services;
 using InventarioWeb.Core.Constants;
 using InventarioWeb.Core.Entities;
 using InventarioWeb.Core.Interfaces;
@@ -66,6 +67,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         );
     })
 );
+
+// ===== SERVICIOS DE APLICACIÓN =====
+builder.Services.AddScoped<IProductoService, ProductoService>();
+builder.Services.AddScoped<IMovimientoService, MovimientoService>();
+builder.Services.AddScoped<IConsignacionService, ConsignacionService>();
+builder.Services.AddScoped<ICategoriaService, CategoriaService>();
+builder.Services.AddScoped<IAlmacenService, AlmacenService>();
+builder.Services.AddScoped<IProveedorService, ProveedorService>();
+builder.Services.AddScoped<IUnidadMedidaService, UnidadMedidaService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 // ===== SERVICIOS =====
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

@@ -18,23 +18,16 @@
                 <dl class="row">
                     <dt class="col-sm-4">Nombre</dt>
                     <dd class="col-sm-8">@Model.Nombre</dd>
-
                     <dt class="col-sm-4">Código</dt>
                     <dd class="col-sm-8"><code>@Model.Codigo</code></dd>
-
                     <dt class="col-sm-4">Tipo</dt>
                     <dd class="col-sm-8">
-                        <span class="badge @(Model.Tipo == "ALMACEN" ? "bg-primary" : "bg-success")">
-                            @Model.Tipo
-                        </span>
+                        <span class="badge @(Model.Tipo == "ALMACEN" ? "bg-primary" : "bg-success")">@Model.Tipo</span>
                     </dd>
-
                     <dt class="col-sm-4">Dirección</dt>
                     <dd class="col-sm-8">@Model.Direccion</dd>
-
                     <dt class="col-sm-4">Encargado</dt>
                     <dd class="col-sm-8">@Model.Encargado</dd>
-
                     <dt class="col-sm-4">Productos</dt>
                     <dd class="col-sm-8">@Model.TotalProductos</dd>
                 </dl>

@@ -1,16 +1,17 @@
-﻿@model IEnumerable<InventarioWeb.Core.DTOs.ProductoDto>
+﻿@model InventarioWeb.Application.Common.PagedResult<InventarioWeb.Core.DTOs.ProductoDto>
 @{
     ViewData["Title"] = "Gestión de Productos";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>
-        <i class="bi bi-box-seam"></i> Gestión de Productos
-    </h2>
+    <h2><i class="bi bi-box-seam"></i> Gestión de Productos</h2>
     <div class="btn-group">
-        <a asp-action="Create" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Nuevo Producto
-        </a>
+        @if (User.IsInRole("Admin") || User.IsInRole("Gerente"))
+        {
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Nuevo Producto
+            </a>
+        }
         <div class="btn-group">
             <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
                 <i class="bi bi-download"></i> Exportar
@@ -35,6 +36,14 @@
 {
     <div class="alert alert-success alert-dismissible fade show">
         <i class="bi bi-check-circle"></i> @TempData["Mensaje"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        <i class="bi bi-exclamation-circle"></i> @TempData["Error"]
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
@@ -87,30 +96,58 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model)
+                    @if (Model.Data != null && Model.Data.Any())
                     {
-                        <tr class="@(item.StockTotal <= item.StockMinimoTotal && item.StockTotal > 0 ? "table-danger" : "")">
-                            <td><code>@item.Codigo</code></td>
-                            <td>@item.Nombre</td>
-                            <td><span class="badge bg-secondary">@item.UnidadMedidaAbreviatura</span></td>
-                            <td><span class="badge bg-info">@item.CategoriaNombre</span></td>
-                            <td class="text-end">@(item.PrecioCosto?.ToString("C2") ?? "-")</td>
-                            <td class="text-end">@item.PrecioVentaMinorista.ToString("C2")</td>
-                            <td class="text-end">@(item.PrecioVentaMayorista?.ToString("C2") ?? "-")</td>
-                            <td class="text-center">
-                                <span class="badge @(item.StockTotal <= item.StockMinimoTotal ? "bg-danger" : "bg-success")">
-                                    @item.StockTotal @item.UnidadMedidaAbreviatura
-                                </span>
-                            </td>
-                            <td>@(item.Activo ? "Activo" : "Inactivo")</td>
-                            <td class="text-center">
-                                <div class="btn-group btn-group-sm">
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info" title="Ver"><i class="bi bi-eye"></i></a>
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning" title="Editar"><i class="bi bi-pencil"></i></a>
-                                    <a asp-action="CambioPrecio" asp-route-id="@item.Id" class="btn btn-info" title="Cambiar Precio"><i class="bi bi-currency-dollar"></i></a>
-                                    <a asp-action="HistorialPrecios" asp-route-id="@item.Id" class="btn btn-outline-info" title="Historial"><i class="bi bi-clock-history"></i></a>
-                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" title="Eliminar"><i class="bi bi-trash"></i></a>
-                                </div>
+                        @foreach (var item in Model.Data)
+                        {
+                            var stockClass = item.StockTotal <= item.StockMinimoTotal && item.StockTotal > 0 ? "table-danger" : "";
+                            <tr class="@stockClass">
+                                <td><code>@item.Codigo</code></td>
+                                <td>@item.Nombre</td>
+                                <td><span class="badge bg-secondary">@item.UnidadMedidaAbreviatura</span></td>
+                                <td><span class="badge bg-info">@item.CategoriaNombre</span></td>
+                                <td class="text-end">@(item.PrecioCosto?.ToString("C2") ?? "-")</td>
+                                <td class="text-end">@item.PrecioVentaMinorista.ToString("C2")</td>
+                                <td class="text-end">@(item.PrecioVentaMayorista?.ToString("C2") ?? "-")</td>
+                                <td class="text-center">
+                                    <span class="badge @(item.StockTotal <= item.StockMinimoTotal ? "bg-danger" : "bg-success")">
+                                        @item.StockTotal @item.UnidadMedidaAbreviatura
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (item.Activo)
+                                    {
+                                        <span class="badge bg-success">Activo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info" title="Ver"><i class="bi bi-eye"></i></a>
+                                        @if (User.IsInRole("Admin") || User.IsInRole("Gerente"))
+                                        {
+                                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning" title="Editar"><i class="bi bi-pencil"></i></a>
+                                            <a asp-action="CambioPrecio" asp-route-id="@item.Id" class="btn btn-info" title="Cambiar Precio"><i class="bi bi-currency-dollar"></i></a>
+                                        }
+                                        <a asp-action="HistorialPrecios" asp-route-id="@item.Id" class="btn btn-outline-info" title="Historial"><i class="bi bi-clock-history"></i></a>
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger" title="Eliminar"><i class="bi bi-trash"></i></a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="10" class="text-center py-4">
+                                <i class="bi bi-inbox display-4 text-muted"></i>
+                                <p class="text-muted">No se encontraron productos</p>
                             </td>
                         </tr>
                     }
@@ -118,29 +155,68 @@
             </table>
         </div>
 
+        <!-- Paginación -->
+        @if (Model.TotalPages > 1)
+        {
+            <nav aria-label="Paginación">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-buscar="@Context.Request.Query["buscar"]"
+                           asp-route-orden="@Context.Request.Query["orden"]"
+                           asp-route-pagina="@(Model.Page - 1)">
+                            <i class="bi bi-chevron-left"></i> Anterior
+                        </a>
+                    </li>
+
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.Page ? "active" : "")">
+                            <a class="page-link"
+                               asp-action="Index"
+                               asp-route-buscar="@Context.Request.Query["buscar"]"
+                               asp-route-orden="@Context.Request.Query["orden"]"
+                               asp-route-pagina="@i">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                        <a class="page-link"
+                           asp-action="Index"
+                           asp-route-buscar="@Context.Request.Query["buscar"]"
+                           asp-route-orden="@Context.Request.Query["orden"]"
+                           asp-route-pagina="@(Model.Page + 1)">
+                            Siguiente <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        }
+
         <!-- Resumen -->
         <div class="row mt-3">
             <div class="col-md-4">
                 <div class="card bg-primary text-white">
                     <div class="card-body text-center">
                         <h5>Total Productos</h5>
-                        <h2>@Model.Count()</h2>
+                        <h2>@Model.TotalCount</h2>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card bg-warning">
+                <div class="card bg-info text-white">
                     <div class="card-body text-center">
-                        <h5>Stock Bajo</h5>
-                        <h2>@Model.Count(p => p.StockTotal <= p.StockMinimoTotal && p.StockTotal > 0)</h2>
+                        <h5>Página</h5>
+                        <h2>@Model.Page de @Model.TotalPages</h2>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="card bg-success text-white">
+                <div class="card bg-secondary text-white">
                     <div class="card-body text-center">
-                        <h5>Valor Inventario</h5>
-                        <h2>@Model.Sum(p => p.StockTotal * (p.PrecioCosto ?? 0)).ToString("C2")</h2>
+                        <h5>Por página</h5>
+                        <h2>@Model.Data.Count()</h2>
                     </div>
                 </div>
             </div>

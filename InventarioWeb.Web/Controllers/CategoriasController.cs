@@ -1,8 +1,7 @@
-﻿using InventarioWeb.Core.Constants;
+﻿using InventarioWeb.Application.Services;
+using InventarioWeb.Core.Constants;
 using InventarioWeb.Core.DTOs;
-using InventarioWeb.Core.Entities;
-using InventarioWeb.Core.Interfaces;
-using InventarioWeb.Core.Mappings;
+using InventarioWeb.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,125 +10,97 @@ namespace InventarioWeb.Web.Controllers;
 [Authorize(Roles = Roles.AllRoles)]
 public class CategoriasController : Controller
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly ICategoriaService _categoriaService;
 
-    public CategoriasController(IUnitOfWork unitOfWork)
+    public CategoriasController(ICategoriaService categoriaService)
     {
-        _unitOfWork = unitOfWork;
+        _categoriaService = categoriaService;
     }
 
-    // GET: Categorias
     public async Task<IActionResult> Index()
     {
-        var categorias = await _unitOfWork.Categorias.GetCategoriasConProductosAsync();
-        var categoriasDto = categorias.Select(c => c.ToDto());
-        return View(categoriasDto);
+        var result = await _categoriaService.GetCategoriasAsync();
+        return View(result.IsSuccess ? result.Data : Enumerable.Empty<CategoriaDto>());
     }
 
-    // GET: Categorias/Details/5
-    // GET: Categorias/Details/5
     public async Task<IActionResult> Details(int id)
     {
-        var categoria = await _unitOfWork.Categorias.GetCategoriaConProductosAsync(id);
-        if (categoria == null) return NotFound();
+        var result = await _categoriaService.GetCategoriaByIdAsync(id);
+        if (result.IsFailure) return NotFound();
 
-        var productosDto = categoria.Productos
-            .Where(p => p.Activo)
-            .Select(p => p.ToDto())
-            .ToList();
+        var productosResult = await _categoriaService.GetProductosPorCategoriaAsync(id);
+        ViewBag.Productos = productosResult.IsSuccess ? productosResult.Data : null;
 
-        ViewBag.Productos = productosDto;
-        return View(categoria.ToDto());
+        return View(result.Data);
     }
 
-    // GET: Categorias/Create
     [Authorize(Roles = Roles.AdminOrGerente)]
-    public IActionResult Create()
-    {
-        return View(new CategoriaDto());
-    }
+    public IActionResult Create() => View(new CategoriaDto());
 
-    // POST: Categorias/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = Roles.AdminOrGerente)]
-    public async Task<IActionResult> Create(CategoriaDto categoriaDto)
+    public async Task<IActionResult> Create(CategoriaDto dto)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid) return View(dto);
+
+        var result = await _categoriaService.CreateCategoriaAsync(dto);
+        if (result.IsFailure)
         {
-            var categoria = categoriaDto.ToEntity();
-            categoria.FechaCreacion = DateTime.Now;
-            categoria.Activo = true;
-
-            await _unitOfWork.Categorias.AddAsync(categoria);
-            await _unitOfWork.CompleteAsync();
-
-            TempData["Mensaje"] = "Categoría creada exitosamente";
-            return RedirectToAction(nameof(Index));
+            ModelState.AddModelError("", result.ErrorMessage!);
+            return View(dto);
         }
-        return View(categoriaDto);
+
+        TempData["Mensaje"] = result.SuccessMessage;
+        return RedirectToAction(nameof(Index));
     }
 
-    // GET: Categorias/Edit/5
     [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> Edit(int id)
     {
-        var categoria = await _unitOfWork.Categorias.GetByIdAsync(id);
-        if (categoria == null) return NotFound();
-
-        return View(categoria.ToDto());
+        var result = await _categoriaService.GetCategoriaByIdAsync(id);
+        if (result.IsFailure) return NotFound();
+        return View(result.Data);
     }
 
-    // POST: Categorias/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = Roles.AdminOrGerente)]
-    public async Task<IActionResult> Edit(int id, CategoriaDto categoriaDto)
+    public async Task<IActionResult> Edit(int id, CategoriaDto dto)
     {
-        if (id != categoriaDto.Id) return NotFound();
+        if (id != dto.Id) return NotFound();
+        if (!ModelState.IsValid) return View(dto);
 
-        if (ModelState.IsValid)
+        var result = await _categoriaService.UpdateCategoriaAsync(id, dto);
+        if (result.IsFailure)
         {
-            var categoria = await _unitOfWork.Categorias.GetByIdAsync(id);
-            if (categoria == null) return NotFound();
-
-            categoriaDto.UpdateEntity(categoria);
-
-            await _unitOfWork.Categorias.UpdateAsync(categoria);
-            await _unitOfWork.CompleteAsync();
-
-            TempData["Mensaje"] = "Categoría actualizada exitosamente";
-            return RedirectToAction(nameof(Index));
+            ModelState.AddModelError("", result.ErrorMessage!);
+            return View(dto);
         }
-        return View(categoriaDto);
+
+        TempData["Mensaje"] = result.SuccessMessage;
+        return RedirectToAction(nameof(Index));
     }
 
-    // GET: Categorias/Delete/5
     [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> Delete(int id)
     {
-        var categoria = await _unitOfWork.Categorias.GetCategoriaConProductosAsync(id);
-        if (categoria == null) return NotFound();
-
-        return View(categoria.ToDto());
+        var result = await _categoriaService.GetCategoriaByIdAsync(id);
+        if (result.IsFailure) return NotFound();
+        return View(result.Data);
     }
 
-    // POST: Categorias/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var categoria = await _unitOfWork.Categorias.GetByIdAsync(id);
-        if (categoria == null) return NotFound();
+        var result = await _categoriaService.DeleteCategoriaAsync(id);
+        if (result.IsFailure)
+            TempData["Error"] = result.ErrorMessage;
+        else
+            TempData["Mensaje"] = result.SuccessMessage;
 
-        categoria.Activo = false;
-        categoria.FechaModificacion = DateTime.Now;
-
-        await _unitOfWork.Categorias.UpdateAsync(categoria);
-        await _unitOfWork.CompleteAsync();
-
-        TempData["Mensaje"] = "Categoría eliminada exitosamente";
         return RedirectToAction(nameof(Index));
     }
 }

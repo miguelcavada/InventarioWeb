@@ -1,84 +1,73 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using InventarioWeb.Core.Entities;
-using InventarioWeb.Core.DTOs;
-using InventarioWeb.Core.Interfaces;
-using InventarioWeb.Core.Mappings;
+﻿using InventarioWeb.Application.Services;
 using InventarioWeb.Core.Constants;
+using InventarioWeb.Core.DTOs;
+using InventarioWeb.Infrastructure.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace InventarioWeb.Web.Controllers;
 
 [Authorize(Roles = Roles.AllRoles)]
 public class UnidadesMedidaController : Controller
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IUnidadMedidaService _unidadMedidaService;
 
-    public UnidadesMedidaController(IUnitOfWork unitOfWork)
+    public UnidadesMedidaController(IUnidadMedidaService unidadMedidaService)
     {
-        _unitOfWork = unitOfWork;
+        _unidadMedidaService = unidadMedidaService;
     }
 
     public async Task<IActionResult> Index()
     {
-        var unidades = await _unitOfWork.UnidadesMedida.GetUnidadesConProductosAsync();
-        var unidadesDto = unidades.Select(u => u.ToDto());
-        return View(unidadesDto);
+        var result = await _unidadMedidaService.GetUnidadesAsync();
+        return View(result.IsSuccess ? result.Data : Enumerable.Empty<UnidadMedidaDto>());
     }
 
     [Authorize(Roles = Roles.AdminOrGerente)]
-    public IActionResult Create()
-    {
-        return View(new UnidadMedidaDto());
-    }
+    public IActionResult Create() => View(new UnidadMedidaDto());
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = Roles.AdminOrGerente)]
-    public async Task<IActionResult> Create(UnidadMedidaDto model)
+    public async Task<IActionResult> Create(UnidadMedidaDto dto)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid) return View(dto);
+
+        var result = await _unidadMedidaService.CreateUnidadAsync(dto);
+        if (result.IsFailure)
         {
-            var unidad = model.ToEntity();
-            unidad.Activo = true;
-            unidad.FechaCreacion = DateTime.Now;
-
-            await _unitOfWork.UnidadesMedida.AddAsync(unidad);
-            await _unitOfWork.CompleteAsync();
-
-            TempData["Mensaje"] = "Unidad de medida creada exitosamente";
-            return RedirectToAction(nameof(Index));
+            ModelState.AddModelError("", result.ErrorMessage!);
+            return View(dto);
         }
-        return View(model);
+
+        TempData["Mensaje"] = result.SuccessMessage;
+        return RedirectToAction(nameof(Index));
     }
 
     [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> Edit(int id)
     {
-        var unidad = await _unitOfWork.UnidadesMedida.GetByIdAsync(id);
-        if (unidad == null) return NotFound();
-
-        return View(unidad.ToDto());
+        var result = await _unidadMedidaService.GetUnidadByIdAsync(id);
+        if (result.IsFailure) return NotFound();
+        return View(result.Data);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = Roles.AdminOrGerente)]
-    public async Task<IActionResult> Edit(int id, UnidadMedidaDto model)
+    public async Task<IActionResult> Edit(int id, UnidadMedidaDto dto)
     {
-        if (id != model.Id) return NotFound();
+        if (id != dto.Id) return NotFound();
+        if (!ModelState.IsValid) return View(dto);
 
-        if (ModelState.IsValid)
+        var result = await _unidadMedidaService.UpdateUnidadAsync(id, dto);
+        if (result.IsFailure)
         {
-            var unidad = await _unitOfWork.UnidadesMedida.GetByIdAsync(id);
-            if (unidad == null) return NotFound();
-
-            model.UpdateEntity(unidad);
-            await _unitOfWork.UnidadesMedida.UpdateAsync(unidad);
-            await _unitOfWork.CompleteAsync();
-
-            TempData["Mensaje"] = "Unidad de medida actualizada exitosamente";
-            return RedirectToAction(nameof(Index));
+            ModelState.AddModelError("", result.ErrorMessage!);
+            return View(dto);
         }
-        return View(model);
+
+        TempData["Mensaje"] = result.SuccessMessage;
+        return RedirectToAction(nameof(Index));
     }
 }

@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\InventarioWeb.Application\InventarioWeb.Application.csproj" />
     <ProjectReference Include="..\InventarioWeb.Infrastructure\InventarioWeb.Infrastructure.csproj" />
   </ItemGroup>
 

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventarioWeb.Infrastructur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventarioWeb.Web", "InventarioWeb.Web\InventarioWeb.Web.csproj", "{E09781F0-EF15-430C-B629-976A10E50782}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventarioWeb.Application", "InventarioWeb.Application\InventarioWeb.Application.csproj", "{06B39170-90DB-408C-AD03-4F7ED5924C82}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{E09781F0-EF15-430C-B629-976A10E50782}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E09781F0-EF15-430C-B629-976A10E50782}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E09781F0-EF15-430C-B629-976A10E50782}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06B39170-90DB-408C-AD03-4F7ED5924C82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06B39170-90DB-408C-AD03-4F7ED5924C82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06B39170-90DB-408C-AD03-4F7ED5924C82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06B39170-90DB-408C-AD03-4F7ED5924C82}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

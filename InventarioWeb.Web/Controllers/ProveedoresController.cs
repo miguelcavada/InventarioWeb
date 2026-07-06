@@ -1,8 +1,7 @@
-﻿using InventarioWeb.Core.Constants;
+﻿using InventarioWeb.Application.Services;
+using InventarioWeb.Core.Constants;
 using InventarioWeb.Core.DTOs;
-using InventarioWeb.Core.Entities;
-using InventarioWeb.Core.Interfaces;
-using InventarioWeb.Core.Mappings;
+using InventarioWeb.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,144 +10,93 @@ namespace InventarioWeb.Web.Controllers;
 [Authorize(Roles = Roles.AllRoles)]
 public class ProveedoresController : Controller
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IProveedorService _proveedorService;
 
-    public ProveedoresController(IUnitOfWork unitOfWork)
+    public ProveedoresController(IProveedorService proveedorService)
     {
-        _unitOfWork = unitOfWork;
+        _proveedorService = proveedorService;
     }
 
-    // GET: Proveedores
     public async Task<IActionResult> Index(string buscar)
     {
-        IEnumerable<Proveedor> proveedores;
-
-        if (!string.IsNullOrEmpty(buscar))
-        {
-            proveedores = await _unitOfWork.Proveedores.BuscarProveedoresAsync(buscar);
-        }
-        else
-        {
-            proveedores = await _unitOfWork.Proveedores.GetProveedoresActivosAsync();
-        }
-
-        var proveedoresDto = proveedores.Select(p => p.ToDto());
-        return View(proveedoresDto);
+        var result = await _proveedorService.GetProveedoresAsync(buscar);
+        return View(result.IsSuccess ? result.Data : Enumerable.Empty<ProveedorDto>());
     }
 
-    // GET: Proveedores/Details/5
     public async Task<IActionResult> Details(int id)
     {
-        var proveedor = await _unitOfWork.Proveedores.GetProveedorConMovimientosAsync(id);
-        if (proveedor == null) return NotFound();
-
-        return View(proveedor.ToDto());
+        var result = await _proveedorService.GetProveedorByIdAsync(id);
+        if (result.IsFailure) return NotFound();
+        return View(result.Data);
     }
 
-    // GET: Proveedores/Create
     [Authorize(Roles = Roles.AdminOrGerente)]
-    public IActionResult Create()
-    {
-        return View(new ProveedorDto());
-    }
+    public IActionResult Create() => View(new ProveedorDto());
 
-    // POST: Proveedores/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = Roles.AdminOrGerente)]
-    public async Task<IActionResult> Create(ProveedorDto proveedorDto)
+    public async Task<IActionResult> Create(ProveedorDto dto)
     {
-        if (!string.IsNullOrEmpty(proveedorDto.RUC))
+        if (!ModelState.IsValid) return View(dto);
+
+        var result = await _proveedorService.CreateProveedorAsync(dto);
+        if (result.IsFailure)
         {
-            if (await _unitOfWork.Proveedores.RUCExisteAsync(proveedorDto.RUC))
-            {
-                ModelState.AddModelError("RUC", "Este RUC ya está registrado");
-            }
+            ModelState.AddModelError("", result.ErrorMessage!);
+            return View(dto);
         }
 
-        if (ModelState.IsValid)
-        {
-            var proveedor = proveedorDto.ToEntity();
-            proveedor.FechaCreacion = DateTime.Now;
-            proveedor.Activo = true;
-
-            await _unitOfWork.Proveedores.AddAsync(proveedor);
-            await _unitOfWork.CompleteAsync();
-
-            TempData["Mensaje"] = "Proveedor creado exitosamente";
-            return RedirectToAction(nameof(Index));
-        }
-        return View(proveedorDto);
+        TempData["Mensaje"] = result.SuccessMessage;
+        return RedirectToAction(nameof(Index));
     }
 
-    // GET: Proveedores/Edit/5
     [Authorize(Roles = Roles.AdminOrGerente)]
     public async Task<IActionResult> Edit(int id)
     {
-        var proveedor = await _unitOfWork.Proveedores.GetByIdAsync(id);
-        if (proveedor == null) return NotFound();
-
-        return View(proveedor.ToDto());
+        var result = await _proveedorService.GetProveedorByIdAsync(id);
+        if (result.IsFailure) return NotFound();
+        return View(result.Data);
     }
 
-    // POST: Proveedores/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = Roles.AdminOrGerente)]
-    public async Task<IActionResult> Edit(int id, ProveedorDto proveedorDto)
+    public async Task<IActionResult> Edit(int id, ProveedorDto dto)
     {
-        if (id != proveedorDto.Id) return NotFound();
+        if (id != dto.Id) return NotFound();
+        if (!ModelState.IsValid) return View(dto);
 
-        if (!string.IsNullOrEmpty(proveedorDto.RUC))
+        var result = await _proveedorService.UpdateProveedorAsync(id, dto);
+        if (result.IsFailure)
         {
-            if (await _unitOfWork.Proveedores.RUCExisteAsync(proveedorDto.RUC, id))
-            {
-                ModelState.AddModelError("RUC", "Este RUC ya está registrado por otro proveedor");
-            }
+            ModelState.AddModelError("", result.ErrorMessage!);
+            return View(dto);
         }
 
-        if (ModelState.IsValid)
-        {
-            var proveedor = await _unitOfWork.Proveedores.GetByIdAsync(id);
-            if (proveedor == null) return NotFound();
-
-            proveedorDto.UpdateEntity(proveedor);
-
-            await _unitOfWork.Proveedores.UpdateAsync(proveedor);
-            await _unitOfWork.CompleteAsync();
-
-            TempData["Mensaje"] = "Proveedor actualizado exitosamente";
-            return RedirectToAction(nameof(Index));
-        }
-        return View(proveedorDto);
+        TempData["Mensaje"] = result.SuccessMessage;
+        return RedirectToAction(nameof(Index));
     }
 
-    // GET: Proveedores/Delete/5
     [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> Delete(int id)
     {
-        var proveedor = await _unitOfWork.Proveedores.GetByIdAsync(id);
-        if (proveedor == null) return NotFound();
-
-        return View(proveedor.ToDto());
+        var result = await _proveedorService.GetProveedorByIdAsync(id);
+        if (result.IsFailure) return NotFound();
+        return View(result.Data);
     }
 
-    // POST: Proveedores/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
     [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-        var proveedor = await _unitOfWork.Proveedores.GetByIdAsync(id);
-        if (proveedor == null) return NotFound();
+        var result = await _proveedorService.DeleteProveedorAsync(id);
+        if (result.IsFailure)
+            TempData["Error"] = result.ErrorMessage;
+        else
+            TempData["Mensaje"] = result.SuccessMessage;
 
-        proveedor.Activo = false;
-        proveedor.FechaModificacion = DateTime.Now;
-
-        await _unitOfWork.Proveedores.UpdateAsync(proveedor);
-        await _unitOfWork.CompleteAsync();
-
-        TempData["Mensaje"] = "Proveedor eliminado exitosamente";
         return RedirectToAction(nameof(Index));
     }
 }

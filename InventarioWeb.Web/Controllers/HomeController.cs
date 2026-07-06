@@ -1,76 +1,43 @@
-using InventarioWeb.Core.Constants;
-using InventarioWeb.Core.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using InventarioWeb.Core.Constants;
+using InventarioWeb.Application.Services;
 
 namespace InventarioWeb.Web.Controllers;
 
 [Authorize(Roles = Roles.AllRoles)]
 public class HomeController : Controller
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IDashboardService _dashboardService;
 
-    public HomeController(IUnitOfWork unitOfWork)
+    public HomeController(IDashboardService dashboardService)
     {
-        _unitOfWork = unitOfWork;
+        _dashboardService = dashboardService;
     }
 
     public async Task<IActionResult> Index()
     {
-        var productos = await _unitOfWork.Productos.GetProductosConCategoriaAsync();
-        var movimientos = await _unitOfWork.Movimientos.GetAllAsync();
-        var almacenes = await _unitOfWork.Almacenes.GetAlmacenesActivosAsync();
+        var result = await _dashboardService.GetDashboardDataAsync();
 
-        // Total de productos activos
-        ViewBag.TotalProductos = productos.Count(p => p.Activo);
+        if (result.IsFailure)
+        {
+            TempData["Error"] = result.ErrorMessage;
+            return View();
+        }
 
-        // Productos inactivos
-        ViewBag.ProductosInactivos = productos.Count(p => !p.Activo);
-
-        // Total de entradas
-        ViewBag.TotalEntradas = movimientos.Count(m => m.Tipo == "ENTRADA");
-
-        // Total de salidas
-        ViewBag.TotalSalidas = movimientos.Count(m => m.Tipo == "SALIDA");
-
-        // Total de traslados
-        ViewBag.TotalTraslados = movimientos.Count(m => m.Tipo == "TRASLADO");
-
-        // Stock bajo: productos con stock total <= stock mínimo total
-        ViewBag.StockBajo = productos.Count(p =>
-            p.Activo &&
-            p.Stocks.Any() &&
-            p.Stocks.Sum(s => s.StockActual) <= p.Stocks.Sum(s => s.StockMinimo) &&
-            p.Stocks.Sum(s => s.StockActual) > 0
-        );
-
-        // Valor total del inventario
-        ViewBag.ValorInventario = productos
-            .Where(p => p.Activo && p.PrecioCosto.HasValue)
-            .Sum(p => p.Stocks.Sum(s => s.StockActual) * (p.PrecioCosto ?? 0));
-
-        // Total de almacenes
-        ViewBag.TotalAlmacenes = almacenes.Count();
-
-        // Últimos movimientos
-        ViewBag.UltimosMovimientos = movimientos
-            .OrderByDescending(m => m.FechaMovimiento)
-            .Take(5)
-            .Select(m => new
-            {
-                m.Id,
-                m.Tipo,
-                m.NumeroDocumento,
-                m.FechaMovimiento,
-                Total = m.Detalles?.Sum(d => d.Cantidad * d.PrecioUnitario) ?? 0
-            })
-            .ToList();
+        var data = result.Data!;
+        ViewBag.TotalProductos = data.TotalProductos;
+        ViewBag.ProductosInactivos = data.ProductosInactivos;
+        ViewBag.StockBajo = data.StockBajo;
+        ViewBag.TotalEntradas = data.TotalEntradas;
+        ViewBag.TotalSalidas = data.TotalSalidas;
+        ViewBag.TotalTraslados = data.TotalTraslados;
+        ViewBag.TotalAlmacenes = data.TotalAlmacenes;
+        ViewBag.ValorInventario = data.ValorInventario;
+        ViewBag.UltimosMovimientos = data.UltimosMovimientos;
 
         return View();
     }
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
+    public IActionResult Privacy() => View();
 }
