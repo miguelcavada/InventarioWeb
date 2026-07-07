@@ -117,7 +117,7 @@ public class AlmacenService : IAlmacenService
 
             almacen.Activo = false;
             almacen.FechaModificacion = DateTime.Now;
-            await _unitOfWork.Almacenes.UpdateAsync(almacen);
+            await _unitOfWork.Almacenes.DeleteAsync(almacen);
             await _unitOfWork.CompleteAsync();
 
             return Result.Success("Almacén eliminado exitosamente");

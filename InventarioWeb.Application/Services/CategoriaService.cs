@@ -121,7 +121,7 @@ public class CategoriaService : ICategoriaService
 
             categoria.Activo = false;
             categoria.FechaModificacion = DateTime.Now;
-            await _unitOfWork.Categorias.UpdateAsync(categoria);
+            await _unitOfWork.Categorias.DeleteAsync(categoria);
             await _unitOfWork.CompleteAsync();
 
             return Result.Success("Categoría eliminada exitosamente");

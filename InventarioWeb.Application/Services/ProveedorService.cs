@@ -113,7 +113,7 @@ public class ProveedorService : IProveedorService
 
             proveedor.Activo = false;
             proveedor.FechaModificacion = DateTime.Now;
-            await _unitOfWork.Proveedores.UpdateAsync(proveedor);
+            await _unitOfWork.Proveedores.DeleteAsync(proveedor);
             await _unitOfWork.CompleteAsync();
 
             return Result.Success("Proveedor eliminado exitosamente");

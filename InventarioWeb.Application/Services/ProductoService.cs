@@ -132,7 +132,7 @@ public class ProductoService : IProductoService
 
             producto.Activo = false;
             producto.FechaModificacion = DateTime.Now;
-            await _unitOfWork.Productos.UpdateAsync(producto);
+            await _unitOfWork.Productos.DeleteAsync(producto);
             await _unitOfWork.CompleteAsync();
 
             return Result.Success("Producto eliminado exitosamente");

@@ -75,4 +75,47 @@ public class MovimientosController : Controller
         var almacenes = await _unitOfWork.Almacenes.GetAlmacenesActivosAsync();
         ViewBag.Almacenes = new SelectList(almacenes, "Id", "Nombre");
     }
+
+    [HttpGet]
+    public async Task<JsonResult> ObtenerPrecioProducto(int productoId, string tipo, string tipoPrecio = "MINORISTA")
+    {
+        var producto = await _unitOfWork.Productos.GetByIdAsync(productoId);
+
+        if (producto == null)
+            return Json(new { success = false, message = "Producto no encontrado" });
+
+        decimal precio = 0;
+
+        switch (tipo)
+        {
+            case "ENTRADA":
+                if (producto.PrecioCosto.HasValue && producto.PrecioCosto > 0)
+                    precio = producto.PrecioCosto.Value;
+                else
+                    return Json(new { success = false, message = "El producto no tiene precio de costo definido. Ingrese manualmente." });
+                break;
+
+            case "SALIDA":
+                if (tipoPrecio == "MAYORISTA" && producto.PrecioVentaMayorista.HasValue && producto.PrecioVentaMayorista > 0)
+                    precio = producto.PrecioVentaMayorista.Value;
+                else
+                    precio = producto.PrecioVentaMinorista;
+                break;
+
+            case "TRASLADO":
+                if (producto.PrecioCosto.HasValue && producto.PrecioCosto > 0)
+                    precio = producto.PrecioCosto.Value;
+                else
+                    precio = producto.PrecioVentaMinorista;
+                break;
+        }
+
+        return Json(new
+        {
+            success = true,
+            precio = precio,
+            unidad = producto.UnidadMedida?.Abreviatura ?? "",
+            stockActual = producto.StockTotal
+        });
+    }
 }
