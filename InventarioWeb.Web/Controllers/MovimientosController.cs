@@ -47,24 +47,23 @@ public class MovimientosController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(MovimientoDto dto)
+    public async Task<IActionResult> Create(MovimientoDto movimientoDto)
     {
-        if (!ModelState.IsValid)
+        if (ModelState.IsValid)
         {
-            await CargarListasAsync();
-            return View(dto);
-        }
+            var result = await _movimientoService.CreateMovimientoAsync(movimientoDto);
 
-        var result = await _movimientoService.CreateMovimientoAsync(dto);
-        if (result.IsFailure)
-        {
+            if (result.IsSuccess)
+            {
+                TempData["Mensaje"] = result.SuccessMessage;
+                return RedirectToAction(nameof(Index));
+            }
+
             ModelState.AddModelError("", result.ErrorMessage!);
-            await CargarListasAsync();
-            return View(dto);
         }
 
-        TempData["Mensaje"] = result.SuccessMessage;
-        return RedirectToAction(nameof(Index));
+        await CargarListasAsync();
+        return View(movimientoDto);
     }
 
     private async Task CargarListasAsync()
@@ -79,43 +78,19 @@ public class MovimientosController : Controller
     [HttpGet]
     public async Task<JsonResult> ObtenerPrecioProducto(int productoId, string tipo, string tipoPrecio = "MINORISTA")
     {
-        var producto = await _unitOfWork.Productos.GetByIdAsync(productoId);
+        var result = await _movimientoService.ObtenerPrecioProductoAsync(productoId, tipo, tipoPrecio);
 
-        if (producto == null)
-            return Json(new { success = false, message = "Producto no encontrado" });
-
-        decimal precio = 0;
-
-        switch (tipo)
+        if (result.IsFailure)
         {
-            case "ENTRADA":
-                if (producto.PrecioCosto.HasValue && producto.PrecioCosto > 0)
-                    precio = producto.PrecioCosto.Value;
-                else
-                    return Json(new { success = false, message = "El producto no tiene precio de costo definido. Ingrese manualmente." });
-                break;
-
-            case "SALIDA":
-                if (tipoPrecio == "MAYORISTA" && producto.PrecioVentaMayorista.HasValue && producto.PrecioVentaMayorista > 0)
-                    precio = producto.PrecioVentaMayorista.Value;
-                else
-                    precio = producto.PrecioVentaMinorista;
-                break;
-
-            case "TRASLADO":
-                if (producto.PrecioCosto.HasValue && producto.PrecioCosto > 0)
-                    precio = producto.PrecioCosto.Value;
-                else
-                    precio = producto.PrecioVentaMinorista;
-                break;
+            return Json(new { success = false, message = result.ErrorMessage });
         }
 
         return Json(new
         {
             success = true,
-            precio = precio,
-            unidad = producto.UnidadMedida?.Abreviatura ?? "",
-            stockActual = producto.StockTotal
+            precio = result.Data!.Precio,
+            unidad = result.Data.Unidad,
+            stockActual = result.Data.StockActual
         });
     }
 }

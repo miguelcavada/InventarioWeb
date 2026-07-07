@@ -10,6 +10,7 @@ public interface IMovimientoService
     Task<Result<IEnumerable<MovimientoDto>>> GetMovimientosAsync(string tipo = "TODOS", DateTime? desde = null, DateTime? hasta = null);
     Task<Result<MovimientoDto>> GetMovimientoByIdAsync(int id);
     Task<Result<MovimientoDto>> CreateMovimientoAsync(MovimientoDto dto);
+    Task<Result<PrecioProductoDto>> ObtenerPrecioProductoAsync(int productoId, string tipo, string tipoPrecio = "MINORISTA");
 }
 
 public class MovimientoService : IMovimientoService
@@ -102,6 +103,79 @@ public class MovimientoService : IMovimientoService
         catch (Exception ex)
         {
             return Result<MovimientoDto>.Failure($"Error al crear movimiento: {ex.Message}");
+        }
+    }
+
+    public async Task<Result<PrecioProductoDto>> ObtenerPrecioProductoAsync(int productoId, string tipo, string tipoPrecio = "MINORISTA")
+    {
+        try
+        {
+            var producto = await _unitOfWork.Productos.GetProductoConCategoriaAsync(productoId);
+
+            if (producto == null)
+                return Result<PrecioProductoDto>.Failure("Producto no encontrado");
+
+            decimal precio = 0;
+            string mensaje = "";
+
+            switch (tipo)
+            {
+                case "ENTRADA":
+                    if (producto.PrecioCosto.HasValue && producto.PrecioCosto > 0)
+                    {
+                        precio = producto.PrecioCosto.Value;
+                    }
+                    else
+                    {
+                        return Result<PrecioProductoDto>.Failure("El producto no tiene precio de costo definido. Ingrese manualmente.");
+                    }
+                    break;
+
+                case "SALIDA":
+                    if (tipoPrecio == "MAYORISTA" && producto.PrecioVentaMayorista.HasValue && producto.PrecioVentaMayorista > 0)
+                    {
+                        precio = producto.PrecioVentaMayorista.Value;
+                        mensaje = "Precio mayorista aplicado";
+                    }
+                    else if (tipoPrecio == "MAYORISTA" && (!producto.PrecioVentaMayorista.HasValue || producto.PrecioVentaMayorista <= 0))
+                    {
+                        precio = producto.PrecioVentaMinorista;
+                        mensaje = "No tiene precio mayorista. Se aplica precio minorista.";
+                    }
+                    else
+                    {
+                        precio = producto.PrecioVentaMinorista;
+                    }
+                    break;
+
+                case "TRASLADO":
+                    if (producto.PrecioCosto.HasValue && producto.PrecioCosto > 0)
+                    {
+                        precio = producto.PrecioCosto.Value;
+                    }
+                    else
+                    {
+                        precio = producto.PrecioVentaMinorista;
+                        mensaje = "Sin costo definido. Se usa precio minorista.";
+                    }
+                    break;
+
+                default:
+                    return Result<PrecioProductoDto>.Failure("Tipo de movimiento no válido");
+            }
+
+            var result = new PrecioProductoDto
+            {
+                Precio = precio,
+                Unidad = producto.UnidadMedida?.Abreviatura ?? "U",
+                StockActual = producto.StockTotal
+            };
+
+            return Result<PrecioProductoDto>.Success(result);
+        }
+        catch (Exception ex)
+        {
+            return Result<PrecioProductoDto>.Failure($"Error al obtener precio: {ex.Message}");
         }
     }
 }
