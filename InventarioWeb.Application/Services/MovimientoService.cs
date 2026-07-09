@@ -60,6 +60,52 @@ public class MovimientoService : IMovimientoService
         }
     }
 
+    //public async Task<Result<MovimientoDto>> CreateMovimientoAsync(MovimientoDto dto)
+    //{
+    //    try
+    //    {
+    //        // Validar precios según tipo de movimiento
+    //        foreach (var detalle in dto.Detalles)
+    //        {
+    //            var producto = await _unitOfWork.Productos.GetByIdAsync(detalle.ProductoId);
+    //            if (producto == null)
+    //                return Result<MovimientoDto>.Failure($"Producto ID {detalle.ProductoId} no encontrado");
+
+    //            // Validar que el precio coincida con el tipo de movimiento
+    //            if (dto.Tipo == "ENTRADA" && producto.PrecioCosto.HasValue && producto.PrecioCosto > 0)
+    //            {
+    //                // Asegurar que se use el precio de costo
+    //                detalle.PrecioUnitario = producto.PrecioCosto.Value;
+    //            }
+    //            else if (dto.Tipo == "SALIDA")
+    //            {
+    //                // Validar que el precio sea minorista o mayorista
+    //                if (detalle.PrecioUnitario != producto.PrecioVentaMinorista &&
+    //                    detalle.PrecioUnitario != producto.PrecioVentaMayorista)
+    //                {
+    //                    // Si no coincide, usar minorista por defecto
+    //                    detalle.PrecioUnitario = producto.PrecioVentaMinorista;
+    //                }
+    //            }
+    //        }
+
+    //        var movimiento = dto.ToEntity();
+    //        movimiento.FechaCreacion = DateTime.Now;
+    //        movimiento.Activo = true;
+
+    //        // ... resto de la lógica de stock ...
+
+    //        await _unitOfWork.Movimientos.AddAsync(movimiento);
+    //        await _unitOfWork.CompleteAsync();
+
+    //        return Result<MovimientoDto>.Success(movimiento.ToDto(), "Movimiento registrado exitosamente");
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        return Result<MovimientoDto>.Failure($"Error al crear movimiento: {ex.Message}");
+    //    }
+    //}
+
     public async Task<Result<MovimientoDto>> CreateMovimientoAsync(MovimientoDto dto)
     {
         try
@@ -71,19 +117,15 @@ public class MovimientoService : IMovimientoService
                 if (producto == null)
                     return Result<MovimientoDto>.Failure($"Producto ID {detalle.ProductoId} no encontrado");
 
-                // Validar que el precio coincida con el tipo de movimiento
                 if (dto.Tipo == "ENTRADA" && producto.PrecioCosto.HasValue && producto.PrecioCosto > 0)
                 {
-                    // Asegurar que se use el precio de costo
                     detalle.PrecioUnitario = producto.PrecioCosto.Value;
                 }
                 else if (dto.Tipo == "SALIDA")
                 {
-                    // Validar que el precio sea minorista o mayorista
                     if (detalle.PrecioUnitario != producto.PrecioVentaMinorista &&
                         detalle.PrecioUnitario != producto.PrecioVentaMayorista)
                     {
-                        // Si no coincide, usar minorista por defecto
                         detalle.PrecioUnitario = producto.PrecioVentaMinorista;
                     }
                 }
@@ -93,7 +135,87 @@ public class MovimientoService : IMovimientoService
             movimiento.FechaCreacion = DateTime.Now;
             movimiento.Activo = true;
 
-            // ... resto de la lógica de stock ...
+            // Actualizar stock para cada detalle
+            foreach (var detalle in movimiento.Detalles)
+            {
+                var stock = await _unitOfWork.StockAlmacenes.GetStockAsync(detalle.ProductoId, movimiento.AlmacenOrigenId);
+
+                if (movimiento.Tipo == "ENTRADA")
+                {
+                    if (stock == null)
+                    {
+                        // Crear nuevo stock si no existe
+                        stock = new StockAlmacen
+                        {
+                            ProductoId = detalle.ProductoId,
+                            AlmacenId = movimiento.AlmacenOrigenId,
+                            StockActual = (int)detalle.Cantidad,
+                            StockMinimo = 5,
+                            StockMaximo = 100,
+                            FechaCreacion = DateTime.Now,
+                            Activo = true
+                        };
+                        await _unitOfWork.StockAlmacenes.AddAsync(stock);
+                    }
+                    else
+                    {
+                        // AUMENTAR stock existente
+                        stock.StockActual += (int)detalle.Cantidad;
+                        stock.FechaModificacion = DateTime.Now;
+                        await _unitOfWork.StockAlmacenes.UpdateAsync(stock);
+                    }
+                }
+                else if (movimiento.Tipo == "SALIDA")
+                {
+                    if (stock == null)
+                        return Result<MovimientoDto>.Failure($"No hay stock del producto en este almacén");
+
+                    if (stock.StockActual < detalle.Cantidad)
+                        return Result<MovimientoDto>.Failure($"Stock insuficiente. Stock actual: {stock.StockActual}");
+
+                    // DISMINUIR stock
+                    stock.StockActual -= (int)detalle.Cantidad;
+                    stock.FechaModificacion = DateTime.Now;
+                    await _unitOfWork.StockAlmacenes.UpdateAsync(stock);
+                }
+                else if (movimiento.Tipo == "TRASLADO")
+                {
+                    if (stock == null)
+                        return Result<MovimientoDto>.Failure($"No hay stock del producto en el almacén origen");
+
+                    if (stock.StockActual < detalle.Cantidad)
+                        return Result<MovimientoDto>.Failure($"Stock insuficiente para traslado. Stock actual: {stock.StockActual}");
+
+                    // DISMINUIR stock del origen
+                    stock.StockActual -= (int)detalle.Cantidad;
+                    stock.FechaModificacion = DateTime.Now;
+                    await _unitOfWork.StockAlmacenes.UpdateAsync(stock);
+
+                    // AUMENTAR stock del destino
+                    var stockDestino = await _unitOfWork.StockAlmacenes.GetStockAsync(detalle.ProductoId, movimiento.AlmacenDestinoId!.Value);
+
+                    if (stockDestino == null)
+                    {
+                        stockDestino = new StockAlmacen
+                        {
+                            ProductoId = detalle.ProductoId,
+                            AlmacenId = movimiento.AlmacenDestinoId!.Value,
+                            StockActual = (int)detalle.Cantidad,
+                            StockMinimo = 5,
+                            StockMaximo = 100,
+                            FechaCreacion = DateTime.Now,
+                            Activo = true
+                        };
+                        await _unitOfWork.StockAlmacenes.AddAsync(stockDestino);
+                    }
+                    else
+                    {
+                        stockDestino.StockActual += (int)detalle.Cantidad;
+                        stockDestino.FechaModificacion = DateTime.Now;
+                        await _unitOfWork.StockAlmacenes.UpdateAsync(stockDestino);
+                    }
+                }
+            }
 
             await _unitOfWork.Movimientos.AddAsync(movimiento);
             await _unitOfWork.CompleteAsync();

@@ -1,7 +1,5 @@
-﻿using InventarioWeb.Application.Services;
-using InventarioWeb.Core.Constants;
+﻿using InventarioWeb.Core.Constants;
 using InventarioWeb.Core.DTOs;
-using InventarioWeb.Core.Interfaces;
 using InventarioWeb.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
