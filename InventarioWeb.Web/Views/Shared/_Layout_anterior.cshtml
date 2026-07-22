@@ -1,0 +1,297 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using InventarioWeb.Core.Constants
+@inject SignInManager<InventarioWeb.Core.Entities.ApplicationUser> SignInManager
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Sistema de Inventario</title>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/bootstrap-icons/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <style>
+        .navbar-nav .nav-link {
+            padding: 0.4rem 0.5rem;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+
+        .navbar-brand {
+            font-size: 1rem;
+            padding: 0.4rem 0.5rem;
+        }
+
+        .dropdown-menu {
+            font-size: 0.85rem;
+            min-width: auto;
+        }
+
+            .dropdown-menu .dropdown-item {
+                padding: 0.35rem 1rem;
+            }
+
+        .badge-role {
+            font-size: 0.7rem;
+        }
+
+        .nav-user-name {
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-xl navbar-dark bg-dark py-1">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-boxes"></i> Inventario
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <ul class="navbar-nav me-auto">
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Index">
+                                    <i class="bi bi-house"></i> Inicio
+                                </a>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                    <i class="bi bi-box-seam"></i> Productos
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="Productos" asp-action="Index">Ver todos</a></li>
+                                    @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Gerente))
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="Productos" asp-action="Create">Nuevo</a></li>
+                                    }
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" asp-controller="Categorias" asp-action="Index">Categorías</a></li>
+                                    <li><a class="dropdown-item" asp-controller="UnidadesMedida" asp-action="Index">Unidades</a></li>
+                                </ul>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                    <i class="bi bi-shop"></i> Almacenes
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="Almacenes" asp-action="Index">Ver todos</a></li>
+                                    @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Gerente))
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="Almacenes" asp-action="Create">Nuevo</a></li>
+                                    }
+                                </ul>
+                            </li>
+
+                            @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Gerente) || User.IsInRole(Roles.Operador))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                        <i class="bi bi-arrow-left-right"></i> Movimientos
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-controller="Movimientos" asp-action="Index">Historial</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Movimientos" asp-action="Create" asp-route-tipo="ENTRADA">
+                                                <i class="bi bi-box-arrow-in-down text-success"></i> Entrada
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Movimientos" asp-action="Create" asp-route-tipo="SALIDA">
+                                                <i class="bi bi-box-arrow-up text-danger"></i> Salida
+                                            </a>
+                                        </li>
+                                        @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Gerente))
+                                        {
+                                            <li>
+                                                <a class="dropdown-item" asp-controller="Movimientos" asp-action="Create" asp-route-tipo="TRASLADO">
+                                                    <i class="bi bi-arrow-left-right text-info"></i> Traslado
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Movimientos" asp-action="Index">
+                                        <i class="bi bi-arrow-left-right"></i> Movimientos
+                                    </a>
+                                </li>
+                            }
+
+                            @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Gerente) || User.IsInRole(Roles.Operador))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                        <i class="bi bi-box-arrow-right"></i> Consignaciones
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-controller="Consignaciones" asp-action="Index">Ver todas</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Consignaciones" asp-action="Create">Nueva</a></li>
+                                    </ul>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Consignaciones" asp-action="Index">
+                                        <i class="bi bi-box-arrow-right"></i> Consignaciones
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                    <i class="bi bi-truck"></i> Proveedores
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-controller="Proveedores" asp-action="Index">Ver todos</a></li>
+                                    @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Gerente))
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="Proveedores" asp-action="Create">Nuevo</a></li>
+                                    }
+                                </ul>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Reportes" asp-action="Index">
+                                    <i class="bi bi-file-earmark-bar-graph"></i> Reportes
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Graficos" asp-action="Index">
+                                    <i class="bi bi-bar-chart"></i> Gráficos
+                                </a>
+                            </li>
+
+                            @if (User.IsInRole(Roles.Admin))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                        <i class="bi bi-gear"></i> Admin
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Usuarios">Usuarios</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="CrearUsuario">Nuevo usuario</a></li>
+                                    </ul>
+                                </li>
+                            }
+                        </ul>
+
+                        <ul class="navbar-nav">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                    <i class="bi bi-person-circle"></i>
+                                    <span class="nav-user-name">@User.Identity?.Name</span>
+                                    <span class="badge bg-info ms-1 badge-role">
+                                        @if (User.IsInRole(Roles.Admin))
+                                        {
+                                            <text>Adm</text>
+                                        }
+                                        else if (User.IsInRole(Roles.Gerente))
+                                        {
+
+                                            <text>Ger</text>
+                                        }
+                                        else if (User.IsInRole(Roles.Operador))
+                                        {
+
+                                            <text>Ope</text>
+                                        }
+                                        else
+                                        {
+
+                                            <text>Con</text>
+                                        }
+                                    </span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <span class="dropdown-item-text">
+                                            <strong>@User.Identity?.Name</strong><br>
+                                            <small class="text-muted">
+                                                @if (User.IsInRole(Roles.Admin))
+                                                {
+                                                    <text>Administrador</text>
+                                                }
+                                                else if (User.IsInRole(Roles.Gerente))
+                                                {
+
+                                                    <text>Gerente</text>
+                                                }
+                                                else if (User.IsInRole(Roles.Operador))
+                                                {
+
+                                                    <text>Operador</text>
+                                                }
+                                                else
+                                                {
+
+                                                    <text>Consulta</text>
+                                                }
+                                            </small>
+                                        </span>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    }
+                    else
+                    {
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">
+                                    <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+                                </a>
+                            </li>
+                        </ul>
+                    }
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container-fluid mt-4">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted mt-5 py-3">
+        <div class="container-fluid text-center">
+            &copy; @DateTime.Now.Year - Sistema de Inventario Web
+        </div>
+    </footer>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

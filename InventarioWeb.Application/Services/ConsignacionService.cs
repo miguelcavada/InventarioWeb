@@ -12,6 +12,7 @@ public interface IConsignacionService
     Task<Result<ConsignacionDto>> CreateConsignacionAsync(ConsignacionDto dto);
     Task<Result> RegistrarVentaAsync(RegistrarVentaDto dto);
     Task<Result> RegistrarDevolucionAsync(RegistrarDevolucionDto dto);
+    Task<Result<PrecioProductoDto>> ObtenerPrecioProductoAsync(int productoId); // Este método
 }
 
 public class ConsignacionService : IConsignacionService
@@ -246,6 +247,27 @@ public class ConsignacionService : IConsignacionService
         else
         {
             consignacion.Estado = "PENDIENTE";
+        }
+    }
+
+    public async Task<Result<PrecioProductoDto>> ObtenerPrecioProductoAsync(int productoId)
+    {
+        try
+        {
+            var producto = await _unitOfWork.Productos.GetByIdAsync(productoId);
+            if (producto == null)
+                return Result<PrecioProductoDto>.Failure("Producto no encontrado");
+
+            return Result<PrecioProductoDto>.Success(new PrecioProductoDto
+            {
+                Precio = producto.PrecioVentaMinorista,
+                Unidad = producto.UnidadMedida?.Abreviatura ?? "U",
+                StockActual = producto.StockTotal
+            });
+        }
+        catch (Exception ex)
+        {
+            return Result<PrecioProductoDto>.Failure($"Error: {ex.Message}");
         }
     }
 }

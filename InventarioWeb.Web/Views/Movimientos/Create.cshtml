@@ -39,27 +39,33 @@
                         </div>
                     </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label asp-for="AlmacenOrigenId" class="form-label">
-                                @(esTraslado ? "Almacén Origen" : "Almacén") <span class="text-danger">*</span>
-                            </label>
-                            <select asp-for="AlmacenOrigenId" class="form-select" asp-items="ViewBag.Almacenes" required>
-                                <option value="">-- Seleccione un almacén --</option>
-                            </select>
-                        </div>
-                        @if (esTraslado)
-                        {
+                    @if (esTraslado)
+                    {
+                        <div class="row mb-3">
                             <div class="col-md-6">
-                                <label asp-for="AlmacenDestinoId" class="form-label">
-                                    Almacén Destino <span class="text-danger">*</span>
+                                <label asp-for="AlmacenOrigenId" class="form-label">
+                                    <i class="bi bi-box-arrow-right"></i> Almacén Origen <span class="text-danger">*</span>
                                 </label>
-                                <select asp-for="AlmacenDestinoId" class="form-select" asp-items="ViewBag.Almacenes" required>
-                                    <option value="">-- Seleccione almacén destino --</option>
+                                <select asp-for="AlmacenOrigenId" class="form-select" asp-items="ViewBag.Almacenes" required>
+                                    <option value="">-- Seleccione origen --</option>
                                 </select>
                             </div>
-                        }
-                    </div>
+                            <div class="col-md-6">
+                                <label asp-for="AlmacenDestinoId" class="form-label">
+                                    <i class="bi bi-box-arrow-in-right"></i> Almacén Destino <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="AlmacenDestinoId" class="form-select" asp-items="ViewBag.Almacenes" required>
+                                    <option value="">-- Seleccione destino --</option>
+                                </select>
+                                <span asp-validation-for="AlmacenDestinoId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Traslado:</strong> El origen y destino deben ser diferentes. El stock se descontará del origen y se agregará al destino.
+                        </div>
+                    }
 
                     <hr />
                     <h5>Detalles del Movimiento</h5>
@@ -255,6 +261,39 @@
         });
 
         $('#btnAgregarDetalle').click(agregarDetalle);
+
+        // Validar que origen y destino no sean iguales en traslados
+        $(document).on('change', 'select[name="AlmacenDestinoId"], select[name="AlmacenOrigenId"]', function() {
+            if (tipoMovimiento === 'TRASLADO') {
+                var origenId = $('select[name="AlmacenOrigenId"]').val();
+                var destinoId = $('select[name="AlmacenDestinoId"]').val();
+
+                if (origenId && destinoId && origenId === destinoId) {
+                    alert('El almacén de destino no puede ser el mismo que el origen.');
+                    $(this).val('');
+                }
+            }
+        });
+
+        // Validar antes de enviar el formulario
+        $('#formMovimiento').submit(function(e) {
+            if (tipoMovimiento === 'TRASLADO') {
+                var origenId = $('select[name="AlmacenOrigenId"]').val();
+                var destinoId = $('select[name="AlmacenDestinoId"]').val();
+
+                if (!destinoId) {
+                    e.preventDefault();
+                    alert('Debe seleccionar un almacén de destino para el traslado.');
+                    return false;
+                }
+
+                if (origenId === destinoId) {
+                    e.preventDefault();
+                    alert('No se puede trasladar al mismo almacén. Seleccione un destino diferente.');
+                    return false;
+                }
+            }
+        });
 
         // Agregar primer detalle al cargar
         $(document).ready(function() {

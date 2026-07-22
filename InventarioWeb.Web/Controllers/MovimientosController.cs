@@ -43,10 +43,49 @@ public class MovimientosController : Controller
         });
     }
 
+    //[HttpPost]
+    //[ValidateAntiForgeryToken]
+    //public async Task<IActionResult> Create(MovimientoDto movimientoDto)
+    //{
+    //    if (ModelState.IsValid)
+    //    {
+    //        var result = await _movimientoService.CreateMovimientoAsync(movimientoDto);
+
+    //        if (result.IsSuccess)
+    //        {
+    //            TempData["Mensaje"] = result.SuccessMessage;
+    //            return RedirectToAction(nameof(Index));
+    //        }
+
+    //        ModelState.AddModelError("", result.ErrorMessage!);
+    //    }
+
+    //    await CargarListasAsync();
+    //    return View(movimientoDto);
+    //}
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(MovimientoDto movimientoDto)
     {
+        // ===== VALIDACIÓN ADICIONAL EN CONTROLADOR =====
+        if (movimientoDto.Tipo == "TRASLADO")
+        {
+            if (movimientoDto.AlmacenOrigenId == movimientoDto.AlmacenDestinoId)
+            {
+                ModelState.AddModelError("AlmacenDestinoId", "El almacén destino no puede ser el mismo que el origen");
+                await CargarListasAsync();
+                return View(movimientoDto);
+            }
+
+            if (!movimientoDto.AlmacenDestinoId.HasValue || movimientoDto.AlmacenDestinoId <= 0)
+            {
+                ModelState.AddModelError("AlmacenDestinoId", "Debe seleccionar un almacén de destino");
+                await CargarListasAsync();
+                return View(movimientoDto);
+            }
+        }
+
         if (ModelState.IsValid)
         {
             var result = await _movimientoService.CreateMovimientoAsync(movimientoDto);
@@ -57,7 +96,7 @@ public class MovimientosController : Controller
                 return RedirectToAction(nameof(Index));
             }
 
-            ModelState.AddModelError("", result.ErrorMessage!);
+            ModelState.AddModelError("", result.ErrorMessage);
         }
 
         await CargarListasAsync();

@@ -3,295 +3,500 @@
 @inject SignInManager<InventarioWeb.Core.Entities.ApplicationUser> SignInManager
 
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-bs-theme="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Sistema de Inventario</title>
-    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="~/bootstrap-icons/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <style>
-        .navbar-nav .nav-link {
-            padding: 0.4rem 0.5rem;
-            font-size: 0.85rem;
-            white-space: nowrap;
-        }
-
-        .navbar-brand {
-            font-size: 1rem;
-            padding: 0.4rem 0.5rem;
-        }
-
-        .dropdown-menu {
-            font-size: 0.85rem;
-            min-width: auto;
-        }
-
-            .dropdown-menu .dropdown-item {
-                padding: 0.35rem 1rem;
-            }
-
-        .badge-role {
-            font-size: 0.7rem;
-        }
-
-        .nav-user-name {
-            max-width: 120px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: inline-block;
-            vertical-align: middle;
-        }
-    </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-xl navbar-dark bg-dark py-1">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-boxes"></i> Inventario
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <i class="bi bi-boxes"></i>
+                <span class="brand-text">InventarioWeb</span>
+            </div>
 
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    @if (SignInManager.IsSignedIn(User))
-                    {
-                        <ul class="navbar-nav me-auto">
+            <nav class="sidebar-nav">
+                <div class="nav-section">Principal</div>
 
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Home" asp-action="Index">
-                                    <i class="bi bi-house"></i> Inicio
-                                </a>
-                            </li>
+                <div class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")"
+                       asp-controller="Home" asp-action="Index">
+                        <i class="bi bi-speedometer2"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </div>
 
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                                    <i class="bi bi-box-seam"></i> Productos
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" asp-controller="Productos" asp-action="Index">Ver todos</a></li>
-                                    @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Gerente))
-                                    {
-                                        <li><a class="dropdown-item" asp-controller="Productos" asp-action="Create">Nuevo</a></li>
-                                    }
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" asp-controller="Categorias" asp-action="Index">Categorías</a></li>
-                                    <li><a class="dropdown-item" asp-controller="UnidadesMedida" asp-action="Index">Unidades</a></li>
-                                </ul>
-                            </li>
+                <!-- Productos -->
+                <div class="nav-item">
+                    <a class="nav-link has-submenu @(ViewContext.RouteData.Values["controller"]?.ToString() == "Productos" || ViewContext.RouteData.Values["controller"]?.ToString() == "Categorias" || ViewContext.RouteData.Values["controller"]?.ToString() == "UnidadesMedida" ? "expanded" : "")"
+                       data-bs-toggle="collapse" href="#productosMenu" role="button">
+                        <i class="bi bi-box-seam"></i>
+                        <span class="nav-text">Productos</span>
+                    </a>
+                    <div class="submenu collapse @(ViewContext.RouteData.Values["controller"]?.ToString() == "Productos" || ViewContext.RouteData.Values["controller"]?.ToString() == "Categorias" || ViewContext.RouteData.Values["controller"]?.ToString() == "UnidadesMedida" ? "show" : "")" id="productosMenu">
+                        <a class="nav-link" asp-controller="Productos" asp-action="Index">
+                            <span class="nav-text">Lista de Productos</span>
+                        </a>
+                        @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Gerente))
+                        {
+                            <a class="nav-link" asp-controller="Productos" asp-action="Create">
+                                <span class="nav-text">Nuevo Producto</span>
+                            </a>
+                        }
+                        <a class="nav-link" asp-controller="Categorias" asp-action="Index">
+                            <span class="nav-text">Categorías</span>
+                        </a>
+                        <a class="nav-link" asp-controller="UnidadesMedida" asp-action="Index">
+                            <span class="nav-text">Unidades de Medida</span>
+                        </a>
+                    </div>
+                </div>
 
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                                    <i class="bi bi-shop"></i> Almacenes
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" asp-controller="Almacenes" asp-action="Index">Ver todos</a></li>
-                                    @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Gerente))
-                                    {
-                                        <li><a class="dropdown-item" asp-controller="Almacenes" asp-action="Create">Nuevo</a></li>
-                                    }
-                                </ul>
-                            </li>
+                <!-- Almacenes -->
+                <div class="nav-item">
+                    <a class="nav-link has-submenu @(ViewContext.RouteData.Values["controller"]?.ToString() == "Almacenes" ? "expanded" : "")"
+                       data-bs-toggle="collapse" href="#almacenesMenu" role="button">
+                        <i class="bi bi-shop"></i>
+                        <span class="nav-text">Almacenes</span>
+                    </a>
+                    <div class="submenu collapse @(ViewContext.RouteData.Values["controller"]?.ToString() == "Almacenes" ? "show" : "")" id="almacenesMenu">
+                        <a class="nav-link" asp-controller="Almacenes" asp-action="Index">
+                            <span class="nav-text">Lista</span>
+                        </a>
+                        @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Gerente))
+                        {
+                            <a class="nav-link" asp-controller="Almacenes" asp-action="Create">
+                                <span class="nav-text">Nuevo</span>
+                            </a>
+                        }
+                    </div>
+                </div>
 
-                            @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Gerente) || User.IsInRole(Roles.Operador))
+                <!-- Movimientos -->
+                @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Gerente) || User.IsInRole(Roles.Operador))
+                {
+                    <div class="nav-item">
+                        <a class="nav-link has-submenu @(ViewContext.RouteData.Values["controller"]?.ToString() == "Movimientos" ? "expanded" : "")"
+                           data-bs-toggle="collapse" href="#movimientosMenu" role="button">
+                            <i class="bi bi-arrow-left-right"></i>
+                            <span class="nav-text">Movimientos</span>
+                        </a>
+                        <div class="submenu collapse @(ViewContext.RouteData.Values["controller"]?.ToString() == "Movimientos" ? "show" : "")" id="movimientosMenu">
+                            <a class="nav-link" asp-controller="Movimientos" asp-action="Index">
+                                <span class="nav-text">Historial</span>
+                            </a>
+                            <a class="nav-link" asp-controller="Movimientos" asp-action="Create" asp-route-tipo="ENTRADA">
+                                <i class="bi bi-box-arrow-in-down text-success"></i>
+                                <span class="nav-text">Nueva Entrada</span>
+                            </a>
+                            <a class="nav-link" asp-controller="Movimientos" asp-action="Create" asp-route-tipo="SALIDA">
+                                <i class="bi bi-box-arrow-up text-danger"></i>
+                                <span class="nav-text">Nueva Salida</span>
+                            </a>
+                            @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Gerente))
                             {
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                                        <i class="bi bi-arrow-left-right"></i> Movimientos
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-controller="Movimientos" asp-action="Index">Historial</a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Movimientos" asp-action="Create" asp-route-tipo="ENTRADA">
-                                                <i class="bi bi-box-arrow-in-down text-success"></i> Entrada
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" asp-controller="Movimientos" asp-action="Create" asp-route-tipo="SALIDA">
-                                                <i class="bi bi-box-arrow-up text-danger"></i> Salida
-                                            </a>
-                                        </li>
-                                        @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Gerente))
-                                        {
-                                            <li>
-                                                <a class="dropdown-item" asp-controller="Movimientos" asp-action="Create" asp-route-tipo="TRASLADO">
-                                                    <i class="bi bi-arrow-left-right text-info"></i> Traslado
-                                                </a>
-                                            </li>
-                                        }
-                                    </ul>
-                                </li>
-                            }
-                            else
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Movimientos" asp-action="Index">
-                                        <i class="bi bi-arrow-left-right"></i> Movimientos
-                                    </a>
-                                </li>
-                            }
-
-                            @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Gerente) || User.IsInRole(Roles.Operador))
-                            {
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                                        <i class="bi bi-box-arrow-right"></i> Consignaciones
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-controller="Consignaciones" asp-action="Index">Ver todas</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Consignaciones" asp-action="Create">Nueva</a></li>
-                                    </ul>
-                                </li>
-                            }
-                            else
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Consignaciones" asp-action="Index">
-                                        <i class="bi bi-box-arrow-right"></i> Consignaciones
-                                    </a>
-                                </li>
-                            }
-
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                                    <i class="bi bi-truck"></i> Proveedores
+                                <a class="nav-link" asp-controller="Movimientos" asp-action="Create" asp-route-tipo="TRASLADO">
+                                    <i class="bi bi-arrow-left-right text-info"></i>
+                                    <span class="nav-text">Nuevo Traslado</span>
                                 </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" asp-controller="Proveedores" asp-action="Index">Ver todos</a></li>
-                                    @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Gerente))
-                                    {
-                                        <li><a class="dropdown-item" asp-controller="Proveedores" asp-action="Create">Nuevo</a></li>
-                                    }
-                                </ul>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Reportes" asp-action="Index">
-                                    <i class="bi bi-file-earmark-bar-graph"></i> Reportes
-                                </a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Graficos" asp-action="Index">
-                                    <i class="bi bi-bar-chart"></i> Gráficos
-                                </a>
-                            </li>
-
-                            @if (User.IsInRole(Roles.Admin))
-                            {
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                                        <i class="bi bi-gear"></i> Admin
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="Usuarios">Usuarios</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Admin" asp-action="CrearUsuario">Nuevo usuario</a></li>
-                                    </ul>
-                                </li>
                             }
-                        </ul>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="nav-item">
+                        <a class="nav-link" asp-controller="Movimientos" asp-action="Index">
+                            <i class="bi bi-arrow-left-right"></i>
+                            <span class="nav-text">Movimientos</span>
+                        </a>
+                    </div>
+                }
 
-                        <ul class="navbar-nav">
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                                    <i class="bi bi-person-circle"></i>
-                                    <span class="nav-user-name">@User.Identity?.Name</span>
-                                    <span class="badge bg-info ms-1 badge-role">
+                <!-- Consignaciones -->
+                @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Gerente) || User.IsInRole(Roles.Operador))
+                {
+                    <div class="nav-item">
+                        <a class="nav-link has-submenu @(ViewContext.RouteData.Values["controller"]?.ToString() == "Consignaciones" ? "expanded" : "")"
+                           data-bs-toggle="collapse" href="#consignacionesMenu" role="button">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span class="nav-text">Consignaciones</span>
+                        </a>
+                        <div class="submenu collapse @(ViewContext.RouteData.Values["controller"]?.ToString() == "Consignaciones" ? "show" : "")" id="consignacionesMenu">
+                            <a class="nav-link" asp-controller="Consignaciones" asp-action="Index">
+                                <span class="nav-text">Lista</span>
+                            </a>
+                            <a class="nav-link" asp-controller="Consignaciones" asp-action="Create">
+                                <span class="nav-text">Nueva</span>
+                            </a>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="nav-item">
+                        <a class="nav-link" asp-controller="Consignaciones" asp-action="Index">
+                            <i class="bi bi-box-arrow-right"></i>
+                            <span class="nav-text">Consignaciones</span>
+                        </a>
+                    </div>
+                }
+
+                <div class="nav-section mt-3">Herramientas</div>
+
+                <div class="nav-item">
+                    <a class="nav-link" asp-controller="Proveedores" asp-action="Index">
+                        <i class="bi bi-truck"></i>
+                        <span class="nav-text">Proveedores</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link" asp-controller="Reportes" asp-action="Index">
+                        <i class="bi bi-file-earmark-bar-graph"></i>
+                        <span class="nav-text">Reportes</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link" asp-controller="Graficos" asp-action="Index">
+                        <i class="bi bi-bar-chart"></i>
+                        <span class="nav-text">Gráficos</span>
+                    </a>
+                </div>
+
+                @if (User.IsInRole(Roles.Admin))
+                {
+                    <div class="nav-section mt-3">Administración</div>
+                    <div class="nav-item">
+                        <a class="nav-link" asp-controller="Admin" asp-action="Usuarios">
+                            <i class="bi bi-people"></i>
+                            <span class="nav-text">Usuarios</span>
+                        </a>
+                    </div>
+                }
+            </nav>
+        </aside>
+
+        <!-- Overlay para móvil -->
+        <div class="sidebar-overlay"></div>
+
+        <!-- ===== MAIN CONTENT ===== -->
+        <div class="main-content" id="mainContent">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="d-flex align-items-center">
+                    <button class="btn-toggle" id="toggleSidebar" title="Menú">
+                        <i class="bi bi-list"></i>
+                    </button>
+                </div>
+
+                <div class="user-menu">
+                    <button class="theme-toggle" id="themeToggle" title="Cambiar tema">
+                        <i class="bi bi-moon-stars"></i>
+                    </button>
+
+                    <div class="dropdown">
+                        <div class="user-avatar dropdown-toggle" data-bs-toggle="dropdown" title="@User.Identity?.Name">
+                            @User.Identity?.Name?.Substring(0, 1).ToUpper()
+                        </div>
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li>
+                                <span class="dropdown-item-text">
+                                    <strong>@User.Identity?.Name</strong><br>
+                                    <small class="text-muted">
                                         @if (User.IsInRole(Roles.Admin))
                                         {
-                                            <text>Adm</text>
+                                            <text>Administrador</text>
                                         }
                                         else if (User.IsInRole(Roles.Gerente))
                                         {
 
-                                            <text>Ger</text>
+                                            <text>Gerente</text>
                                         }
                                         else if (User.IsInRole(Roles.Operador))
                                         {
 
-                                            <text>Ope</text>
+                                            <text>Operador</text>
                                         }
                                         else
                                         {
 
-                                            <text>Con</text>
+                                            <text>Consulta</text>
                                         }
-                                    </span>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li>
-                                        <span class="dropdown-item-text">
-                                            <strong>@User.Identity?.Name</strong><br>
-                                            <small class="text-muted">
-                                                @if (User.IsInRole(Roles.Admin))
-                                                {
-                                                    <text>Administrador</text>
-                                                }
-                                                else if (User.IsInRole(Roles.Gerente))
-                                                {
-
-                                                    <text>Gerente</text>
-                                                }
-                                                else if (User.IsInRole(Roles.Operador))
-                                                {
-
-                                                    <text>Operador</text>
-                                                }
-                                                else
-                                                {
-
-                                                    <text>Consulta</text>
-                                                }
-                                            </small>
-                                        </span>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <form asp-controller="Account" asp-action="Logout" method="post">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="dropdown-item">
-                                                <i class="bi bi-box-arrow-right"></i> Cerrar sesión
-                                            </button>
-                                        </form>
-                                    </li>
-                                </ul>
+                                    </small>
+                                </span>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form asp-controller="Account" asp-action="Logout" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                                    </button>
+                                </form>
                             </li>
                         </ul>
-                    }
-                    else
-                    {
-                        <ul class="navbar-nav ms-auto">
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Account" asp-action="Login">
-                                    <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
-                                </a>
-                            </li>
-                        </ul>
-                    }
+                    </div>
                 </div>
             </div>
-        </nav>
-    </header>
 
-    <div class="container-fluid mt-4">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted mt-5 py-3">
-        <div class="container-fluid text-center">
-            &copy; @DateTime.Now.Year - Sistema de Inventario Web
+            <!-- Page Content -->
+            <div class="page-content">
+                @RenderBody()
+            </div>
         </div>
-    </footer>
+    }
+    else
+    {
+        <!-- Usuario no autenticado -->
+        <div class="container mt-5">
+            @RenderBody()
+        </div>
+    }
 
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        $(document).ready(function() {
+            var sidebar = $('#sidebar');
+            var mainContent = $('#mainContent');
+            var overlay = $('.sidebar-overlay');
+            var expandedByClick = false;
+            var collapseTimer = null;
+
+        // ===== MARCAR SOLO LA OPCIÓN ACTIVA =====
+        function setActiveMenuItem() {
+            var currentPath = window.location.pathname.toLowerCase();
+            var currentSearch = window.location.search.toLowerCase();
+            var fullUrl = currentPath + currentSearch;
+
+            // Primero remover TODOS los active
+            $('.sidebar .nav-link').removeClass('active');
+            $('.sidebar .has-submenu').removeClass('open');
+            $('.sidebar .submenu').removeClass('show');
+
+            var found = false;
+
+            // Buscar coincidencia exacta (ruta + parámetros)
+            $('.sidebar .nav-link').each(function() {
+                var href = $(this).attr('href');
+                if (href) {
+                    var linkUrl = href.toLowerCase();
+
+                    // Comparar URL completa (con parámetros)
+                    if (fullUrl === linkUrl || fullUrl.startsWith(linkUrl + '&')) {
+                        $(this).addClass('active');
+                        expandParentSubmenu($(this));
+                        found = true;
+                        return false;
+                    }
+                }
+            });
+
+            // Si no encontró, buscar solo por ruta (sin parámetros)
+            if (!found) {
+                $('.sidebar .nav-link').each(function() {
+                    var href = $(this).attr('href');
+                    if (href) {
+                        var linkPath = href.split('?')[0].toLowerCase();
+
+                        if (currentPath === linkPath) {
+                            $(this).addClass('active');
+                            expandParentSubmenu($(this));
+                            found = true;
+                            return false;
+                        }
+                    }
+                });
+            }
+
+            // Si aún no encontró, buscar por controlador en la ruta
+            if (!found) {
+                var pathParts = currentPath.split('/').filter(function(p) { return p !== ''; });
+                if (pathParts.length > 0) {
+                    var controller = pathParts[0];
+                    var action = pathParts.length > 1 ? pathParts[1] : 'index';
+
+                    $('.sidebar .nav-link').each(function() {
+                        var href = $(this).attr('href');
+                        if (href) {
+                            var hrefLower = href.toLowerCase();
+                            // Buscar el controlador en el href
+                            if (hrefLower.indexOf('/' + controller) >= 0) {
+                                // Si es el controlador exacto
+                                if (action === 'index' || hrefLower.indexOf('/' + controller + '/' + action) >= 0) {
+                                    $(this).addClass('active');
+                                    expandParentSubmenu($(this));
+                                    found = true;
+                                    return false;
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Fallback: Dashboard
+            if (!found) {
+                $('.sidebar .nav-link[href="/"]').addClass('active');
+            }
+        }
+
+        // Función auxiliar para expandir submenú padre
+        function expandParentSubmenu(link) {
+            var submenu = link.closest('.submenu');
+            if (submenu.length) {
+                submenu.addClass('show');
+                submenu.prev('.has-submenu').addClass('open');
+            }
+        }
+
+        // Función auxiliar para expandir submenú padre
+        function expandParentSubmenu(link) {
+            var submenu = link.closest('.submenu');
+            if (submenu.length) {
+                submenu.addClass('show');
+                submenu.prev('.has-submenu').addClass('open');
+            }
+        }
+
+            // Ejecutar al cargar
+            setActiveMenuItem();
+
+            // ===== TOGGLE SIDEBAR =====
+            $('#toggleSidebar').click(function() {
+                if ($(window).width() <= 768) {
+                    sidebar.toggleClass('mobile-open');
+                    overlay.toggleClass('show');
+                } else {
+                    sidebar.toggleClass('collapsed');
+                    mainContent.toggleClass('expanded');
+                    localStorage.setItem('sbCollapsed', sidebar.hasClass('collapsed'));
+
+                    if (!sidebar.hasClass('collapsed')) {
+                        clearTimeout(collapseTimer);
+                        sidebar.removeClass('expanded-temp');
+                        overlay.removeClass('show');
+                    }
+                }
+            });
+
+            // ===== CLIC EN OPCIÓN CON SUBMENÚ =====
+            $('.has-submenu').click(function(e) {
+                if ($(window).width() <= 768) {
+                    e.preventDefault();
+                    $(this).toggleClass('open');
+                    $(this).next('.submenu').toggleClass('show');
+                } else if (sidebar.hasClass('collapsed')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    sidebar.addClass('expanded-temp');
+                    overlay.addClass('show');
+                    expandedByClick = true;
+
+                    $(this).addClass('open');
+                    $(this).next('.submenu').addClass('show');
+
+                    clearTimeout(collapseTimer);
+                } else {
+                    e.preventDefault();
+                    $(this).toggleClass('open');
+                    $(this).next('.submenu').toggleClass('show');
+                }
+            });
+
+            // ===== CERRAR CON OVERLAY =====
+            overlay.click(function() {
+                sidebar.removeClass('expanded-temp').removeClass('mobile-open');
+                overlay.removeClass('show');
+                expandedByClick = false;
+
+                // Restaurar solo el submenú activo
+                $('.submenu').not(':has(.nav-link.active)').removeClass('show');
+                $('.has-submenu').not(':has(+ .submenu .nav-link.active)').removeClass('open');
+            });
+
+            // ===== CLIC EN CUALQUIER ENLACE =====
+            $('.sidebar .nav-link').click(function() {
+                // Si es un enlace normal (sin submenú), marcar como activo
+                if (!$(this).hasClass('has-submenu')) {
+                    $('.sidebar .nav-link').removeClass('active');
+                    $(this).addClass('active');
+                }
+
+                // Cerrar sidebar en móvil
+                if ($(window).width() <= 768 && !$(this).hasClass('has-submenu')) {
+                    setTimeout(function() {
+                        sidebar.removeClass('mobile-open');
+                        overlay.removeClass('show');
+                    }, 200);
+                }
+
+                // Cerrar sidebar expandido temporalmente
+                if (sidebar.hasClass('expanded-temp') && !$(this).hasClass('has-submenu')) {
+                    setTimeout(function() {
+                        sidebar.removeClass('expanded-temp');
+                        overlay.removeClass('show');
+                        expandedByClick = false;
+
+                        // Mantener solo el submenú activo
+                        $('.submenu').not(':has(.nav-link.active)').removeClass('show');
+                        $('.has-submenu').not(':has(+ .submenu .nav-link.active)').removeClass('open');
+                    }, 300);
+                }
+            });
+
+            // ===== AUTO-CERRAR AL SALIR =====
+            sidebar.mouseleave(function() {
+                if (expandedByClick && sidebar.hasClass('expanded-temp')) {
+                    collapseTimer = setTimeout(function() {
+                        sidebar.removeClass('expanded-temp');
+                        overlay.removeClass('show');
+                        expandedByClick = false;
+
+                        $('.submenu').not(':has(.nav-link.active)').removeClass('show');
+                        $('.has-submenu').not(':has(+ .submenu .nav-link.active)').removeClass('open');
+                    }, 500);
+                }
+            });
+
+            sidebar.mouseenter(function() {
+                clearTimeout(collapseTimer);
+            });
+
+            // ===== RESTAURAR ESTADO =====
+            if ($(window).width() > 768 && localStorage.getItem('sbCollapsed') === 'true') {
+                sidebar.addClass('collapsed');
+                mainContent.addClass('expanded');
+            }
+
+            // ===== TOGGLE THEME =====
+            $('#themeToggle').click(function() {
+                var html = $('html');
+                var isDark = html.attr('data-bs-theme') === 'dark';
+                html.attr('data-bs-theme', isDark ? 'light' : 'dark');
+                $(this).find('i').toggleClass('bi-moon-stars bi-sun');
+                localStorage.setItem('theme', isDark ? 'light' : 'dark');
+            });
+
+            if (localStorage.getItem('theme') === 'dark') {
+                $('html').attr('data-bs-theme', 'dark');
+                $('#themeToggle i').removeClass('bi-moon-stars').addClass('bi-sun');
+            }
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

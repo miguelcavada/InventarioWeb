@@ -49,6 +49,8 @@ public class RegistroDto
 public class AuthResponseDto
 {
     public bool Success { get; set; }
+    public string? Token { get; set; }
+    public DateTime? Expiration { get; set; }
     public string? Mensaje { get; set; }
     public UsuarioDto? Usuario { get; set; }
 }

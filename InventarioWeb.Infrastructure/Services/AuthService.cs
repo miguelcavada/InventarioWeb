@@ -1,12 +1,18 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using InventarioWeb.Core.DTOs;
 using InventarioWeb.Core.Entities;
-using InventarioWeb.Core.DTOs;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace InventarioWeb.Infrastructure.Services;
 
 public interface IAuthService
 {
     Task<AuthResponseDto> LoginAsync(LoginDto loginDto);
+    Task<AuthResponseDto> LoginJwtAsync(LoginDto loginDto); // Nuevo método para API
     Task<AuthResponseDto> RegistrarAsync(RegistroDto registroDto);
     Task LogoutAsync();
     Task<List<UsuarioDto>> GetUsuariosAsync();
@@ -22,15 +28,18 @@ public class AuthService : IAuthService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly RoleManager<ApplicationRole> _roleManager;
+    private readonly IConfiguration _configuration;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
-        RoleManager<ApplicationRole> roleManager)
+        RoleManager<ApplicationRole> roleManager,
+        IConfiguration configuration)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _roleManager = roleManager;
+        _configuration = configuration;
     }
 
     public async Task<AuthResponseDto> LoginAsync(LoginDto loginDto)
@@ -86,6 +95,78 @@ public class AuthService : IAuthService
         }
 
         return new AuthResponseDto { Success = false, Mensaje = "Contraseña incorrecta" };
+    }
+
+    // Login con JWT (API)
+    public async Task<AuthResponseDto> LoginJwtAsync(LoginDto loginDto)
+    {
+        var user = await _userManager.FindByEmailAsync(loginDto.Email);
+
+        if (user == null)
+            return new AuthResponseDto { Success = false, Mensaje = "Usuario no encontrado" };
+
+        if (!user.Activo)
+            return new AuthResponseDto { Success = false, Mensaje = "Usuario desactivado" };
+
+        var passwordValid = await _userManager.CheckPasswordAsync(user, loginDto.Password);
+
+        if (!passwordValid)
+            return new AuthResponseDto { Success = false, Mensaje = "Contraseña incorrecta" };
+
+        user.UltimoAcceso = DateTime.Now;
+        await _userManager.UpdateAsync(user);
+
+        var roles = await _userManager.GetRolesAsync(user);
+        var token = await GenerateJwtToken(user);
+
+        return new AuthResponseDto
+        {
+            Success = true,
+            Token = token,
+            Expiration = DateTime.Now.AddHours(8),
+            Mensaje = "Login exitoso",
+            Usuario = new UsuarioDto
+            {
+                Id = user.Id,
+                NombreCompleto = user.NombreCompleto,
+                Email = user.Email ?? "",
+                Rol = roles.FirstOrDefault() ?? "Sin rol",
+                Activo = user.Activo,
+                UltimoAcceso = user.UltimoAcceso
+            }
+        };
+    }
+
+    private async Task<string> GenerateJwtToken(ApplicationUser user)
+    {
+        var roles = await _userManager.GetRolesAsync(user);
+
+        var jwtKey = _configuration["Jwt:Key"] ?? "ClaveSuperSecreta12345678901234567890Minimo32Caracteres";
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id),
+            new Claim(ClaimTypes.Email, user.Email ?? ""),
+            new Claim(ClaimTypes.Name, user.NombreCompleto),
+            new Claim("Activo", user.Activo.ToString())
+        };
+
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+
+        var token = new JwtSecurityToken(
+            issuer: _configuration["Jwt:Issuer"] ?? "InventarioAPI",
+            audience: _configuration["Jwt:Audience"] ?? "InventarioApp",
+            claims: claims,
+            expires: DateTime.Now.AddHours(8),
+            signingCredentials: credentials
+        );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
     public async Task<AuthResponseDto> RegistrarAsync(RegistroDto registroDto)
