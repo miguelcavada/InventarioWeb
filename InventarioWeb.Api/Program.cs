@@ -127,6 +127,7 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IIdentitySeedService, IdentitySeedService>();
+builder.Services.AddScoped<IConversionLoaderService, ConversionLoaderService>();
 
 // Identity
 builder.Services.AddIdentity<InventarioWeb.Core.Entities.ApplicationUser, InventarioWeb.Core.Entities.ApplicationRole>(options =>

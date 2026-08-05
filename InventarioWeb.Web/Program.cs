@@ -77,6 +77,7 @@ builder.Services.AddScoped<IAlmacenService, AlmacenService>();
 builder.Services.AddScoped<IProveedorService, ProveedorService>();
 builder.Services.AddScoped<IUnidadMedidaService, UnidadMedidaService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IConversionLoaderService, ConversionLoaderService>();
 
 // ===== SERVICIOS =====
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -112,6 +113,18 @@ using (var scope = app.Services.CreateScope())
 
     var seedService = scope.ServiceProvider.GetRequiredService<IIdentitySeedService>();
     await seedService.SeedAsync();
+
+    // Cargar conversiones desde JSON
+    try
+    {
+        var conversionLoader = scope.ServiceProvider.GetRequiredService<IConversionLoaderService>();
+        await conversionLoader.CargarConversionesDesdeJsonAsync();
+    }
+    catch (Exception ex)
+    {
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogWarning(ex, "No se pudieron cargar las conversiones desde JSON");
+    }
 }
 
 app.Run();

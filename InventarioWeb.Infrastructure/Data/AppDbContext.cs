@@ -20,6 +20,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
     public DbSet<Consignacion> Consignaciones { get; set; }
     public DbSet<ConsignacionDetalle> ConsignacionDetalles { get; set; }
     public DbSet<UnidadMedida> UnidadesMedida { get; set; }
+    public DbSet<ConversionUnidad> Conversiones { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -137,6 +138,21 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
                   .WithMany()
                   .HasForeignKey(d => d.ProductoId)
                   .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<ConversionUnidad>(entity =>
+        {
+            entity.HasOne(c => c.UnidadOrigen)
+                  .WithMany()
+                  .HasForeignKey(c => c.UnidadOrigenId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(c => c.UnidadDestino)
+                  .WithMany()
+                  .HasForeignKey(c => c.UnidadDestinoId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(c => new { c.UnidadOrigenId, c.UnidadDestinoId }).IsUnique();
         });
 
         // Datos semilla

@@ -15,6 +15,7 @@ public class UnitOfWork : IUnitOfWork
     private IConsignacionRepository? _consignaciones;
     private IConsignacionDetalleRepository? _consignacionDetalles;
     private IUnidadMedidaRepository? _unidadesMedida;
+    private IConversionRepository? _conversiones;    
 
     public UnitOfWork(AppDbContext context)
     {
@@ -50,6 +51,9 @@ public class UnitOfWork : IUnitOfWork
 
     public IUnidadMedidaRepository UnidadesMedida =>
     _unidadesMedida ??= new UnidadMedidaRepository(_context);
+
+    public IConversionRepository Conversiones =>
+        _conversiones ??= new ConversionRepository(_context);
 
     public async Task<int> CompleteAsync()
     {

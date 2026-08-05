@@ -1,0 +1,90 @@
+﻿@model InventarioWeb.Core.DTOs.ConversionUnidadDto
+@{
+    ViewData["Title"] = "Nueva Conversión";
+}
+
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <div class="card animate-in">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Nueva Conversión de Unidad</h4>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="UnidadOrigenId" class="form-label">
+                            Unidad Origen <span class="text-danger">*</span>
+                        </label>
+                        <select asp-for="UnidadOrigenId" class="form-select" asp-items="ViewBag.Unidades" required>
+                            <option value="">-- Seleccione unidad origen --</option>
+                        </select>
+                        <span asp-validation-for="UnidadOrigenId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="UnidadDestinoId" class="form-label">
+                            Unidad Destino <span class="text-danger">*</span>
+                        </label>
+                        <select asp-for="UnidadDestinoId" class="form-select" asp-items="ViewBag.Unidades" required>
+                            <option value="">-- Seleccione unidad destino --</option>
+                        </select>
+                        <span asp-validation-for="UnidadDestinoId" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Factor" class="form-label">
+                            Factor de Conversión <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="Factor" class="form-control" type="number" step="0.000001" min="0.000001" required
+                               placeholder="Ej: 1000" />
+                        <small class="text-muted">
+                            ¿Cuántas unidades destino equivalen a <strong>1</strong> unidad origen?
+                        </small>
+                        <span asp-validation-for="Factor" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Descripcion" class="form-label">Descripción</label>
+                        <input asp-for="Descripcion" class="form-control" placeholder="Ej: 1 Kg = 1000 gramos" />
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Ejemplo:</strong> Para convertir Kilogramos a Gramos, el factor es <strong>1000</strong> porque 1 Kg = 1000 g.
+                    </div>
+
+                    <hr />
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Guardar Conversión
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            // Validar que origen y destino no sean iguales
+            $('form').submit(function(e) {
+                var origen = $('#UnidadOrigenId').val();
+                var destino = $('#UnidadDestinoId').val();
+                if (origen && destino && origen === destino) {
+                    e.preventDefault();
+                    alert('La unidad origen y destino no pueden ser iguales.');
+                    return false;
+                }
+            });
+        });
+    </script>
+}

@@ -12,5 +12,6 @@ public interface IUnitOfWork : IDisposable
     IConsignacionRepository Consignaciones { get; }
     IConsignacionDetalleRepository ConsignacionDetalles { get; }
     IUnidadMedidaRepository UnidadesMedida { get; }
+    IConversionRepository Conversiones { get; }
     Task<int> CompleteAsync();
 }

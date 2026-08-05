@@ -5,7 +5,7 @@
 
 <div class="row">
     <div class="col-md-10 mx-auto">
-        <div class="card">
+        <div class="card animate-in">
             <div class="card-header bg-info text-white">
                 <h4 class="mb-0">
                     <i class="bi bi-eye"></i> @Model.Nombre
@@ -18,35 +18,16 @@
                         <dl>
                             <dt>Código</dt>
                             <dd><code>@Model.Codigo</code></dd>
-
                             <dt>Nombre</dt>
                             <dd><strong>@Model.Nombre</strong></dd>
-
                             <dt>Descripción</dt>
                             <dd>@(string.IsNullOrEmpty(Model.Descripcion) ? "Sin descripción" : Model.Descripcion)</dd>
-
                             <dt>Categoría</dt>
                             <dd><span class="badge bg-info">@Model.CategoriaNombre</span></dd>
-
                             <dt>Unidad de Medida</dt>
-                            <dd>
-                                <span class="badge bg-secondary fs-6">
-                                    @Model.UnidadMedidaAbreviatura - @Model.UnidadMedidaNombre
-                                </span>
-                            </dd>
-
+                            <dd><span class="badge bg-secondary fs-6">@Model.UnidadMedidaAbreviatura - @Model.UnidadMedidaNombre</span></dd>
                             <dt>Estado</dt>
-                            <dd>
-                                @if (Model.Activo)
-                                {
-                                    <span class="badge bg-success">Activo</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">Inactivo</span>
-                                }
-                            </dd>
-
+                            <dd>@(Model.Activo ? "Activo" : "Inactivo")</dd>
                             <dt>Fecha de Creación</dt>
                             <dd>@Model.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</dd>
                         </dl>
@@ -56,67 +37,21 @@
                             <div class="card-body">
                                 <h5 class="card-title"><i class="bi bi-currency-dollar"></i> Precios</h5>
                                 <table class="table table-sm table-borderless">
-                                    <tr>
-                                        <td><strong>Precio de Costo:</strong></td>
-                                        <td class="text-end">
-                                            @if (Model.PrecioCosto.HasValue)
-                                            {
-                                                @Model.PrecioCosto.Value.ToString("C2")
-                                            }
-                                            else
-                                            {
-                                                <span class="text-muted">No especificado</span>
-                                            }
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Precio Minorista:</strong></td>
-                                        <td class="text-end">
-                                            <span class="text-primary fs-5">@Model.PrecioVentaMinorista.ToString("C2")</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Precio Mayorista:</strong></td>
-                                        <td class="text-end">
-                                            @if (Model.PrecioVentaMayorista.HasValue)
-                                            {
-                                                @Model.PrecioVentaMayorista.Value.ToString("C2")
-                                            }
-                                            else
-                                            {
-                                                <span class="text-muted">No aplica</span>
-                                            }
-                                        </td>
-                                    </tr>
+                                    <tr><td><strong>Precio de Costo:</strong></td><td class="text-end">@(Model.PrecioCosto?.ToString("C2") ?? "No especificado")</td></tr>
+                                    <tr><td><strong>Precio Minorista:</strong></td><td class="text-end"><span class="text-primary fs-5">@Model.PrecioVentaMinorista.ToString("C2")</span></td></tr>
+                                    <tr><td><strong>Precio Mayorista:</strong></td><td class="text-end">@(Model.PrecioVentaMayorista?.ToString("C2") ?? "No aplica")</td></tr>
                                     <tr>
                                         <td><strong>Margen Minorista:</strong></td>
                                         <td class="text-end">
                                             @if (Model.MargenGananciaMinorista.HasValue)
                                             {
                                                 var m = Model.MargenGananciaMinorista.Value;
-                                                <span class="badge @(m >= 30 ? "bg-success" : m >= 15 ? "bg-warning" : "bg-danger")">
-                                                    @m.ToString("F1")%
-                                                </span>
+                                                <span class="badge @(m >= 30 ? "bg-success" : m >= 15 ? "bg-warning" : "bg-danger")">@m.ToString("F1")%</span>
                                             }
                                             else
                                             {
+
                                                 <span class="badge bg-secondary">Sin costo</span>
-                                            }
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Margen Mayorista:</strong></td>
-                                        <td class="text-end">
-                                            @if (Model.MargenGananciaMayorista.HasValue)
-                                            {
-                                                var m = Model.MargenGananciaMayorista.Value;
-                                                <span class="badge @(m >= 30 ? "bg-success" : m >= 15 ? "bg-warning" : "bg-danger")">
-                                                    @m.ToString("F1")%
-                                                </span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-secondary">No aplica</span>
                                             }
                                         </td>
                                     </tr>
@@ -129,68 +64,17 @@
                 <hr />
                 <h5><i class="bi bi-box-seam"></i> Inventario</h5>
                 <div class="row mb-3">
-                    <div class="col-md-3">
-                        <div class="card bg-primary text-white">
-                            <div class="card-body text-center">
-                                <h5>Stock Total</h5>
-                                <h2>@Model.StockTotal</h2>
-                                <small>@Model.UnidadMedidaAbreviatura</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card bg-warning">
-                            <div class="card-body text-center">
-                                <h5>Stock Mínimo</h5>
-                                <h2>@Model.StockMinimoTotal</h2>
-                                <small>@Model.UnidadMedidaAbreviatura</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card bg-success text-white">
-                            <div class="card-body text-center">
-                                <h5>Valor Inventario</h5>
-                                <h2>@(Model.ValorInventario?.ToString("C2") ?? "N/A")</h2>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card bg-info text-white">
-                            <div class="card-body text-center">
-                                <h5>Estado Stock</h5>
-                                <h2>
-                                    @if (Model.StockTotal <= 0)
-                                    {
-                                        <span class="badge bg-danger">AGOTADO</span>
-                                    }
-                                    else if (Model.StockTotal <= Model.StockMinimoTotal)
-                                    {
-                                        <span class="badge bg-warning">BAJO</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-success">NORMAL</span>
-                                    }
-                                </h2>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="col-md-3"><div class="card bg-primary text-white"><div class="card-body text-center"><h5>Stock Total</h5><h2>@Model.StockTotal</h2><small>@Model.UnidadMedidaAbreviatura</small></div></div></div>
+                    <div class="col-md-3"><div class="card bg-warning"><div class="card-body text-center"><h5>Stock Mínimo</h5><h2>@Model.StockMinimoTotal</h2><small>@Model.UnidadMedidaAbreviatura</small></div></div></div>
+                    <div class="col-md-3"><div class="card bg-success text-white"><div class="card-body text-center"><h5>Valor Inventario</h5><h2>@(Model.ValorInventario?.ToString("C2") ?? "N/A")</h2></div></div></div>
+                    <div class="col-md-3"><div class="card bg-info text-white"><div class="card-body text-center"><h5>Estado Stock</h5><h2>@(Model.StockTotal <= 0 ? "AGOTADO" : Model.StockTotal <= Model.StockMinimoTotal ? "BAJO" : "NORMAL")</h2></div></div></div>
                 </div>
 
                 @if (Model.Stocks != null && Model.Stocks.Any())
                 {
                     <div class="table-responsive">
                         <table class="table table-sm table-bordered">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Almacén</th>
-                                    <th class="text-center">Stock</th>
-                                    <th class="text-center">Mínimo</th>
-                                    <th class="text-center">Máximo</th>
-                                    <th>Ubicación</th>
-                                </tr>
-                            </thead>
+                            <thead class="table-light"><tr><th>Almacén</th><th class="text-center">Stock</th><th class="text-center">Mínimo</th><th class="text-center">Máximo</th><th>Ubicación</th></tr></thead>
                             <tbody>
                                 @foreach (var stock in Model.Stocks)
                                 {
@@ -206,33 +90,48 @@
                         </table>
                     </div>
                 }
-                else
-                {
-                    <div class="alert alert-warning">
-                        <i class="bi bi-exclamation-triangle"></i> No hay stock registrado en ningún almacén.
+
+                <hr />
+                <h5><i class="bi bi-arrow-left-right"></i> Conversor de Unidades</h5>
+                <div class="row g-2 align-items-end mb-3">
+                    <div class="col-md-3">
+                        <label class="form-label small">Cantidad en @Model.UnidadMedidaAbreviatura</label>
+                        <div class="input-group">
+                            <input id="convCantidadDetalle" class="form-control" type="number" step="0.01" value="1" min="0.01" />
+                            <span class="input-group-text">@Model.UnidadMedidaAbreviatura</span>
+                        </div>
                     </div>
-                }
+                    <div class="col-md-1 text-center"><i class="bi bi-arrow-right fs-4 text-muted"></i></div>
+                    <div class="col-md-3">
+                        <label class="form-label small">Convertir a</label>
+                        <select id="convUnidadDestinoDetalle" class="form-select" asp-items="ViewBag.UnidadesMedida">
+                            <option value="">-- Seleccione --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small">Resultado</label>
+                        <input id="convResultadoDetalle" class="form-control bg-light" readonly />
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" id="btnConvertirDetalle" class="btn btn-info w-100">
+                            <i class="bi bi-arrow-left-right"></i> Convertir
+                        </button>
+                    </div>
+                </div>
+                <div id="convMensajeDetalle" class="small"></div>
 
                 <hr />
                 <div class="d-flex justify-content-between">
-                    <a asp-action="Index" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left"></i> Volver
-                    </a>
+                    <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Volver</a>
                     <div>
                         @if (User.IsInRole("Admin") || User.IsInRole("Gerente"))
                         {
-                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
-                                <i class="bi bi-pencil"></i> Editar
-                            </a>
-                            <a asp-action="CambioPrecio" asp-route-id="@Model.Id" class="btn btn-info">
-                                <i class="bi bi-currency-dollar"></i> Cambiar Precios
-                            </a>
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning"><i class="bi bi-pencil"></i> Editar</a>
+                            <a asp-action="CambioPrecio" asp-route-id="@Model.Id" class="btn btn-info"><i class="bi bi-currency-dollar"></i> Cambiar Precios</a>
                         }
                         @if (User.IsInRole("Admin"))
                         {
-                            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
-                                <i class="bi bi-trash"></i> Eliminar
-                            </a>
+                            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger"><i class="bi bi-trash"></i> Eliminar</a>
                         }
                     </div>
                 </div>
@@ -240,3 +139,49 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            function convertirDetalle() {
+                var origenId = '@Model.UnidadMedidaId';
+                var destinoId = $('#convUnidadDestinoDetalle').val();
+                var cantidad = parseFloat($('#convCantidadDetalle').val());
+
+                if (!destinoId) return;
+                if (!cantidad || cantidad <= 0) {
+                    $('#convMensajeDetalle').html('<span class="text-warning">Ingrese una cantidad válida</span>');
+                    return;
+                }
+
+                $.get('/Productos/ConvertirUnidad', {
+                    unidadOrigenId: origenId,
+                    unidadDestinoId: destinoId,
+                    cantidad: cantidad
+                }, function(data) {
+                    if (data.success) {
+                        $('#convResultadoDetalle').val(data.resultado);
+                        $('#convMensajeDetalle').html(
+                            '<span class="text-success"><i class="bi bi-check-circle"></i> ' +
+                            cantidad + ' @Model.UnidadMedidaAbreviatura = <strong>' + data.resultado + '</strong> ' +
+                            $('#convUnidadDestinoDetalle option:selected').text() + '</span>'
+                        );
+                    } else {
+                        $('#convResultadoDetalle').val('');
+                        $('#convMensajeDetalle').html('<span class="text-danger"><i class="bi bi-exclamation-triangle"></i> ' + data.mensaje + '</span>');
+                    }
+                });
+            }
+
+            $('#btnConvertirDetalle').click(convertirDetalle);
+
+            $('#convUnidadDestinoDetalle').change(function() {
+                if ($(this).val()) convertirDetalle();
+            });
+
+            $('#convCantidadDetalle').on('input', function() {
+                if ($('#convUnidadDestinoDetalle').val() && $(this).val()) convertirDetalle();
+            });
+        });
+    </script>
+}

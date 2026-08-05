@@ -4,6 +4,7 @@ using InventarioWeb.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InventarioWeb.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260805200705_ConversionesUnidades")]
+    partial class ConversionesUnidades
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -134,7 +137,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Codigo = "ALM-CENTRAL",
                             Direccion = "Calle Principal #100",
                             Encargado = "Carlos López",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7940),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(5913),
                             Nombre = "Almacén Central",
                             Telefono = "555-0101",
                             Tipo = "ALMACEN"
@@ -146,7 +149,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Codigo = "MER-NORTE",
                             Direccion = "Av. Norte #200",
                             Encargado = "María García",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7944),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(5919),
                             Nombre = "Mercado Norte",
                             Telefono = "555-0202",
                             Tipo = "MERCADO"
@@ -158,7 +161,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Codigo = "MER-SUR",
                             Direccion = "Av. Sur #300",
                             Encargado = "Pedro Martínez",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7949),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(5923),
                             Nombre = "Mercado Sur",
                             Telefono = "555-0303",
                             Tipo = "MERCADO"
@@ -170,7 +173,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Codigo = "MER-ESTE",
                             Direccion = "Calle Este #400",
                             Encargado = "Ana Rodríguez",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7953),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(5928),
                             Nombre = "Mercado Este",
                             Telefono = "555-0404",
                             Tipo = "MERCADO"
@@ -182,7 +185,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Codigo = "ALM-SEC",
                             Direccion = "Zona Industrial #500",
                             Encargado = "Luis Sánchez",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7958),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(5932),
                             Nombre = "Almacén Secundario",
                             Telefono = "555-0505",
                             Tipo = "ALMACEN"
@@ -337,7 +340,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 1,
                             Activo = true,
                             Descripcion = "Dispositivos electrónicos y gadgets",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7562),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(5616),
                             Nombre = "Electrónicos"
                         },
                         new
@@ -345,7 +348,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 2,
                             Activo = true,
                             Descripcion = "Muebles de oficina y hogar",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7568),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(5621),
                             Nombre = "Muebles"
                         },
                         new
@@ -353,7 +356,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 3,
                             Activo = true,
                             Descripcion = "Suministros de oficina y papelería",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7572),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(5625),
                             Nombre = "Suministros"
                         },
                         new
@@ -361,7 +364,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 4,
                             Activo = true,
                             Descripcion = "Productos alimenticios y bebidas",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7576),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(5628),
                             Nombre = "Alimentos"
                         },
                         new
@@ -369,7 +372,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 5,
                             Activo = true,
                             Descripcion = "Productos de limpieza e higiene",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7579),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(5632),
                             Nombre = "Limpieza"
                         },
                         new
@@ -377,7 +380,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 6,
                             Activo = true,
                             Descripcion = "Herramientas y materiales de construcción",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7583),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(5635),
                             Nombre = "Ferretería"
                         });
                 });
@@ -535,7 +538,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Activo = true,
                             Descripcion = "1 Kg = 1000 g",
                             Factor = 1m,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8402),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6418),
                             UnidadDestinoId = 1,
                             UnidadOrigenId = 2
                         },
@@ -545,7 +548,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Activo = true,
                             Descripcion = "1 L = 1000 ml",
                             Factor = 1000m,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8408),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6424),
                             UnidadDestinoId = 1,
                             UnidadOrigenId = 3
                         },
@@ -555,7 +558,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Activo = true,
                             Descripcion = "1 Docena = 12 Unidades",
                             Factor = 12m,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8411),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6428),
                             UnidadDestinoId = 1,
                             UnidadOrigenId = 6
                         },
@@ -565,7 +568,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Activo = true,
                             Descripcion = "1 Par = 2 Unidades",
                             Factor = 2m,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8415),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6431),
                             UnidadDestinoId = 1,
                             UnidadOrigenId = 7
                         },
@@ -575,7 +578,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Activo = true,
                             Descripcion = "1 Caja = 24 Unidades",
                             Factor = 24m,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8418),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6435),
                             UnidadDestinoId = 1,
                             UnidadOrigenId = 5
                         });
@@ -736,7 +739,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 1,
                             Codigo = "ELE-001",
                             Descripcion = "Laptop HP 15.6 pulgadas, 8GB RAM, 256GB SSD",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8001),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6018),
                             Nombre = "Laptop HP 15\"",
                             PrecioCosto = 650.00m,
                             PrecioVentaMayorista = 799.99m,
@@ -750,7 +753,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 1,
                             Codigo = "ELE-002",
                             Descripcion = "Monitor Dell 24 pulgadas Full HD",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8007),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6024),
                             Nombre = "Monitor Dell 24\"",
                             PrecioCosto = 200.00m,
                             PrecioVentaMayorista = 299.99m,
@@ -764,7 +767,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 1,
                             Codigo = "ELE-003",
                             Descripcion = "Teclado inalámbrico Bluetooth multimedia",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8012),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6032),
                             Nombre = "Teclado Inalámbrico",
                             PrecioCosto = 25.00m,
                             PrecioVentaMayorista = 39.99m,
@@ -778,7 +781,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 1,
                             Codigo = "ELE-004",
                             Descripcion = "Mouse óptico USB ergonómico 1200dpi",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8017),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6037),
                             Nombre = "Mouse Óptico USB",
                             PrecioCosto = 10.00m,
                             PrecioVentaMayorista = 19.99m,
@@ -792,7 +795,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 1,
                             Codigo = "ELE-005",
                             Descripcion = "Audífonos inalámbricos con micrófono y cancelación de ruido",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8022),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6042),
                             Nombre = "Audífonos Bluetooth",
                             PrecioCosto = 35.00m,
                             PrecioVentaMayorista = 59.99m,
@@ -806,7 +809,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 2,
                             Codigo = "MUE-001",
                             Descripcion = "Escritorio de madera 120x60cm con cajones",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8028),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6046),
                             Nombre = "Escritorio Ejecutivo",
                             PrecioCosto = 250.00m,
                             PrecioVentaMayorista = 399.99m,
@@ -820,7 +823,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 2,
                             Codigo = "MUE-002",
                             Descripcion = "Silla ergonómica con soporte lumbar ajustable",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8033),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6051),
                             Nombre = "Silla de Oficina",
                             PrecioCosto = 150.00m,
                             PrecioVentaMayorista = 249.99m,
@@ -834,7 +837,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 2,
                             Codigo = "MUE-003",
                             Descripcion = "Estantería 5 niveles 180x90x40cm",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8038),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6057),
                             Nombre = "Estantería Metálica",
                             PrecioCosto = 100.00m,
                             PrecioVentaMayorista = 159.99m,
@@ -848,7 +851,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 2,
                             Codigo = "MUE-004",
                             Descripcion = "Archivador metálico con llave de seguridad",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8043),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6062),
                             Nombre = "Archivador 3 Cajones",
                             PrecioCosto = 80.00m,
                             PrecioVentaMayorista = 129.99m,
@@ -862,7 +865,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 3,
                             Codigo = "SUM-001",
                             Descripcion = "Resma de papel bond A4 500 hojas 75g",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8048),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6067),
                             Nombre = "Papel Bond A4",
                             PrecioCosto = 3.50m,
                             PrecioVentaMayorista = 5.99m,
@@ -876,7 +879,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 3,
                             Codigo = "SUM-002",
                             Descripcion = "Caja de 12 bolígrafos azules punto fino",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8054),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6072),
                             Nombre = "Bolígrafos Azules",
                             PrecioCosto = 2.00m,
                             PrecioVentaMayorista = 3.99m,
@@ -890,7 +893,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 3,
                             Codigo = "SUM-003",
                             Descripcion = "Cuaderno 100 hojas rayado tamaño carta",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8059),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6077),
                             Nombre = "Cuaderno Universitario",
                             PrecioCosto = 1.50m,
                             PrecioVentaMayorista = 2.99m,
@@ -904,7 +907,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 3,
                             Codigo = "SUM-004",
                             Descripcion = "Cartucho de tinta negra compatible HP",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8064),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6082),
                             Nombre = "Tinta para Impresora",
                             PrecioCosto = 15.00m,
                             PrecioVentaMayorista = 24.99m,
@@ -918,7 +921,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 3,
                             Codigo = "SUM-005",
                             Descripcion = "Cinta adhesiva transparente 12mm x 33m",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8069),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6088),
                             Nombre = "Cinta Adhesiva",
                             PrecioCosto = 0.50m,
                             PrecioVentaMayorista = 0.99m,
@@ -932,7 +935,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 4,
                             Codigo = "ALI-001",
                             Descripcion = "Café molido premium 500g",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8073),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6094),
                             Nombre = "Café Molido",
                             PrecioCosto = 8.00m,
                             PrecioVentaMayorista = 11.99m,
@@ -946,7 +949,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 4,
                             Codigo = "ALI-002",
                             Descripcion = "Azúcar blanca refinada 1Kg",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8079),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6100),
                             Nombre = "Azúcar Blanca",
                             PrecioCosto = 1.00m,
                             PrecioVentaMayorista = 1.99m,
@@ -960,7 +963,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 4,
                             Codigo = "ALI-003",
                             Descripcion = "Botella de agua mineral sin gas 500ml",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8087),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6106),
                             Nombre = "Agua Mineral",
                             PrecioCosto = 0.30m,
                             PrecioVentaMayorista = 0.75m,
@@ -974,7 +977,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 4,
                             Codigo = "ALI-004",
                             Descripcion = "Paquete de galletas surtidas 400g",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8092),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6111),
                             Nombre = "Galletas Surtidas",
                             PrecioCosto = 2.50m,
                             PrecioVentaMayorista = 3.99m,
@@ -988,7 +991,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 5,
                             Codigo = "LIM-001",
                             Descripcion = "Detergente líquido multiusos 1L",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8129),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6116),
                             Nombre = "Detergente Líquido",
                             PrecioCosto = 2.00m,
                             PrecioVentaMayorista = 3.99m,
@@ -1002,7 +1005,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 5,
                             Codigo = "LIM-002",
                             Descripcion = "Cloro concentrado 1L",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8134),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6122),
                             Nombre = "Cloro Concentrado",
                             PrecioCosto = 1.00m,
                             PrecioVentaMayorista = 1.99m,
@@ -1016,7 +1019,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 5,
                             Codigo = "LIM-003",
                             Descripcion = "Paquete de 4 rollos doble hoja",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8139),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6127),
                             Nombre = "Papel Higiénico",
                             PrecioCosto = 1.50m,
                             PrecioVentaMayorista = 2.99m,
@@ -1030,7 +1033,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 5,
                             Codigo = "LIM-004",
                             Descripcion = "Jabón líquido antibacterial 500ml",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8144),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6132),
                             Nombre = "Jabón de Manos",
                             PrecioCosto = 2.00m,
                             PrecioVentaMayorista = 3.49m,
@@ -1044,7 +1047,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 6,
                             Codigo = "FER-001",
                             Descripcion = "Martillo de acero forjado mango de madera",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8149),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6136),
                             Nombre = "Martillo de Acero",
                             PrecioCosto = 8.00m,
                             PrecioVentaMayorista = 12.99m,
@@ -1058,7 +1061,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 6,
                             Codigo = "FER-002",
                             Descripcion = "Cinta métrica retráctil 5 metros",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8154),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6141),
                             Nombre = "Cinta Métrica 5m",
                             PrecioCosto = 3.00m,
                             PrecioVentaMayorista = 5.99m,
@@ -1072,7 +1075,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             CategoriaId = 6,
                             Codigo = "FER-003",
                             Descripcion = "Cable eléctrico calibre 12 por metro",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8162),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6146),
                             Nombre = "Cable Eléctrico #12",
                             PrecioCosto = 0.50m,
                             PrecioVentaMayorista = 0.99m,
@@ -1130,7 +1133,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Activo = true,
                             Direccion = "Av. Tecnológica #100",
                             Email = "ventas@techsupply.com",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8355),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6371),
                             Nombre = "TechSupply S.A.",
                             RUC = "12345678901",
                             Telefono = "555-1001"
@@ -1141,7 +1144,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Activo = true,
                             Direccion = "Calle Carpinteros #200",
                             Email = "info@mueblesymas.com",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8359),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6376),
                             Nombre = "Muebles & Más",
                             RUC = "23456789012",
                             Telefono = "555-1002"
@@ -1152,7 +1155,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Activo = true,
                             Direccion = "Av. Papel #300",
                             Email = "pedidos@distpapelera.com",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8362),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6379),
                             Nombre = "Distribuidora Papelera",
                             RUC = "34567890123",
                             Telefono = "555-1003"
@@ -1163,7 +1166,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Activo = true,
                             Direccion = "Zona Industrial #400",
                             Email = "contacto@alimentosdelsur.com",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8366),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6383),
                             Nombre = "Alimentos del Sur",
                             RUC = "45678901234",
                             Telefono = "555-1004"
@@ -1174,7 +1177,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Activo = true,
                             Direccion = "Parque Industrial #500",
                             Email = "ventas@cleanpro.com",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8369),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6386),
                             Nombre = "CleanPro S.A.",
                             RUC = "56789012345",
                             Telefono = "555-1005"
@@ -1232,7 +1235,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 1,
                             Activo = true,
                             AlmacenId = 1,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8214),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6196),
                             ProductoId = 1,
                             StockActual = 15,
                             StockMaximo = 30,
@@ -1244,7 +1247,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 2,
                             Activo = true,
                             AlmacenId = 1,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8218),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6201),
                             ProductoId = 2,
                             StockActual = 10,
                             StockMaximo = 20,
@@ -1256,7 +1259,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 3,
                             Activo = true,
                             AlmacenId = 1,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8222),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6204),
                             ProductoId = 3,
                             StockActual = 50,
                             StockMaximo = 100,
@@ -1268,7 +1271,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 4,
                             Activo = true,
                             AlmacenId = 1,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8226),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6208),
                             ProductoId = 4,
                             StockActual = 75,
                             StockMaximo = 150,
@@ -1280,7 +1283,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 5,
                             Activo = true,
                             AlmacenId = 1,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8230),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6212),
                             ProductoId = 5,
                             StockActual = 30,
                             StockMaximo = 60,
@@ -1292,7 +1295,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 6,
                             Activo = true,
                             AlmacenId = 1,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8234),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6215),
                             ProductoId = 6,
                             StockActual = 5,
                             StockMaximo = 10,
@@ -1304,7 +1307,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 7,
                             Activo = true,
                             AlmacenId = 1,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8237),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6252),
                             ProductoId = 7,
                             StockActual = 8,
                             StockMaximo = 15,
@@ -1316,7 +1319,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 8,
                             Activo = true,
                             AlmacenId = 1,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8241),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6256),
                             ProductoId = 8,
                             StockActual = 4,
                             StockMaximo = 8,
@@ -1328,7 +1331,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 9,
                             Activo = true,
                             AlmacenId = 1,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8245),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6259),
                             ProductoId = 9,
                             StockActual = 6,
                             StockMaximo = 12,
@@ -1340,7 +1343,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 10,
                             Activo = true,
                             AlmacenId = 2,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8248),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6263),
                             ProductoId = 1,
                             StockActual = 3,
                             StockMaximo = 10,
@@ -1352,7 +1355,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 11,
                             Activo = true,
                             AlmacenId = 2,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8252),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6267),
                             ProductoId = 2,
                             StockActual = 2,
                             StockMaximo = 5,
@@ -1364,7 +1367,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 12,
                             Activo = true,
                             AlmacenId = 2,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8255),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6270),
                             ProductoId = 4,
                             StockActual = 20,
                             StockMaximo = 40,
@@ -1376,7 +1379,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 13,
                             Activo = true,
                             AlmacenId = 2,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8259),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6274),
                             ProductoId = 19,
                             StockActual = 60,
                             StockMaximo = 120,
@@ -1388,7 +1391,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 14,
                             Activo = true,
                             AlmacenId = 2,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8262),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6277),
                             ProductoId = 20,
                             StockActual = 45,
                             StockMaximo = 90,
@@ -1400,7 +1403,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 15,
                             Activo = true,
                             AlmacenId = 2,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8266),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6281),
                             ProductoId = 21,
                             StockActual = 90,
                             StockMaximo = 180,
@@ -1412,7 +1415,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 16,
                             Activo = true,
                             AlmacenId = 3,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8270),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6284),
                             ProductoId = 10,
                             StockActual = 100,
                             StockMaximo = 200,
@@ -1424,7 +1427,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 17,
                             Activo = true,
                             AlmacenId = 3,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8273),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6288),
                             ProductoId = 11,
                             StockActual = 80,
                             StockMaximo = 150,
@@ -1436,7 +1439,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 18,
                             Activo = true,
                             AlmacenId = 3,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8277),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6292),
                             ProductoId = 12,
                             StockActual = 150,
                             StockMaximo = 300,
@@ -1448,7 +1451,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 19,
                             Activo = true,
                             AlmacenId = 4,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8280),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6295),
                             ProductoId = 15,
                             StockActual = 25,
                             StockMaximo = 50,
@@ -1460,7 +1463,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 20,
                             Activo = true,
                             AlmacenId = 4,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8284),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6299),
                             ProductoId = 16,
                             StockActual = 40,
                             StockMaximo = 80,
@@ -1472,7 +1475,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 21,
                             Activo = true,
                             AlmacenId = 4,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8287),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6302),
                             ProductoId = 17,
                             StockActual = 200,
                             StockMaximo = 400,
@@ -1484,7 +1487,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 22,
                             Activo = true,
                             AlmacenId = 4,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8291),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6306),
                             ProductoId = 18,
                             StockActual = 30,
                             StockMaximo = 60,
@@ -1496,7 +1499,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 23,
                             Activo = true,
                             AlmacenId = 5,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8294),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6309),
                             ProductoId = 23,
                             StockActual = 12,
                             StockMaximo = 25,
@@ -1508,7 +1511,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 24,
                             Activo = true,
                             AlmacenId = 5,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8298),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6313),
                             ProductoId = 24,
                             StockActual = 20,
                             StockMaximo = 40,
@@ -1520,7 +1523,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Id = 25,
                             Activo = true,
                             AlmacenId = 5,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(8301),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(6316),
                             ProductoId = 25,
                             StockActual = 100,
                             StockMaximo = 200,
@@ -1571,7 +1574,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Abreviatura = "U",
                             Activo = true,
                             Descripcion = "Unidad individual",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7789),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(5844),
                             Nombre = "Unidad"
                         },
                         new
@@ -1580,7 +1583,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Abreviatura = "Kg",
                             Activo = true,
                             Descripcion = "Peso en kilogramos",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7793),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(5849),
                             Nombre = "Kilogramo"
                         },
                         new
@@ -1589,7 +1592,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Abreviatura = "L",
                             Activo = true,
                             Descripcion = "Volumen en litros",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7797),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(5853),
                             Nombre = "Litro"
                         },
                         new
@@ -1598,7 +1601,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Abreviatura = "m",
                             Activo = true,
                             Descripcion = "Longitud en metros",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7800),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(5856),
                             Nombre = "Metro"
                         },
                         new
@@ -1607,7 +1610,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Abreviatura = "Cja",
                             Activo = true,
                             Descripcion = "Caja o paquete cerrado",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7804),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(5860),
                             Nombre = "Caja"
                         },
                         new
@@ -1616,7 +1619,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Abreviatura = "Doc",
                             Activo = true,
                             Descripcion = "Conjunto de 12 unidades",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7808),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(5863),
                             Nombre = "Docena"
                         },
                         new
@@ -1625,7 +1628,7 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Abreviatura = "Par",
                             Activo = true,
                             Descripcion = "Conjunto de 2 unidades",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7811),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(5867),
                             Nombre = "Par"
                         },
                         new
@@ -1634,88 +1637,8 @@ namespace InventarioWeb.Infrastructure.Migrations
                             Abreviatura = "Rol",
                             Activo = true,
                             Descripcion = "Rollo completo",
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7852),
+                            FechaCreacion = new DateTime(2026, 8, 5, 16, 7, 3, 253, DateTimeKind.Local).AddTicks(5870),
                             Nombre = "Rollo"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Abreviatura = "g",
-                            Activo = true,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7856),
-                            Nombre = "Gramo"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Abreviatura = "ml",
-                            Activo = true,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7860),
-                            Nombre = "Mililitro"
-                        },
-                        new
-                        {
-                            Id = 11,
-                            Abreviatura = "cm",
-                            Activo = true,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7864),
-                            Nombre = "Centímetro"
-                        },
-                        new
-                        {
-                            Id = 12,
-                            Abreviatura = "mm",
-                            Activo = true,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7867),
-                            Nombre = "Milímetro"
-                        },
-                        new
-                        {
-                            Id = 13,
-                            Abreviatura = "lb",
-                            Activo = true,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7871),
-                            Nombre = "Libra"
-                        },
-                        new
-                        {
-                            Id = 14,
-                            Abreviatura = "oz",
-                            Activo = true,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7874),
-                            Nombre = "Onza"
-                        },
-                        new
-                        {
-                            Id = 15,
-                            Abreviatura = "gal",
-                            Activo = true,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7878),
-                            Nombre = "Galón"
-                        },
-                        new
-                        {
-                            Id = 16,
-                            Abreviatura = "ft",
-                            Activo = true,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7882),
-                            Nombre = "Pie"
-                        },
-                        new
-                        {
-                            Id = 17,
-                            Abreviatura = "ton",
-                            Activo = true,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7885),
-                            Nombre = "Tonelada"
-                        },
-                        new
-                        {
-                            Id = 18,
-                            Abreviatura = "cm3",
-                            Activo = true,
-                            FechaCreacion = new DateTime(2026, 8, 5, 17, 0, 23, 521, DateTimeKind.Local).AddTicks(7888),
-                            Nombre = "Centímetro Cúbico"
                         });
                 });
 

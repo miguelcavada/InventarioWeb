@@ -27,4 +27,10 @@
     <ProjectReference Include="..\InventarioWeb.Infrastructure\InventarioWeb.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="wwwroot\data\conversiones.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

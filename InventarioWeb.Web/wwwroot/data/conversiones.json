@@ -1,0 +1,154 @@
+{
+  "conversiones": [
+    {
+      "origen": "Kg",
+      "destino": "g",
+      "factor": 1000,
+      "descripcion": "1 Kilogramo = 1000 gramos"
+    },
+    {
+      "origen": "g",
+      "destino": "Kg",
+      "factor": 0.001,
+      "descripcion": "1 gramo = 0.001 Kilogramos"
+    },
+    {
+      "origen": "L",
+      "destino": "ml",
+      "factor": 1000,
+      "descripcion": "1 Litro = 1000 mililitros"
+    },
+    {
+      "origen": "ml",
+      "destino": "L",
+      "factor": 0.001,
+      "descripcion": "1 mililitro = 0.001 Litros"
+    },
+    {
+      "origen": "m",
+      "destino": "cm",
+      "factor": 100,
+      "descripcion": "1 Metro = 100 centímetros"
+    },
+    {
+      "origen": "cm",
+      "destino": "m",
+      "factor": 0.01,
+      "descripcion": "1 centímetro = 0.01 Metros"
+    },
+    {
+      "origen": "m",
+      "destino": "mm",
+      "factor": 1000,
+      "descripcion": "1 Metro = 1000 milímetros"
+    },
+    {
+      "origen": "Kg",
+      "destino": "lb",
+      "factor": 2.20462,
+      "descripcion": "1 Kilogramo = 2.20462 libras"
+    },
+    {
+      "origen": "lb",
+      "destino": "Kg",
+      "factor": 0.453592,
+      "descripcion": "1 libra = 0.453592 Kilogramos"
+    },
+    {
+      "origen": "L",
+      "destino": "gal",
+      "factor": 0.264172,
+      "descripcion": "1 Litro = 0.264172 galones"
+    },
+    {
+      "origen": "gal",
+      "destino": "L",
+      "factor": 3.78541,
+      "descripcion": "1 galón = 3.78541 Litros"
+    },
+    {
+      "origen": "m",
+      "destino": "ft",
+      "factor": 3.28084,
+      "descripcion": "1 Metro = 3.28084 pies"
+    },
+    {
+      "origen": "ft",
+      "destino": "m",
+      "factor": 0.3048,
+      "descripcion": "1 pie = 0.3048 Metros"
+    },
+    {
+      "origen": "Kg",
+      "destino": "oz",
+      "factor": 35.274,
+      "descripcion": "1 Kilogramo = 35.274 onzas"
+    },
+    {
+      "origen": "oz",
+      "destino": "g",
+      "factor": 28.3495,
+      "descripcion": "1 onza = 28.3495 gramos"
+    },
+    {
+      "origen": "g",
+      "destino": "oz",
+      "factor": 0.035274,
+      "descripcion": "1 gramo = 0.035274 onzas"
+    },
+    {
+      "origen": "Doc",
+      "destino": "U",
+      "factor": 12,
+      "descripcion": "1 Docena = 12 Unidades"
+    },
+    {
+      "origen": "U",
+      "destino": "Doc",
+      "factor": 0.0833333,
+      "descripcion": "1 Unidad = 0.0833333 Docenas"
+    },
+    {
+      "origen": "Par",
+      "destino": "U",
+      "factor": 2,
+      "descripcion": "1 Par = 2 Unidades"
+    },
+    {
+      "origen": "U",
+      "destino": "Par",
+      "factor": 0.5,
+      "descripcion": "1 Unidad = 0.5 Pares"
+    },
+    {
+      "origen": "Cja",
+      "destino": "U",
+      "factor": 24,
+      "descripcion": "1 Caja = 24 Unidades"
+    },
+    {
+      "origen": "U",
+      "destino": "Cja",
+      "factor": 0.0416667,
+      "descripcion": "1 Unidad = 0.0416667 Cajas"
+    },
+    {
+      "origen": "L",
+      "destino": "cm3",
+      "factor": 1000,
+      "descripcion": "1 Litro = 1000 centímetros cúbicos"
+    },
+    {
+      "origen": "Kg",
+      "destino": "ton",
+      "factor": 0.001,
+      "descripcion": "1 Kilogramo = 0.001 toneladas"
+    },
+    {
+      "origen": "ton",
+      "destino": "Kg",
+      "factor": 1000,
+      "descripcion": "1 tonelada = 1000 Kilogramos"
+    }
+  ]
+}

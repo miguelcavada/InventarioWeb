@@ -188,4 +188,51 @@ public class ProductosController : Controller
         var unidades = await _unitOfWork.UnidadesMedida.GetAllAsync();
         ViewBag.UnidadesMedida = new SelectList(unidades.Where(u => u.Activo), "Id", "Abreviatura", unidadMedidaId);
     }
+
+    // Endpoint para convertir cantidad entre unidades
+    [HttpGet]
+    public async Task<JsonResult> ConvertirUnidad(int unidadOrigenId, int unidadDestinoId, decimal cantidad)
+    {
+        // Si es la misma unidad, retornar la misma cantidad
+        if (unidadOrigenId == unidadDestinoId)
+        {
+            return Json(new { success = true, resultado = cantidad, mensaje = "Misma unidad" });
+        }
+
+        // Buscar conversión directa
+        var conversion = await _unitOfWork.Conversiones.GetConversionAsync(unidadOrigenId, unidadDestinoId);
+
+        if (conversion != null)
+        {
+            var resultado = cantidad * conversion.Factor;
+            var unidadDestino = await _unitOfWork.UnidadesMedida.GetByIdAsync(unidadDestinoId);
+            return Json(new
+            {
+                success = true,
+                resultado = Math.Round(resultado, 4),
+                factor = conversion.Factor,
+                operacion = "multiplicar",
+                mensaje = $"1 = {conversion.Factor} {unidadDestino?.Abreviatura}"
+            });
+        }
+
+        // Buscar conversión inversa
+        var conversionInversa = await _unitOfWork.Conversiones.GetConversionAsync(unidadDestinoId, unidadOrigenId);
+
+        if (conversionInversa != null)
+        {
+            var resultado = cantidad / conversionInversa.Factor;
+            var unidadDestino = await _unitOfWork.UnidadesMedida.GetByIdAsync(unidadDestinoId);
+            return Json(new
+            {
+                success = true,
+                resultado = Math.Round(resultado, 4),
+                factor = 1 / conversionInversa.Factor,
+                operacion = "dividir",
+                mensaje = $"1 = {1 / conversionInversa.Factor} {unidadDestino?.Abreviatura}"
+            });
+        }
+
+        return Json(new { success = false, mensaje = "No existe conversión entre estas unidades" });
+    }
 }

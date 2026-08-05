@@ -13,6 +13,7 @@ public static class SeedData
         SeedProductos(modelBuilder);
         SeedStocks(modelBuilder);
         SeedProveedores(modelBuilder);
+        SeedConversiones(modelBuilder);
     }
 
     private static void SeedCategorias(ModelBuilder modelBuilder)
@@ -37,7 +38,19 @@ public static class SeedData
             new UnidadMedida { Id = 5, Nombre = "Caja", Abreviatura = "Cja", Descripcion = "Caja o paquete cerrado", Activo = true, FechaCreacion = DateTime.Now },
             new UnidadMedida { Id = 6, Nombre = "Docena", Abreviatura = "Doc", Descripcion = "Conjunto de 12 unidades", Activo = true, FechaCreacion = DateTime.Now },
             new UnidadMedida { Id = 7, Nombre = "Par", Abreviatura = "Par", Descripcion = "Conjunto de 2 unidades", Activo = true, FechaCreacion = DateTime.Now },
-            new UnidadMedida { Id = 8, Nombre = "Rollo", Abreviatura = "Rol", Descripcion = "Rollo completo", Activo = true, FechaCreacion = DateTime.Now }
+            new UnidadMedida { Id = 8, Nombre = "Rollo", Abreviatura = "Rol", Descripcion = "Rollo completo", Activo = true, FechaCreacion = DateTime.Now },
+
+            // Unidades adicionales para conversiones
+            new UnidadMedida { Id = 9, Nombre = "Gramo", Abreviatura = "g", Activo = true, FechaCreacion = DateTime.Now },
+            new UnidadMedida { Id = 10, Nombre = "Mililitro", Abreviatura = "ml", Activo = true, FechaCreacion = DateTime.Now },
+            new UnidadMedida { Id = 11, Nombre = "Centímetro", Abreviatura = "cm", Activo = true, FechaCreacion = DateTime.Now },
+            new UnidadMedida { Id = 12, Nombre = "Milímetro", Abreviatura = "mm", Activo = true, FechaCreacion = DateTime.Now },
+            new UnidadMedida { Id = 13, Nombre = "Libra", Abreviatura = "lb", Activo = true, FechaCreacion = DateTime.Now },
+            new UnidadMedida { Id = 14, Nombre = "Onza", Abreviatura = "oz", Activo = true, FechaCreacion = DateTime.Now },
+            new UnidadMedida { Id = 15, Nombre = "Galón", Abreviatura = "gal", Activo = true, FechaCreacion = DateTime.Now },
+            new UnidadMedida { Id = 16, Nombre = "Pie", Abreviatura = "ft", Activo = true, FechaCreacion = DateTime.Now },
+            new UnidadMedida { Id = 17, Nombre = "Tonelada", Abreviatura = "ton", Activo = true, FechaCreacion = DateTime.Now },
+            new UnidadMedida { Id = 18, Nombre = "Centímetro Cúbico", Abreviatura = "cm3", Activo = true, FechaCreacion = DateTime.Now }
         );
     }
 
@@ -144,6 +157,22 @@ public static class SeedData
             new Proveedor { Id = 3, Nombre = "Distribuidora Papelera", RUC = "34567890123", Direccion = "Av. Papel #300", Telefono = "555-1003", Email = "pedidos@distpapelera.com", Activo = true, FechaCreacion = DateTime.Now },
             new Proveedor { Id = 4, Nombre = "Alimentos del Sur", RUC = "45678901234", Direccion = "Zona Industrial #400", Telefono = "555-1004", Email = "contacto@alimentosdelsur.com", Activo = true, FechaCreacion = DateTime.Now },
             new Proveedor { Id = 5, Nombre = "CleanPro S.A.", RUC = "56789012345", Direccion = "Parque Industrial #500", Telefono = "555-1005", Email = "ventas@cleanpro.com", Activo = true, FechaCreacion = DateTime.Now }
+        );
+    }
+
+    private static void SeedConversiones(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ConversionUnidad>().HasData(
+            // Peso
+            new ConversionUnidad { Id = 1, UnidadOrigenId = 2, UnidadDestinoId = 1, Factor = 1m, Descripcion = "1 Kg = 1000 g", Activo = true, FechaCreacion = DateTime.Now },
+            // Volumen
+            new ConversionUnidad { Id = 2, UnidadOrigenId = 3, UnidadDestinoId = 1, Factor = 1000m, Descripcion = "1 L = 1000 ml", Activo = true, FechaCreacion = DateTime.Now },
+            // Docena
+            new ConversionUnidad { Id = 3, UnidadOrigenId = 6, UnidadDestinoId = 1, Factor = 12m, Descripcion = "1 Docena = 12 Unidades", Activo = true, FechaCreacion = DateTime.Now },
+            // Par
+            new ConversionUnidad { Id = 4, UnidadOrigenId = 7, UnidadDestinoId = 1, Factor = 2m, Descripcion = "1 Par = 2 Unidades", Activo = true, FechaCreacion = DateTime.Now },
+            // Caja a Unidad (ejemplo: 24 unidades por caja)
+            new ConversionUnidad { Id = 5, UnidadOrigenId = 5, UnidadDestinoId = 1, Factor = 24m, Descripcion = "1 Caja = 24 Unidades", Activo = true, FechaCreacion = DateTime.Now }            
         );
     }
 }
