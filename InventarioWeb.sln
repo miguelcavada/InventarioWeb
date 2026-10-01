@@ -13,6 +13,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventarioWeb.Application",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventarioWeb.Api", "InventarioWeb.Api\InventarioWeb.Api.csproj", "{F1E6D9AD-2E70-45A6-AC20-2A844517F11C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventarioWeb.ApiRest", "InventarioWeb.ApiRest\InventarioWeb.ApiRest.csproj", "{00240BC0-0E47-4C91-A0F8-966F793BBA76}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventarioWeb.BlazorApp", "InventarioWeb.BlazorApp\InventarioWeb.BlazorApp.csproj", "{315CD990-7F1E-49A7-BF12-CF7AA33BC0A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventarioWeb.WinForms", "InventarioWeb.WinForms\InventarioWeb.WinForms.csproj", "{0CD3597A-397F-4660-8041-886597A10558}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +45,18 @@ Global
 		{F1E6D9AD-2E70-45A6-AC20-2A844517F11C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1E6D9AD-2E70-45A6-AC20-2A844517F11C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F1E6D9AD-2E70-45A6-AC20-2A844517F11C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00240BC0-0E47-4C91-A0F8-966F793BBA76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00240BC0-0E47-4C91-A0F8-966F793BBA76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00240BC0-0E47-4C91-A0F8-966F793BBA76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00240BC0-0E47-4C91-A0F8-966F793BBA76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{315CD990-7F1E-49A7-BF12-CF7AA33BC0A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{315CD990-7F1E-49A7-BF12-CF7AA33BC0A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{315CD990-7F1E-49A7-BF12-CF7AA33BC0A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{315CD990-7F1E-49A7-BF12-CF7AA33BC0A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CD3597A-397F-4660-8041-886597A10558}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CD3597A-397F-4660-8041-886597A10558}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CD3597A-397F-4660-8041-886597A10558}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CD3597A-397F-4660-8041-886597A10558}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

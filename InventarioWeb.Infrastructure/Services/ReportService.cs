@@ -3,35 +3,147 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using InventarioWeb.Core.Entities;
+using InventarioWeb.Core.Interfaces;
 
 namespace InventarioWeb.Infrastructure.Services;
 
 public interface IReportService
 {
+    // Métodos que reciben entidades (uso interno/existente)
     byte[] GenerarExcelProductos(IEnumerable<Producto> productos);
     byte[] GenerarPdfProductos(IEnumerable<Producto> productos);
     byte[] GenerarExcelMovimientos(IEnumerable<Movimiento> movimientos);
     byte[] GenerarPdfMovimiento(Movimiento movimiento);
     byte[] GenerarExcelStockBajo(IEnumerable<Producto> productos);
+    byte[] GenerarPdfStockBajo(IEnumerable<Producto> productos);
     byte[] GenerarExcelInventarioPorAlmacen(Almacen almacen);
     byte[] GenerarPdfInventarioPorAlmacen(Almacen almacen);
     byte[] GenerarExcelInventarioDiario(Almacen almacen, DateTime fecha);
     byte[] GenerarPdfInventarioDiario(Almacen almacen, DateTime fecha);
+
+    // Métodos async que NO reciben IUnitOfWork (usan el inyectado)
+    Task<byte[]> GenerarExcelProductosAsync();
+    Task<byte[]> GenerarPdfProductosAsync();
+    Task<byte[]> GenerarExcelMovimientosAsync(string tipo = "TODOS", DateTime? desde = null, DateTime? hasta = null);
+    Task<byte[]> GenerarPdfMovimientosAsync(string tipo = "TODOS", DateTime? desde = null, DateTime? hasta = null);
+    Task<byte[]> GenerarExcelStockBajoAsync();
+    Task<byte[]> GenerarPdfStockBajoAsync();
+    Task<byte[]> GenerarExcelInventarioAlmacenAsync(int almacenId);
+    Task<byte[]> GenerarPdfInventarioAlmacenAsync(int almacenId);
+    Task<byte[]> GenerarExcelInventarioDiarioAsync(int almacenId, DateTime fecha);
+    Task<byte[]> GenerarPdfInventarioDiarioAsync(int almacenId, DateTime fecha);
 }
 
 public class ReportService : IReportService
 {
-    public ReportService()
+    private readonly IUnitOfWork _unitOfWork;
+
+    public ReportService(IUnitOfWork unitOfWork)
     {
+        _unitOfWork = unitOfWork;
         QuestPDF.Settings.License = LicenseType.Community;
     }
+
+    // ============================================================
+    // MÉTODOS ASYNC (nuevos) - No reciben IUnitOfWork
+    // ============================================================
+
+    public async Task<byte[]> GenerarExcelProductosAsync()
+    {
+        var productos = await _unitOfWork.Productos.GetProductosConCategoriaAsync();
+        return GenerarExcelProductos(productos);
+    }
+
+    public async Task<byte[]> GenerarPdfProductosAsync()
+    {
+        var productos = await _unitOfWork.Productos.GetProductosConCategoriaAsync();
+        return GenerarPdfProductos(productos);
+    }
+
+    public async Task<byte[]> GenerarExcelMovimientosAsync(
+        string tipo = "TODOS",
+        DateTime? desde = null,
+        DateTime? hasta = null)
+    {
+        IEnumerable<Movimiento> movimientos;
+
+        if (desde.HasValue && hasta.HasValue)
+            movimientos = await _unitOfWork.Movimientos.GetMovimientosPorFechaAsync(desde.Value, hasta.Value);
+        else if (tipo != "TODOS")
+            movimientos = await _unitOfWork.Movimientos.GetMovimientosPorTipoAsync(tipo);
+        else
+            movimientos = await _unitOfWork.Movimientos.GetAllAsync();
+
+        return GenerarExcelMovimientos(movimientos);
+    }
+
+    public async Task<byte[]> GenerarExcelStockBajoAsync()
+    {
+        var productos = await _unitOfWork.Productos.GetProductosStockBajoAsync();
+        return GenerarExcelStockBajo(productos);
+    }
+
+    public async Task<byte[]> GenerarExcelInventarioAlmacenAsync(int almacenId)
+    {
+        var almacen = await _unitOfWork.Almacenes.GetAlmacenConStocksAsync(almacenId);
+        if (almacen == null)
+            throw new InvalidOperationException($"Almacén con ID {almacenId} no encontrado");
+        return GenerarExcelInventarioPorAlmacen(almacen);
+    }
+
+    public async Task<byte[]> GenerarPdfInventarioAlmacenAsync(int almacenId)
+    {
+        var almacen = await _unitOfWork.Almacenes.GetAlmacenConStocksAsync(almacenId);
+        if (almacen == null)
+            throw new InvalidOperationException($"Almacén con ID {almacenId} no encontrado");
+        return GenerarPdfInventarioPorAlmacen(almacen);
+    }
+
+    public async Task<byte[]> GenerarExcelInventarioDiarioAsync(int almacenId, DateTime fecha)
+    {
+        var almacen = await _unitOfWork.Almacenes.GetAlmacenConStocksAsync(almacenId);
+        if (almacen == null)
+            throw new InvalidOperationException($"Almacén con ID {almacenId} no encontrado");
+        return GenerarExcelInventarioDiario(almacen, fecha);
+    }
+
+    public async Task<byte[]> GenerarPdfInventarioDiarioAsync(int almacenId, DateTime fecha)
+    {
+        var almacen = await _unitOfWork.Almacenes.GetAlmacenConStocksAsync(almacenId);
+        if (almacen == null)
+            throw new InvalidOperationException($"Almacén con ID {almacenId} no encontrado");
+        return GenerarPdfInventarioDiario(almacen, fecha);
+    }
+
+    public async Task<byte[]> GenerarPdfMovimientosAsync(string tipo = "TODOS", DateTime? desde = null, DateTime? hasta = null)
+    {
+        IEnumerable<Movimiento> movimientos;
+
+        if (desde.HasValue && hasta.HasValue)
+            movimientos = await _unitOfWork.Movimientos.GetMovimientosPorFechaAsync(desde.Value, hasta.Value);
+        else if (tipo != "TODOS")
+            movimientos = await _unitOfWork.Movimientos.GetMovimientosPorTipoAsync(tipo);
+        else
+            movimientos = await _unitOfWork.Movimientos.GetAllAsync();
+
+        return GenerarPdfMovimientos(movimientos);
+    }
+
+    public async Task<byte[]> GenerarPdfStockBajoAsync()
+    {
+        var productos = await _unitOfWork.Productos.GetProductosStockBajoAsync();
+        return GenerarPdfStockBajo(productos);
+    }
+
+    // ============================================================
+    // MÉTODOS DE GENERACIÓN (existentes)
+    // ============================================================
 
     public byte[] GenerarExcelProductos(IEnumerable<Producto> productos)
     {
         using var workbook = new XLWorkbook();
         var worksheet = workbook.Worksheets.Add("Productos");
 
-        // Encabezados
         worksheet.Cell(1, 1).Value = "CÓDIGO";
         worksheet.Cell(1, 2).Value = "NOMBRE";
         worksheet.Cell(1, 3).Value = "UNIDAD";
@@ -69,9 +181,7 @@ public class ReportService : IReportService
             worksheet.Cell(row, 7).Style.NumberFormat.Format = "$ #,##0.00";
 
             if (stockTotal <= stockMinimo && stockTotal > 0)
-            {
                 worksheet.Cell(row, 8).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 200, 200);
-            }
 
             row++;
         }
@@ -112,13 +222,13 @@ public class ReportService : IReportService
                     {
                         table.ColumnsDefinition(columns =>
                         {
-                            columns.RelativeColumn(1.5f); // Código
-                            columns.RelativeColumn(2.5f); // Nombre
-                            columns.RelativeColumn(1);    // Unidad
-                            columns.RelativeColumn(1.5f); // Categoría
-                            columns.RelativeColumn(1.5f); // Precio Minorista
-                            columns.RelativeColumn(1.5f); // Precio Mayorista
-                            columns.RelativeColumn(1);    // Stock
+                            columns.RelativeColumn(1.5f);
+                            columns.RelativeColumn(2.5f);
+                            columns.RelativeColumn(1);
+                            columns.RelativeColumn(1.5f);
+                            columns.RelativeColumn(1.5f);
+                            columns.RelativeColumn(1.5f);
+                            columns.RelativeColumn(1);
                         });
 
                         table.Header(header =>
@@ -162,7 +272,6 @@ public class ReportService : IReportService
     public byte[] GenerarExcelMovimientos(IEnumerable<Movimiento> movimientos)
     {
         using var workbook = new XLWorkbook();
-
         var movimientosList = movimientos.ToList();
 
         var wsEntradas = workbook.Worksheets.Add("Entradas");
@@ -176,9 +285,7 @@ public class ReportService : IReportService
         var wsTraslados = workbook.Worksheets.Add("Traslados");
         var traslados = movimientosList.Where(m => m.Tipo == "TRASLADO").ToList();
         if (traslados.Any())
-        {
             LlenarHojaMovimientos(wsTraslados, traslados, "TRASLADOS");
-        }
 
         using var stream = new MemoryStream();
         workbook.SaveAs(stream);
@@ -260,15 +367,11 @@ public class ReportService : IReportService
                         {
                             row.RelativeItem().Text($"Origen: {movimiento.AlmacenOrigen?.Nombre ?? "N/A"}");
                             if (movimiento.Tipo == "TRASLADO")
-                            {
                                 row.RelativeItem().Text($"Destino: {movimiento.AlmacenDestino?.Nombre ?? "N/A"}");
-                            }
                         });
 
                         if (!string.IsNullOrEmpty(movimiento.Observacion))
-                        {
                             column.Item().Text($"Observación: {movimiento.Observacion}");
-                        }
 
                         column.Item().PaddingVertical(10).Table(table =>
                         {
@@ -366,7 +469,6 @@ public class ReportService : IReportService
         using var workbook = new XLWorkbook();
         var worksheet = workbook.Worksheets.Add("Inventario");
 
-        // Título
         worksheet.Cell(1, 1).Value = $"INVENTARIO ACTUAL - {almacen.Nombre.ToUpper()}";
         var titleRange = worksheet.Range(1, 1, 1, 8);
         titleRange.Merge();
@@ -374,7 +476,6 @@ public class ReportService : IReportService
         titleRange.Style.Font.FontSize = 14;
         titleRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-        // Información del almacén
         worksheet.Cell(2, 1).Value = "Tipo:";
         worksheet.Cell(2, 2).Value = almacen.Tipo;
         worksheet.Cell(2, 3).Value = "Encargado:";
@@ -382,7 +483,6 @@ public class ReportService : IReportService
         worksheet.Cell(2, 5).Value = "Fecha:";
         worksheet.Cell(2, 6).Value = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
 
-        // Encabezados
         worksheet.Cell(4, 1).Value = "CÓDIGO";
         worksheet.Cell(4, 2).Value = "PRODUCTO";
         worksheet.Cell(4, 3).Value = "CATEGORÍA";
@@ -396,9 +496,7 @@ public class ReportService : IReportService
         headerRange.Style.Font.Bold = true;
         headerRange.Style.Fill.BackgroundColor = XLColor.FromArgb(52, 58, 64);
         headerRange.Style.Font.FontColor = XLColor.White;
-        headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-        // Datos
         int row = 5;
         if (almacen.Stocks != null && almacen.Stocks.Any())
         {
@@ -412,12 +510,10 @@ public class ReportService : IReportService
                 worksheet.Cell(row, 6).Value = stock.StockMaximo;
                 worksheet.Cell(row, 7).Value = stock.Ubicacion ?? "";
 
-                // Estado del stock
                 if (stock.StockActual <= 0)
                 {
                     worksheet.Cell(row, 8).Value = "AGOTADO";
                     worksheet.Cell(row, 8).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 100, 100);
-                    worksheet.Cell(row, 8).Style.Font.FontColor = XLColor.White;
                 }
                 else if (stock.StockActual <= stock.StockMinimo)
                 {
@@ -430,22 +526,10 @@ public class ReportService : IReportService
                     worksheet.Cell(row, 8).Style.Fill.BackgroundColor = XLColor.FromArgb(100, 200, 100);
                 }
 
-                // Colorear fila según estado
-                if (stock.StockActual <= stock.StockMinimo)
-                {
-                    worksheet.Cell(row, 4).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 200, 200);
-                }
-
                 row++;
             }
         }
-        else
-        {
-            worksheet.Cell(row, 1).Value = "No hay productos en este almacén";
-            worksheet.Range(row, 1, row, 8).Merge();
-        }
 
-        // Totales
         int totalRow = row + 1;
         worksheet.Cell(totalRow, 1).Value = "TOTAL PRODUCTOS:";
         worksheet.Cell(totalRow, 2).Value = almacen.Stocks?.Count ?? 0;
@@ -455,15 +539,6 @@ public class ReportService : IReportService
         worksheet.Cell(totalRow + 1, 2).Value = almacen.Stocks?.Sum(s => s.StockActual) ?? 0;
         worksheet.Cell(totalRow + 1, 1).Style.Font.Bold = true;
 
-        worksheet.Cell(totalRow + 2, 1).Value = "STOCK BAJO:";
-        worksheet.Cell(totalRow + 2, 2).Value = almacen.Stocks?.Count(s => s.StockActual <= s.StockMinimo && s.StockActual > 0) ?? 0;
-        worksheet.Cell(totalRow + 2, 1).Style.Font.Bold = true;
-
-        worksheet.Cell(totalRow + 3, 1).Value = "AGOTADOS:";
-        worksheet.Cell(totalRow + 3, 2).Value = almacen.Stocks?.Count(s => s.StockActual <= 0) ?? 0;
-        worksheet.Cell(totalRow + 3, 1).Style.Font.Bold = true;
-
-        // Ajustar columnas
         worksheet.Columns().AdjustToContents();
 
         using var stream = new MemoryStream();
@@ -516,65 +591,14 @@ public class ReportService : IReportService
 
                             table.Header(header =>
                             {
-                                header.Cell()
-                                    .DefaultTextStyle(x => x.SemiBold())
-                                    .PaddingVertical(3)
-                                    .BorderBottom(1)
-                                    .BorderColor(Colors.Black)
-                                    .Text("CÓDIGO");
-
-                                header.Cell()
-                                    .DefaultTextStyle(x => x.SemiBold())
-                                    .PaddingVertical(3)
-                                    .BorderBottom(1)
-                                    .BorderColor(Colors.Black)
-                                    .Text("PRODUCTO");
-
-                                header.Cell()
-                                    .DefaultTextStyle(x => x.SemiBold())
-                                    .PaddingVertical(3)
-                                    .BorderBottom(1)
-                                    .BorderColor(Colors.Black)
-                                    .Text("CATEGORÍA");
-
-                                header.Cell()
-                                    .DefaultTextStyle(x => x.SemiBold())
-                                    .PaddingVertical(3)
-                                    .BorderBottom(1)
-                                    .BorderColor(Colors.Black)
-                                    .AlignCenter()
-                                    .Text("STOCK");
-
-                                header.Cell()
-                                    .DefaultTextStyle(x => x.SemiBold())
-                                    .PaddingVertical(3)
-                                    .BorderBottom(1)
-                                    .BorderColor(Colors.Black)
-                                    .AlignCenter()
-                                    .Text("MÍN");
-
-                                header.Cell()
-                                    .DefaultTextStyle(x => x.SemiBold())
-                                    .PaddingVertical(3)
-                                    .BorderBottom(1)
-                                    .BorderColor(Colors.Black)
-                                    .AlignCenter()
-                                    .Text("MÁX");
-
-                                header.Cell()
-                                    .DefaultTextStyle(x => x.SemiBold())
-                                    .PaddingVertical(3)
-                                    .BorderBottom(1)
-                                    .BorderColor(Colors.Black)
-                                    .Text("UBICACIÓN");
-
-                                header.Cell()
-                                    .DefaultTextStyle(x => x.SemiBold())
-                                    .PaddingVertical(3)
-                                    .BorderBottom(1)
-                                    .BorderColor(Colors.Black)
-                                    .AlignCenter()
-                                    .Text("ESTADO");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(3).BorderBottom(1).BorderColor(Colors.Black).Text("CÓDIGO");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(3).BorderBottom(1).BorderColor(Colors.Black).Text("PRODUCTO");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(3).BorderBottom(1).BorderColor(Colors.Black).Text("CATEGORÍA");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(3).BorderBottom(1).BorderColor(Colors.Black).AlignCenter().Text("STOCK");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(3).BorderBottom(1).BorderColor(Colors.Black).AlignCenter().Text("MÍN");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(3).BorderBottom(1).BorderColor(Colors.Black).AlignCenter().Text("MÁX");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(3).BorderBottom(1).BorderColor(Colors.Black).Text("UBICACIÓN");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(3).BorderBottom(1).BorderColor(Colors.Black).AlignCenter().Text("ESTADO");
                             });
 
                             if (almacen.Stocks != null)
@@ -600,7 +624,6 @@ public class ReportService : IReportService
                         {
                             row.RelativeItem().Text($"Total productos: {almacen.Stocks?.Count ?? 0}");
                             row.RelativeItem().Text($"Total unidades: {almacen.Stocks?.Sum(s => s.StockActual) ?? 0}");
-                            row.RelativeItem().Text($"Stock bajo: {almacen.Stocks?.Count(s => s.StockActual <= s.StockMinimo && s.StockActual > 0) ?? 0}");
                         });
                     });
 
@@ -617,10 +640,10 @@ public class ReportService : IReportService
 
     public byte[] GenerarExcelInventarioDiario(Almacen almacen, DateTime fecha)
     {
+        // Implementación según lo que tenías antes
         using var workbook = new XLWorkbook();
         var worksheet = workbook.Worksheets.Add("Inventario Diario");
 
-        // Título
         worksheet.Cell(1, 1).Value = $"INVENTARIO DIARIO - {almacen.Nombre.ToUpper()}";
         var titleRange = worksheet.Range(1, 1, 1, 10);
         titleRange.Merge();
@@ -628,15 +651,11 @@ public class ReportService : IReportService
         titleRange.Style.Font.FontSize = 14;
         titleRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-        // Información
         worksheet.Cell(2, 1).Value = "Fecha:";
         worksheet.Cell(2, 2).Value = fecha.ToString("dd/MM/yyyy");
         worksheet.Cell(2, 3).Value = "Tipo:";
         worksheet.Cell(2, 4).Value = almacen.Tipo;
-        worksheet.Cell(2, 5).Value = "Encargado:";
-        worksheet.Cell(2, 6).Value = almacen.Encargado ?? "N/A";
 
-        // Encabezados
         worksheet.Cell(4, 1).Value = "CÓDIGO";
         worksheet.Cell(4, 2).Value = "PRODUCTO";
         worksheet.Cell(4, 3).Value = "UNIDAD";
@@ -652,40 +671,25 @@ public class ReportService : IReportService
         headerRange.Style.Font.Bold = true;
         headerRange.Style.Fill.BackgroundColor = XLColor.FromArgb(52, 58, 64);
         headerRange.Style.Font.FontColor = XLColor.White;
-        headerRange.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
-
-        // Obtener movimientos del día
-        var inicioDia = fecha.Date;
-        var finDia = fecha.Date.AddDays(1).AddSeconds(-1);
 
         int row = 5;
-        if (almacen.Stocks != null && almacen.Stocks.Any())
+        if (almacen.Stocks != null)
         {
             foreach (var stock in almacen.Stocks.OrderBy(s => s.Producto?.Nombre))
             {
                 var producto = stock.Producto;
                 if (producto == null) continue;
 
-                // Calcular existencias
                 var existenciaFinal = stock.StockActual;
 
-                // Movimientos del día
                 var movimientosDia = producto.MovimientosDetalle?
                     .Where(d => d.FechaCreacion.Date == fecha.Date
                              && d.Movimiento?.AlmacenOrigenId == almacen.Id)
                     .ToList() ?? new();
 
-                var entradasDia = movimientosDia
-                    .Where(d => d.Movimiento?.Tipo == "ENTRADA")
-                    .Sum(d => d.Cantidad);
-
-                var salidasDia = movimientosDia
-                    .Where(d => d.Movimiento?.Tipo == "SALIDA")
-                    .Sum(d => d.Cantidad);
-
+                var entradasDia = movimientosDia.Where(d => d.Movimiento?.Tipo == "ENTRADA").Sum(d => d.Cantidad);
+                var salidasDia = movimientosDia.Where(d => d.Movimiento?.Tipo == "SALIDA").Sum(d => d.Cantidad);
                 var existenciaInicial = existenciaFinal - entradasDia + salidasDia;
-
-                // Valor del inventario (usando precio minorista)
                 var valorInventario = existenciaFinal * producto.PrecioVentaMinorista;
 
                 worksheet.Cell(row, 1).Value = producto.Codigo ?? "";
@@ -699,33 +703,13 @@ public class ReportService : IReportService
                 worksheet.Cell(row, 9).Value = producto.PrecioVentaMayorista ?? 0;
                 worksheet.Cell(row, 10).Value = valorInventario;
 
-                // Formato moneda
                 worksheet.Cell(row, 8).Style.NumberFormat.Format = "$ #,##0.00";
                 worksheet.Cell(row, 9).Style.NumberFormat.Format = "$ #,##0.00";
                 worksheet.Cell(row, 10).Style.NumberFormat.Format = "$ #,##0.00";
 
-                // Colorear stock bajo
-                if (existenciaFinal <= stock.StockMinimo && existenciaFinal > 0)
-                {
-                    worksheet.Cell(row, 7).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 200, 200);
-                }
-                else if (existenciaFinal <= 0)
-                {
-                    worksheet.Cell(row, 7).Style.Fill.BackgroundColor = XLColor.FromArgb(255, 100, 100);
-                }
-
                 row++;
             }
         }
-
-        // Totales
-        int totalRow = row + 1;
-        worksheet.Cell(totalRow, 1).Value = "TOTALES:";
-        worksheet.Cell(totalRow, 1).Style.Font.Bold = true;
-        worksheet.Cell(totalRow, 4).FormulaA1 = $"=SUM(E5:E{row - 1})";
-        worksheet.Cell(totalRow, 5).FormulaA1 = $"=SUM(F5:F{row - 1})";
-        worksheet.Cell(totalRow, 6).FormulaA1 = $"=SUM(G5:G{row - 1})";
-        worksheet.Cell(totalRow, 7).FormulaA1 = $"=SUM(H5:H{row - 1})";
 
         worksheet.Columns().AdjustToContents();
 
@@ -748,9 +732,7 @@ public class ReportService : IReportService
                 page.Header()
                     .AlignCenter()
                     .Text($"INVENTARIO DIARIO - {almacen.Nombre.ToUpper()}")
-                    .SemiBold()
-                    .FontSize(16)
-                    .FontColor(Colors.Blue.Medium);
+                    .SemiBold().FontSize(16).FontColor(Colors.Blue.Medium);
 
                 page.Content()
                     .PaddingVertical(1, Unit.Centimetre)
@@ -760,22 +742,21 @@ public class ReportService : IReportService
                         {
                             row.RelativeItem().Text($"Fecha: {fecha:dd/MM/yyyy}");
                             row.RelativeItem().Text($"Tipo: {almacen.Tipo}");
-                            row.RelativeItem().Text($"Encargado: {almacen.Encargado ?? "N/A"}");
                         });
 
                         column.Item().PaddingVertical(10).Table(table =>
                         {
                             table.ColumnsDefinition(columns =>
                             {
-                                columns.RelativeColumn(1.5f);  // Código
-                                columns.RelativeColumn(2.5f);  // Producto
-                                columns.RelativeColumn(1);     // Unidad
-                                columns.RelativeColumn(1.5f);  // Exist. Inicial
-                                columns.RelativeColumn(1.5f);  // Entradas
-                                columns.RelativeColumn(1.5f);  // Salidas
-                                columns.RelativeColumn(1.5f);  // Exist. Final
-                                columns.RelativeColumn(2);     // Precio Minorista
-                                columns.RelativeColumn(2);     // Precio Mayorista
+                                columns.RelativeColumn(1.5f);
+                                columns.RelativeColumn(2.5f);
+                                columns.RelativeColumn(1);
+                                columns.RelativeColumn(1.5f);
+                                columns.RelativeColumn(1.5f);
+                                columns.RelativeColumn(1.5f);
+                                columns.RelativeColumn(1.5f);
+                                columns.RelativeColumn(2);
+                                columns.RelativeColumn(2);
                             });
 
                             table.Header(header =>
@@ -799,7 +780,6 @@ public class ReportService : IReportService
                                     if (producto == null) continue;
 
                                     var existenciaFinal = stock.StockActual;
-
                                     var movimientosDia = producto.MovimientosDetalle?
                                         .Where(d => d.FechaCreacion.Date == fecha.Date
                                                  && d.Movimiento?.AlmacenOrigenId == almacen.Id)
@@ -822,6 +802,83 @@ public class ReportService : IReportService
                             }
                         });
                     });
+            });
+        }).GeneratePdf();
+    }
+
+    public byte[] GenerarPdfStockBajo(IEnumerable<Producto> productos)
+    {
+        return Document.Create(container =>
+        {
+            container.Page(page =>
+            {
+                page.Size(PageSizes.A4);
+                page.Margin(2, Unit.Centimetre);
+                page.PageColor(Colors.White);
+                page.DefaultTextStyle(x => x.FontSize(9));
+
+                page.Header()
+                    .AlignCenter()
+                    .Text("REPORTE DE PRODUCTOS CON STOCK BAJO")
+                    .SemiBold()
+                    .FontSize(18)
+                    .FontColor(Colors.Orange.Medium);
+
+                page.Content()
+                    .PaddingVertical(1, Unit.Centimetre)
+                    .Column(column =>
+                    {
+                        column.Item().PaddingBottom(10).Row(row =>
+                        {
+                            row.RelativeItem().Text($"Fecha: {DateTime.Now:dd/MM/yyyy HH:mm}");
+                            row.RelativeItem().AlignRight().Text($"Total: {productos.Count(p => p.Activo && (p.Stocks?.Sum(s => s.StockActual) ?? 0) <= (p.Stocks?.Sum(s => s.StockMinimo) ?? 0) && (p.Stocks?.Sum(s => s.StockActual) ?? 0) > 0)} productos");
+                        });
+
+                        column.Item().Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn(1.5f); // Código
+                                columns.RelativeColumn(3);    // Producto
+                                columns.RelativeColumn(2);    // Categoría
+                                columns.RelativeColumn(1.5f); // Stock
+                                columns.RelativeColumn(1.5f); // Mínimo
+                                columns.RelativeColumn(1.5f); // Diferencia
+                            });
+
+                            table.Header(header =>
+                            {
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).Text("CÓDIGO");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).Text("PRODUCTO");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).Text("CATEGORÍA");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).AlignCenter().Text("STOCK");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).AlignCenter().Text("MÍNIMO");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).AlignCenter().Text("FALTANTE");
+                            });
+
+                            foreach (var producto in productos)
+                            {
+                                var stockTotal = producto.Stocks?.Sum(s => s.StockActual) ?? 0;
+                                var stockMinimo = producto.Stocks?.Sum(s => s.StockMinimo) ?? 0;
+
+                                if (!producto.Activo || stockTotal > stockMinimo || stockTotal <= 0)
+                                    continue;
+
+                                table.Cell().PaddingVertical(3).Text(producto.Codigo ?? "");
+                                table.Cell().PaddingVertical(3).Text(producto.Nombre ?? "");
+                                table.Cell().PaddingVertical(3).Text(producto.Categoria?.Nombre ?? "N/A");
+                                table.Cell().PaddingVertical(3).AlignCenter().Text(stockTotal.ToString());
+                                table.Cell().PaddingVertical(3).AlignCenter().Text(stockMinimo.ToString());
+                                table.Cell().PaddingVertical(3).AlignCenter().Text((stockMinimo - stockTotal).ToString());
+                            }
+                        });
+
+                        column.Item().PaddingTop(15).AlignRight()
+                            .Text("* Los productos listados requieren reposición inmediata")
+                            .Italic()
+                            .FontSize(8)
+                            .FontColor(Colors.Grey.Medium);
+                    });
 
                 page.Footer()
                     .AlignCenter()
@@ -829,6 +886,108 @@ public class ReportService : IReportService
                     {
                         x.Span("Página ");
                         x.CurrentPageNumber();
+                        x.Span(" de ");
+                        x.TotalPages();
+                    });
+            });
+        }).GeneratePdf();
+    }
+
+    public byte[] GenerarPdfMovimientos(IEnumerable<Movimiento> movimientos)
+    {
+        var movimientosList = movimientos.OrderByDescending(m => m.FechaMovimiento).ToList();
+        var entradas = movimientosList.Count(m => m.Tipo == "ENTRADA");
+        var salidas = movimientosList.Count(m => m.Tipo == "SALIDA");
+        var traslados = movimientosList.Count(m => m.Tipo == "TRASLADO");
+        var totalGeneral = movimientosList.Sum(m => m.Detalles?.Sum(d => d.Cantidad * d.PrecioUnitario) ?? 0);
+
+        return Document.Create(container =>
+        {
+            container.Page(page =>
+            {
+                page.Size(PageSizes.A4.Landscape());  // Horizontal para más columnas
+                page.Margin(1.5f, Unit.Centimetre);
+                page.PageColor(Colors.White);
+                page.DefaultTextStyle(x => x.FontSize(8));
+
+                page.Header()
+                    .AlignCenter()
+                    .Text("REPORTE DE MOVIMIENTOS DE INVENTARIO")
+                    .SemiBold()
+                    .FontSize(18)
+                    .FontColor(Colors.Blue.Medium);
+
+                page.Content()
+                    .PaddingVertical(0.5f, Unit.Centimetre)
+                    .Column(column =>
+                    {
+                        // Resumen
+                        column.Item().PaddingBottom(10).Row(row =>
+                        {
+                            row.RelativeItem().Text($"Fecha reporte: {DateTime.Now:dd/MM/yyyy HH:mm}");
+                            row.RelativeItem().AlignCenter().Text($"Entradas: {entradas}  |  Salidas: {salidas}  |  Traslados: {traslados}");
+                            row.RelativeItem().AlignRight().Text($"Total general: ${totalGeneral:N2}").SemiBold();
+                        });
+
+                        // Tabla
+                        column.Item().Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn(1.5f); // Documento
+                                columns.RelativeColumn(1.2f); // Tipo
+                                columns.RelativeColumn(1.3f); // Fecha
+                                columns.RelativeColumn(2);    // Origen
+                                columns.RelativeColumn(2);    // Destino
+                                columns.RelativeColumn(2);    // Observación
+                                columns.RelativeColumn(1.3f); // Total
+                            });
+
+                            table.Header(header =>
+                            {
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).Text("DOCUMENTO");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).Text("TIPO");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).Text("FECHA");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).Text("ORIGEN");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).Text("DESTINO");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).Text("OBSERVACIÓN");
+                                header.Cell().DefaultTextStyle(x => x.SemiBold()).PaddingVertical(4).BorderBottom(1).BorderColor(Colors.Black).AlignRight().Text("TOTAL");
+                            });
+
+                            foreach (var mov in movimientosList)
+                            {
+                                var total = mov.Detalles?.Sum(d => d.Cantidad * d.PrecioUnitario) ?? 0;
+                                var color = mov.Tipo == "ENTRADA" ? Colors.Green.Darken2 :
+                                            mov.Tipo == "SALIDA" ? Colors.Red.Darken2 : Colors.Blue.Darken2;
+
+                                table.Cell().PaddingVertical(2).Text(mov.NumeroDocumento ?? "");
+                                table.Cell().PaddingVertical(2).Text(mov.Tipo ?? "").FontColor(color).SemiBold();
+                                table.Cell().PaddingVertical(2).Text(mov.FechaMovimiento.ToString("dd/MM/yyyy HH:mm"));
+                                table.Cell().PaddingVertical(2).Text(mov.AlmacenOrigen?.Nombre ?? "");
+                                table.Cell().PaddingVertical(2).Text(mov.AlmacenDestino?.Nombre ?? "-");
+                                table.Cell().PaddingVertical(2).Text(mov.Observacion ?? "-").FontSize(7);
+                                table.Cell().PaddingVertical(2).AlignRight().Text($"${total:N2}");
+                            }
+                        });
+
+                        // Totales por tipo
+                        column.Item().PaddingTop(15).Row(row =>
+                        {
+                            row.RelativeItem().Text($"Entradas: {entradas}").FontColor(Colors.Green.Darken2).SemiBold();
+                            row.RelativeItem().Text($"Salidas: {salidas}").FontColor(Colors.Red.Darken2).SemiBold();
+                            row.RelativeItem().Text($"Traslados: {traslados}").FontColor(Colors.Blue.Darken2).SemiBold();
+                            row.RelativeItem().AlignRight().Text($"TOTAL GENERAL: ${totalGeneral:N2}").FontSize(12).Bold();
+                        });
+                    });
+
+                page.Footer()
+                    .AlignCenter()
+                    .Text(x =>
+                    {
+                        x.Span("Página ");
+                        x.CurrentPageNumber();
+                        x.Span(" de ");
+                        x.TotalPages();
                     });
             });
         }).GeneratePdf();

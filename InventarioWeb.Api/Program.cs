@@ -2,7 +2,6 @@ using InventarioWeb.Api.Endpoints;
 using InventarioWeb.Application.Services;
 using InventarioWeb.Infrastructure.Data;
 using InventarioWeb.Infrastructure.Services;
-using InventarioWeb.Web.Api;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -22,13 +21,13 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("BlazorPolicy", policy =>
     {
-        policy.WithOrigins("https://localhost:7067", "http://localhost:5010") // URL de Blazor
+        policy.WithOrigins("https://localhost:7033", "http://localhost:5149") // URL de Blazor
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
     });
 
-    // Política más permisiva para desarrollo
+    // Polï¿½tica mï¿½s permisiva para desarrollo
     options.AddPolicy("DevPolicy", policy =>
     {
         policy.AllowAnyOrigin()
@@ -39,7 +38,7 @@ builder.Services.AddCors(options =>
 
 // ===== BASE DE DATOS MYSQL =====
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-var serverVersion = new MariaDbServerVersion(ServerVersion.AutoDetect(connectionString)); // Cambia según tu versión de MySQL
+var serverVersion = new MariaDbServerVersion(ServerVersion.AutoDetect(connectionString)); // Cambia segï¿½n tu versiï¿½n de MySQL
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, serverVersion, mySqlOptions =>
@@ -85,7 +84,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "API Sistema de Inventario",
         Version = "v1",
-        Description = "API REST para gestión de inventario con JWT"
+        Description = "API REST para gestiï¿½n de inventario con JWT"
     });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -151,7 +150,7 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseCors("BlazorPolicy"); // Producción: solo Blazor
+    app.UseCors("BlazorPolicy"); // Producciï¿½n: solo Blazor
 }
 
 // Configure the HTTP request pipeline.

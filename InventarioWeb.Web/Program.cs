@@ -55,7 +55,7 @@ builder.Services.AddControllersWithViews();
 
 // ===== BASE DE DATOS MYSQL =====
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-var serverVersion = new MariaDbServerVersion(ServerVersion.AutoDetect(connectionString)); // Cambia según tu versión de MySQL
+var serverVersion = new MySqlServerVersion(ServerVersion.AutoDetect(connectionString)); // Cambia según tu versión de MySQL
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, serverVersion, mySqlOptions =>

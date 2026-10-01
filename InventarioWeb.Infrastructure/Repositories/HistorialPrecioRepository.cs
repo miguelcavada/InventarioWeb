@@ -35,4 +35,24 @@ public class HistorialPrecioRepository : Repository<HistorialPrecio>, IHistorial
             .Take(cantidad)
             .ToListAsync();
     }
+
+    public async Task<IEnumerable<HistorialPrecio>> GetHistorialCompletoAsync(DateTime? desde = null, DateTime? hasta = null, string? usuario = null)
+    {
+        var query = _context.HistorialPrecios
+            .Include(h => h.Producto)
+            .AsQueryable();
+
+        if (desde.HasValue)
+            query = query.Where(h => h.FechaCambio >= desde.Value);
+
+        if (hasta.HasValue)
+            query = query.Where(h => h.FechaCambio <= hasta.Value.AddDays(1).AddSeconds(-1));
+
+        if (!string.IsNullOrEmpty(usuario))
+            query = query.Where(h => h.UsuarioCambio != null && h.UsuarioCambio.Contains(usuario));
+
+        return await query
+            .OrderByDescending(h => h.FechaCambio)
+            .ToListAsync();
+    }
 }

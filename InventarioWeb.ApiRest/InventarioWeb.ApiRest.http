@@ -1,0 +1,6 @@
+@InventarioWeb.ApiRest_HostAddress = http://localhost:5007
+
+GET {{InventarioWeb.ApiRest_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

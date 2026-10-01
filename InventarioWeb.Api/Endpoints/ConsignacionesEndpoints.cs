@@ -1,9 +1,8 @@
 ﻿using InventarioWeb.Application.Services;
 using InventarioWeb.Core.DTOs;
-using InventarioWeb.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace InventarioWeb.Web.Api;
+namespace InventarioWeb.Api.Endpoints;
 
 public static class ConsignacionesEndpoints
 {
