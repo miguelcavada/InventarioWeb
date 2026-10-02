@@ -44,6 +44,82 @@ public partial class FrmMovimientos : Form
         cmbFiltroTipo.SelectedIndex = 0;
     }
 
+    //private async Task CargarMovimientosAsync()
+    //{
+    //    dgvMovimientos.Rows.Clear();
+
+    //    string tipo = "TODOS";
+    //    var tipoItem = cmbFiltroTipo.SelectedItem as ComboItem;
+    //    if (tipoItem != null)
+    //    {
+    //        switch (tipoItem.Id)
+    //        {
+    //            case 1: tipo = "ENTRADA"; break;
+    //            case 2: tipo = "SALIDA"; break;
+    //            case 3: tipo = "TRASLADO"; break;
+    //        }
+    //    }
+
+    //    DateTime? desde = chkFecha.Checked ? dtpDesde.Value.Date : null;
+    //    DateTime? hasta = chkFecha.Checked ? dtpHasta.Value.Date : null;
+
+    //    var result = await _movimientoService.GetMovimientosAsync(tipo, desde, hasta);
+
+    //    if (!result.IsSuccess || result.Data == null)
+    //    {
+    //        MessageBox.Show(result.ErrorMessage ?? "Error al cargar movimientos",
+    //            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+    //        return;
+    //    }
+
+    //    var movimientos = result.Data.ToList();
+
+    //    // Filtro por búsqueda
+    //    if (!string.IsNullOrWhiteSpace(txtBuscar.Text))
+    //    {
+    //        var buscar = txtBuscar.Text.Trim();
+    //        movimientos = movimientos.Where(m =>
+    //            m.NumeroDocumento.Contains(buscar, StringComparison.OrdinalIgnoreCase) ||
+    //            (m.Observacion != null && m.Observacion.Contains(buscar, StringComparison.OrdinalIgnoreCase)))
+    //            .ToList();
+    //    }
+
+    //    _movimientos = movimientos;
+
+    //    foreach (var m in _movimientos)
+    //    {
+    //        int index = dgvMovimientos.Rows.Add(
+    //            m.Id,
+    //            m.NumeroDocumento,
+    //            m.Tipo,
+    //            m.FechaMovimiento.ToString("dd/MM/yyyy HH:mm"),
+    //            m.AlmacenOrigenNombre ?? "",
+    //            m.AlmacenDestinoNombre ?? "",
+    //            m.Observacion ?? "",
+    //            m.Total.ToString("C2")
+    //        );
+
+    //        // Colorear según tipo
+    //        switch (m.Tipo)
+    //        {
+    //            case "ENTRADA":
+    //                dgvMovimientos.Rows[index].Cells["colTipo"].Style.BackColor = System.Drawing.Color.FromArgb(220, 255, 220);
+    //                dgvMovimientos.Rows[index].Cells["colTipo"].Style.ForeColor = System.Drawing.Color.DarkGreen;
+    //                break;
+    //            case "SALIDA":
+    //                dgvMovimientos.Rows[index].Cells["colTipo"].Style.BackColor = System.Drawing.Color.FromArgb(255, 220, 220);
+    //                dgvMovimientos.Rows[index].Cells["colTipo"].Style.ForeColor = System.Drawing.Color.DarkRed;
+    //                break;
+    //            case "TRASLADO":
+    //                dgvMovimientos.Rows[index].Cells["colTipo"].Style.BackColor = System.Drawing.Color.FromArgb(220, 235, 255);
+    //                dgvMovimientos.Rows[index].Cells["colTipo"].Style.ForeColor = System.Drawing.Color.DarkBlue;
+    //                break;
+    //        }
+    //    }
+
+    //    lblTotal.Text = $"Total: {_movimientos.Count} movimiento(s)";
+    //}
+
     private async Task CargarMovimientosAsync()
     {
         dgvMovimientos.Rows.Clear();
@@ -74,7 +150,6 @@ public partial class FrmMovimientos : Form
 
         var movimientos = result.Data.ToList();
 
-        // Filtro por búsqueda
         if (!string.IsNullOrWhiteSpace(txtBuscar.Text))
         {
             var buscar = txtBuscar.Text.Trim();
@@ -92,6 +167,7 @@ public partial class FrmMovimientos : Form
                 m.Id,
                 m.NumeroDocumento,
                 m.Tipo,
+                m.MotivoSalida ?? "-",   // ← NUEVO
                 m.FechaMovimiento.ToString("dd/MM/yyyy HH:mm"),
                 m.AlmacenOrigenNombre ?? "",
                 m.AlmacenDestinoNombre ?? "",
@@ -114,6 +190,30 @@ public partial class FrmMovimientos : Form
                     dgvMovimientos.Rows[index].Cells["colTipo"].Style.BackColor = System.Drawing.Color.FromArgb(220, 235, 255);
                     dgvMovimientos.Rows[index].Cells["colTipo"].Style.ForeColor = System.Drawing.Color.DarkBlue;
                     break;
+            }
+
+            // NUEVO: Colorear según motivo de salida
+            if (m.Tipo == "SALIDA" && !string.IsNullOrEmpty(m.MotivoSalida))
+            {
+                switch (m.MotivoSalida)
+                {
+                    case "VENTA":
+                        dgvMovimientos.Rows[index].Cells["colMotivo"].Style.BackColor = System.Drawing.Color.FromArgb(220, 255, 220);
+                        dgvMovimientos.Rows[index].Cells["colMotivo"].Style.ForeColor = System.Drawing.Color.DarkGreen;
+                        break;
+                    case "MERMA":
+                        dgvMovimientos.Rows[index].Cells["colMotivo"].Style.BackColor = System.Drawing.Color.FromArgb(255, 220, 220);
+                        dgvMovimientos.Rows[index].Cells["colMotivo"].Style.ForeColor = System.Drawing.Color.DarkRed;
+                        break;
+                    case "DEVOLUCION":
+                        dgvMovimientos.Rows[index].Cells["colMotivo"].Style.BackColor = System.Drawing.Color.FromArgb(255, 245, 220);
+                        dgvMovimientos.Rows[index].Cells["colMotivo"].Style.ForeColor = System.Drawing.Color.DarkGoldenrod;
+                        break;
+                    case "AJUSTE":
+                        dgvMovimientos.Rows[index].Cells["colMotivo"].Style.BackColor = System.Drawing.Color.FromArgb(220, 240, 255);
+                        dgvMovimientos.Rows[index].Cells["colMotivo"].Style.ForeColor = System.Drawing.Color.DarkBlue;
+                        break;
+                }
             }
         }
 

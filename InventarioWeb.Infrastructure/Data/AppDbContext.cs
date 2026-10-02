@@ -72,6 +72,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, 
         {
             entity.HasIndex(m => m.NumeroDocumento).IsUnique();
             entity.Property(m => m.Tipo).HasMaxLength(20);
+            entity.Property(m => m.MotivoSalida).HasMaxLength(20);
 
             entity.HasOne(m => m.AlmacenOrigen)
                   .WithMany(a => a.MovimientosOrigen)

@@ -58,6 +58,8 @@
             this.panelBottom = new System.Windows.Forms.Panel();
             this.lblTotal = new System.Windows.Forms.Label();
 
+            this.colMotivo = new System.Windows.Forms.DataGridViewTextBoxColumn();
+
             this.panelTop.SuspendLayout();
             this.panelBottom.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvMovimientos)).BeginInit();
@@ -257,7 +259,7 @@
             this.dgvMovimientos.ColumnHeadersDefaultCellStyle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.dgvMovimientos.ColumnHeadersHeight = 35;
             this.dgvMovimientos.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-                this.colId, this.colNumero, this.colTipo, this.colFecha,
+                this.colId, this.colNumero, this.colTipo, this.colMotivo, this.colFecha,
                 this.colOrigen, this.colDestino, this.colObservacion, this.colTotal});
             this.dgvMovimientos.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvMovimientos.Location = new System.Drawing.Point(0, 140);
@@ -283,6 +285,10 @@
             this.colTipo.Name = "colTipo";
             this.colTipo.HeaderText = "Tipo";
             this.colTipo.FillWeight = 80;
+
+            this.colMotivo.Name = "colMotivo";
+            this.colMotivo.HeaderText = "Motivo";
+            this.colMotivo.FillWeight = 80;
 
             this.colFecha.Name = "colFecha";
             this.colFecha.HeaderText = "Fecha";
@@ -370,6 +376,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn colDestino;
         private System.Windows.Forms.DataGridViewTextBoxColumn colObservacion;
         private System.Windows.Forms.DataGridViewTextBoxColumn colTotal;
+
+        private System.Windows.Forms.DataGridViewTextBoxColumn colMotivo;
 
         #endregion
     }

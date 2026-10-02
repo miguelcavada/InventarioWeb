@@ -60,6 +60,11 @@
             this.btnGuardar = new System.Windows.Forms.Button();
             this.btnCancelar = new System.Windows.Forms.Button();
 
+            this.lblMotivoSalida = new System.Windows.Forms.Label();
+            this.cmbMotivoSalida = new System.Windows.Forms.ComboBox();
+
+            this.lblEstadoProductos = new System.Windows.Forms.Label();
+
             this.panelTop.SuspendLayout();
             this.panelHeader.SuspendLayout();
             this.panelAlmacenes.SuspendLayout();
@@ -178,6 +183,8 @@
             this.panelAlmacenes.Controls.Add(this.lblAlmacenDestino);
             this.panelAlmacenes.Controls.Add(this.cmbAlmacenOrigen);
             this.panelAlmacenes.Controls.Add(this.lblAlmacenOrigen);
+            this.panelAlmacenes.Controls.Add(this.lblMotivoSalida);
+            this.panelAlmacenes.Controls.Add(this.cmbMotivoSalida);
             this.panelAlmacenes.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelAlmacenes.Location = new System.Drawing.Point(0, 170);
             this.panelAlmacenes.Name = "panelAlmacenes";
@@ -196,22 +203,44 @@
             this.cmbAlmacenOrigen.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbAlmacenOrigen.Location = new System.Drawing.Point(120, 17);
             this.cmbAlmacenOrigen.Name = "cmbAlmacenOrigen";
-            this.cmbAlmacenOrigen.Size = new System.Drawing.Size(300, 23);
+            //this.cmbAlmacenOrigen.Size = new System.Drawing.Size(300, 23);
+            this.cmbAlmacenOrigen.Size = new System.Drawing.Size(250, 23);
             this.cmbAlmacenOrigen.TabIndex = 0;
+            this.cmbAlmacenOrigen.SelectedIndexChanged += new System.EventHandler(this.cmbAlmacenOrigen_SelectedIndexChanged);
 
             // lblAlmacenDestino
             this.lblAlmacenDestino.AutoSize = true;
-            this.lblAlmacenDestino.Location = new System.Drawing.Point(450, 20);
+            //this.lblAlmacenDestino.Location = new System.Drawing.Point(450, 20);
+            this.lblAlmacenDestino.Location = new System.Drawing.Point(620, 20);
             this.lblAlmacenDestino.Name = "lblAlmacenDestino";
             this.lblAlmacenDestino.Size = new System.Drawing.Size(100, 15);
             this.lblAlmacenDestino.Text = "Almacén Destino:";
 
             // cmbAlmacenDestino
             this.cmbAlmacenDestino.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbAlmacenDestino.Location = new System.Drawing.Point(560, 17);
+            //this.cmbAlmacenDestino.Location = new System.Drawing.Point(560, 17);
+            this.cmbAlmacenDestino.Location = new System.Drawing.Point(730, 17);
             this.cmbAlmacenDestino.Name = "cmbAlmacenDestino";
-            this.cmbAlmacenDestino.Size = new System.Drawing.Size(300, 23);
+            //this.cmbAlmacenDestino.Size = new System.Drawing.Size(300, 23);
+            this.cmbAlmacenDestino.Size = new System.Drawing.Size(250, 23);
             this.cmbAlmacenDestino.TabIndex = 1;
+
+            // lblMotivoSalida
+            this.lblMotivoSalida.AutoSize = true;
+            //this.lblMotivoSalida.Location = new System.Drawing.Point(250, 20);
+            this.lblMotivoSalida.Location = new System.Drawing.Point(390, 20);
+            this.lblMotivoSalida.Name = "lblMotivoSalida";
+            this.lblMotivoSalida.Size = new System.Drawing.Size(60, 15);
+            this.lblMotivoSalida.Text = "Motivo:";
+
+            // cmbMotivoSalida
+            this.cmbMotivoSalida.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            //this.cmbMotivoSalida.Location = new System.Drawing.Point(320, 17);
+            this.cmbMotivoSalida.Location = new System.Drawing.Point(450, 17);
+            this.cmbMotivoSalida.Name = "cmbMotivoSalida";
+            this.cmbMotivoSalida.Size = new System.Drawing.Size(150, 23);
+            this.cmbMotivoSalida.TabIndex = 3;
+            this.cmbMotivoSalida.SelectedIndexChanged += new System.EventHandler(this.cmbMotivoSalida_SelectedIndexChanged);
 
             // ===== panelDetalle =====
             this.panelDetalle.Controls.Add(this.lblTotal);
@@ -232,10 +261,12 @@
             this.panelAgregar.Controls.Add(this.lblTipoPrecio);
             this.panelAgregar.Controls.Add(this.cmbProducto);
             this.panelAgregar.Controls.Add(this.lblProducto);
+            this.panelAgregar.Controls.Add(this.lblEstadoProductos);
             this.panelAgregar.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelAgregar.Location = new System.Drawing.Point(20, 10);
             this.panelAgregar.Name = "panelAgregar";
-            this.panelAgregar.Size = new System.Drawing.Size(860, 60);
+            //this.panelAgregar.Size = new System.Drawing.Size(860, 60);
+            this.panelAgregar.Size = new System.Drawing.Size(910, 80);
             this.panelAgregar.TabIndex = 0;
 
             // lblProducto
@@ -285,6 +316,15 @@
             this.numCantidad.TabIndex = 2;
             this.numCantidad.Value = 1;
 
+            // lblEstadoProductos
+            this.lblEstadoProductos.AutoSize = true;
+            this.lblEstadoProductos.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Italic);
+            this.lblEstadoProductos.ForeColor = System.Drawing.Color.Gray;
+            this.lblEstadoProductos.Location = new System.Drawing.Point(0, 45);
+            this.lblEstadoProductos.Name = "lblEstadoProductos";
+            this.lblEstadoProductos.Size = new System.Drawing.Size(300, 13);
+            this.lblEstadoProductos.Text = "Seleccione primero un almacén";
+
             // btnAgregarProducto
             this.btnAgregarProducto.BackColor = System.Drawing.Color.FromArgb(46, 196, 182);
             this.btnAgregarProducto.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
@@ -306,7 +346,8 @@
             this.dgvDetalles.ColumnHeadersDefaultCellStyle.ForeColor = System.Drawing.Color.White;
             this.dgvDetalles.ColumnHeadersHeight = 30;
             this.dgvDetalles.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvDetalles.Location = new System.Drawing.Point(20, 70);
+            //this.dgvDetalles.Location = new System.Drawing.Point(20, 70);
+            this.dgvDetalles.Location = new System.Drawing.Point(20, 90);
             this.dgvDetalles.MultiSelect = false;
             this.dgvDetalles.Name = "dgvDetalles";
             this.dgvDetalles.ReadOnly = true;
@@ -427,6 +468,12 @@
         private System.Windows.Forms.Label lblTotal;
         private System.Windows.Forms.Button btnGuardar;
         private System.Windows.Forms.Button btnCancelar;
+
+        private System.Windows.Forms.Label lblMotivoSalida;
+        private System.Windows.Forms.ComboBox cmbMotivoSalida;
+
+        private System.Windows.Forms.Label lblEstadoProductos;
+
 
         #endregion
     }

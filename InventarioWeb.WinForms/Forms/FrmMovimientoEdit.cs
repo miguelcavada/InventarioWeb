@@ -20,8 +20,9 @@ public partial class FrmMovimientoEdit : Form
     public string TipoInicial { get; set; } = "ENTRADA";
 
     private List<AlmacenDto> _almacenes = new();
-    private List<ProductoDto> _productos = new();
+    private List<ProductoStockDto> _productosDelAlmacen = new();
     private List<MovimientoDetalleDto> _detalles = new();
+    private int? _almacenOrigenSeleccionado = null;
 
     public FrmMovimientoEdit(
         IMovimientoService movimientoService,
@@ -34,9 +35,12 @@ public partial class FrmMovimientoEdit : Form
         _productoService = productoService;
     }
 
+    // ============================================================
+    // LOAD
+    // ============================================================
     private async void FrmMovimientoEdit_Load(object sender, EventArgs e)
     {
-        await CargarCombosAsync();
+        await CargarCombosBaseAsync();
 
         // Configurar tipo inicial
         cmbTipo.SelectedValue = TipoInicial;
@@ -46,85 +50,162 @@ public partial class FrmMovimientoEdit : Form
         dtpFecha.Format = DateTimePickerFormat.Custom;
         dtpFecha.CustomFormat = "dd/MM/yyyy HH:mm";
 
-        // Generar número de documento automático
+        // Generar número de documento
         GenerarNumeroDocumento();
 
-        // Configurar grid de detalles
+        // Configurar grid
         ConfigurarGridDetalles();
 
-        // Actualizar visibilidad según tipo
+        // Actualizar visibilidad
         ActualizarVisibilidadPorTipo();
-
-        // Combo TipoPrecio (solo para salidas)
-        var tiposPrecio = new List<ComboItem>
-{
-    new ComboItem { Id = 1, Nombre = "MINORISTA" },
-    new ComboItem { Id = 2, Nombre = "MAYORISTA" }
-};
-
-        cmbTipoPrecio.DataSource = tiposPrecio;
-        cmbTipoPrecio.DisplayMember = "Nombre";
-        cmbTipoPrecio.ValueMember = "Nombre";
-        cmbTipoPrecio.SelectedIndex = 0;
     }
 
-    private async Task CargarCombosAsync()
+    // ============================================================
+    // CARGA DE COMBOS BASE
+    // ============================================================
+    //private async Task CargarCombosBaseAsync()
+    //{
+    //    // Tipo de movimiento
+    //    var tipos = new List<ComboItem>
+    //    {
+    //        new ComboItem { Id = 1, Nombre = "ENTRADA" },
+    //        new ComboItem { Id = 2, Nombre = "SALIDA" },
+    //        new ComboItem { Id = 3, Nombre = "TRASLADO" }
+    //    };
+    //    cmbTipo.DataSource = tipos;
+    //    cmbTipo.DisplayMember = "Nombre";
+    //    cmbTipo.ValueMember = "Nombre";
+    //    cmbTipo.SelectedIndex = 0;
+
+    //    // Motivo de Salida
+    //    var motivos = new List<ComboItem>
+    //    {
+    //        new ComboItem { Id = 1, Nombre = "VENTA" },
+    //        new ComboItem { Id = 2, Nombre = "MERMA" },
+    //        new ComboItem { Id = 3, Nombre = "DEVOLUCION" },
+    //        new ComboItem { Id = 4, Nombre = "AJUSTE" },
+    //        new ComboItem { Id = 5, Nombre = "OTRO" }
+    //    };
+    //    cmbMotivoSalida.DataSource = motivos;
+    //    cmbMotivoSalida.DisplayMember = "Nombre";
+    //    cmbMotivoSalida.ValueMember = "Nombre";
+    //    cmbMotivoSalida.SelectedIndex = 0;
+
+    //    // Tipo de Precio
+    //    var tiposPrecio = new List<ComboItem>
+    //    {
+    //        new ComboItem { Id = 1, Nombre = "MINORISTA" },
+    //        new ComboItem { Id = 2, Nombre = "MAYORISTA" }
+    //    };
+    //    cmbTipoPrecio.DataSource = tiposPrecio;
+    //    cmbTipoPrecio.DisplayMember = "Nombre";
+    //    cmbTipoPrecio.ValueMember = "Nombre";
+    //    cmbTipoPrecio.SelectedIndex = 0;
+
+    //    // Almacenes
+    //    var almResult = await _almacenService.GetAlmacenesAsync();
+    //    if (almResult.IsSuccess && almResult.Data != null)
+    //    {
+    //        _almacenes = almResult.Data.Where(a => a.Activo).ToList();
+
+    //        var almacenesCombo = _almacenes.Select(a => new ComboItem
+    //        {
+    //            Id = a.Id,
+    //            Nombre = $"{a.Nombre} ({(a.Tipo == "MERCADO" ? "Mercado" : "Almacén")})"
+    //        }).ToList();
+
+    //        cmbAlmacenOrigen.DataSource = almacenesCombo.ToList();
+    //        cmbAlmacenOrigen.DisplayMember = "Nombre";
+    //        cmbAlmacenOrigen.ValueMember = "Id";
+    //        cmbAlmacenOrigen.SelectedIndex = -1;
+
+    //        cmbAlmacenDestino.DataSource = almacenesCombo.ToList();
+    //        cmbAlmacenDestino.DisplayMember = "Nombre";
+    //        cmbAlmacenDestino.ValueMember = "Id";
+    //        cmbAlmacenDestino.SelectedIndex = -1;
+    //    }
+    //}
+
+    private bool _cargandoCombos = false;
+
+    private async Task CargarCombosBaseAsync()
     {
-        // Combo de Tipo de movimiento
-        var tipos = new List<ComboItem>
+        _cargandoCombos = true;
+
+        try
+        {
+            // Tipo de movimiento
+            var tipos = new List<ComboItem>
         {
             new ComboItem { Id = 1, Nombre = "ENTRADA" },
             new ComboItem { Id = 2, Nombre = "SALIDA" },
             new ComboItem { Id = 3, Nombre = "TRASLADO" }
         };
+            cmbTipo.DataSource = tipos;
+            cmbTipo.DisplayMember = "Nombre";
+            cmbTipo.ValueMember = "Nombre";
+            cmbTipo.SelectedIndex = 0;
 
-        cmbTipo.DataSource = tipos;
-        cmbTipo.DisplayMember = "Nombre";
-        cmbTipo.ValueMember = "Nombre";
-        cmbTipo.SelectedIndex = 0;
-
-        // Combo de Almacenes
-        var almResult = await _almacenService.GetAlmacenesAsync();
-        if (almResult.IsSuccess && almResult.Data != null)
+            // Motivo de Salida
+            var motivos = new List<ComboItem>
         {
-            _almacenes = almResult.Data.Where(a => a.Activo).ToList();
+            new ComboItem { Id = 1, Nombre = "VENTA" },
+            new ComboItem { Id = 2, Nombre = "MERMA" },
+            new ComboItem { Id = 3, Nombre = "DEVOLUCION" },
+            new ComboItem { Id = 4, Nombre = "AJUSTE" },
+            new ComboItem { Id = 5, Nombre = "OTRO" }
+        };
+            cmbMotivoSalida.DataSource = motivos;
+            cmbMotivoSalida.DisplayMember = "Nombre";
+            cmbMotivoSalida.ValueMember = "Nombre";
+            cmbMotivoSalida.SelectedIndex = 0;
 
-            cmbAlmacenOrigen.DataSource = _almacenes.Select(a => new ComboItem
-            {
-                Id = a.Id,
-                Nombre = $"{a.Nombre} ({(a.Tipo == "MERCADO" ? "Mercado" : "Almacén")})"
-            }).ToList();
-            cmbAlmacenOrigen.DisplayMember = "Nombre";
-            cmbAlmacenOrigen.ValueMember = "Id";
-            cmbAlmacenOrigen.SelectedIndex = -1;
+            // Tipo de Precio
+            var tiposPrecio = new List<ComboItem>
+        {
+            new ComboItem { Id = 1, Nombre = "MINORISTA" },
+            new ComboItem { Id = 2, Nombre = "MAYORISTA" }
+        };
+            cmbTipoPrecio.DataSource = tiposPrecio;
+            cmbTipoPrecio.DisplayMember = "Nombre";
+            cmbTipoPrecio.ValueMember = "Nombre";
+            cmbTipoPrecio.SelectedIndex = 0;
 
-            cmbAlmacenDestino.DataSource = _almacenes.Select(a => new ComboItem
+            // Almacenes
+            var almResult = await _almacenService.GetAlmacenesAsync();
+            if (almResult.IsSuccess && almResult.Data != null)
             {
-                Id = a.Id,
-                Nombre = $"{a.Nombre} ({(a.Tipo == "MERCADO" ? "Mercado" : "Almacén")})"
-            }).ToList();
-            cmbAlmacenDestino.DisplayMember = "Nombre";
-            cmbAlmacenDestino.ValueMember = "Id";
-            cmbAlmacenDestino.SelectedIndex = -1;
+                _almacenes = almResult.Data.Where(a => a.Activo).ToList();
+
+                var almacenesCombo = _almacenes.Select(a => new ComboItem
+                {
+                    Id = a.Id,
+                    Nombre = $"{a.Nombre} ({(a.Tipo == "MERCADO" ? "Mercado" : "Almacén")})"
+                }).ToList();
+
+                cmbAlmacenOrigen.DataSource = almacenesCombo.ToList();
+                cmbAlmacenOrigen.DisplayMember = "Nombre";
+                cmbAlmacenOrigen.ValueMember = "Id";
+                cmbAlmacenOrigen.SelectedIndex = -1;
+
+                cmbAlmacenDestino.DataSource = almacenesCombo.ToList();
+                cmbAlmacenDestino.DisplayMember = "Nombre";
+                cmbAlmacenDestino.ValueMember = "Id";
+                cmbAlmacenDestino.SelectedIndex = -1;
+            }
+
+            // Limpiar combo productos
+            LimpiarComboProductos();
         }
-
-        // Combo de Productos
-        var prodResult = await _productoService.GetProductosAsync();
-        if (prodResult.IsSuccess && prodResult.Data != null)
+        finally
         {
-            _productos = prodResult.Data.Where(p => p.Activo).ToList();
-
-            cmbProducto.DataSource = _productos.Select(p => new ComboItem
-            {
-                Id = p.Id,
-                Nombre = $"{p.Codigo} - {p.Nombre}"
-            }).ToList();
-            cmbProducto.DisplayMember = "Nombre";
-            cmbProducto.ValueMember = "Id";
-            cmbProducto.SelectedIndex = -1;
+            _cargandoCombos = false;
         }
     }
 
+    // ============================================================
+    // GRID DE DETALLES
+    // ============================================================
     private void ConfigurarGridDetalles()
     {
         dgvDetalles.AutoGenerateColumns = false;
@@ -175,40 +256,9 @@ public partial class FrmMovimientoEdit : Form
         });
     }
 
-    private void GenerarNumeroDocumento()
-    {
-        var tipoItem = cmbTipo.SelectedItem as ComboItem;
-        string tipo = tipoItem?.Nombre ?? "ENTRADA";
-
-        string prefijo = tipo switch
-        {
-            "ENTRADA" => "ENT",
-            "SALIDA" => "SAL",
-            "TRASLADO" => "TRA",
-            _ => "DOC"
-        };
-
-        txtNumeroDocumento.Text = $"{prefijo}-{DateTime.Now:yyyyMMddHHmmss}";
-    }
-
-    private void ActualizarVisibilidadPorTipo()
-    {
-        var tipoItem = cmbTipo.SelectedItem as ComboItem;
-        string tipo = tipoItem?.Nombre ?? "ENTRADA";
-
-        // Destino solo visible en traslados
-        lblAlmacenDestino.Visible = tipo == "TRASLADO";
-        cmbAlmacenDestino.Visible = tipo == "TRASLADO";
-
-        // Cambiar etiqueta de origen
-        lblAlmacenOrigen.Text = tipo == "ENTRADA" ? "Almacén Destino:" :
-                                tipo == "TRASLADO" ? "Almacén Origen:" : "Almacén Origen:";
-
-        // En salidas, permitir seleccionar tipo de precio
-        lblTipoPrecio.Visible = tipo == "SALIDA";
-        cmbTipoPrecio.Visible = tipo == "SALIDA";
-    }
-
+    // ============================================================
+    // EVENTOS DE COMBOS
+    // ============================================================
     private async void cmbTipo_SelectedIndexChanged(object sender, EventArgs e)
     {
         if (!IsHandleCreated || DesignMode) return;
@@ -216,26 +266,181 @@ public partial class FrmMovimientoEdit : Form
         ActualizarVisibilidadPorTipo();
         GenerarNumeroDocumento();
 
-        // Si es salida, actualizar precios de los detalles existentes
-        if ((cmbTipo.SelectedItem as ComboItem)?.Nombre == "SALIDA")
-        {
-            await ActualizarPreciosDetallesAsync();
-        }
+        // Al cambiar el tipo, actualizar precios de los detalles existentes
+        await ActualizarPreciosDetallesAsync();
     }
 
-    private async Task ActualizarPreciosDetallesAsync()
+    private void cmbMotivoSalida_SelectedIndexChanged(object sender, EventArgs e)
     {
-        foreach (var detalle in _detalles)
-        {
-            var precioResult = await ObtenerPrecioProductoAsync(detalle.ProductoId);
-            if (precioResult.HasValue)
-                detalle.PrecioUnitario = precioResult.Value;
-        }
-        RefrescarGrid();
+        if (!IsHandleCreated || DesignMode) return;
+        ActualizarVisibilidadPorTipo();
     }
 
+    private async void cmbTipoPrecio_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        if (!IsHandleCreated || DesignMode) return;
+        await ActualizarPreciosDetallesAsync();
+    }
+
+    // *** CRÍTICO: Al seleccionar almacén origen, cargar SOLO productos con stock ***
+    //private async void cmbAlmacenOrigen_SelectedIndexChanged(object sender, EventArgs e)
+    //{
+    //    if (!IsHandleCreated || DesignMode) return;
+
+    //    var almacenItem = cmbAlmacenOrigen.SelectedItem as ComboItem;
+    //    if (almacenItem == null || almacenItem.Id <= 0)
+    //    {
+    //        LimpiarComboProductos();
+    //        return;
+    //    }
+
+    //    // Si ya había detalles y se cambia el almacén, preguntar si continuar
+    //    if (_detalles.Count > 0 && _almacenOrigenSeleccionado.HasValue
+    //        && _almacenOrigenSeleccionado.Value != almacenItem.Id)
+    //    {
+    //        var result = MessageBox.Show(
+    //            "Ha cambiado el almacén. Los productos ya agregados podrían no tener stock en el nuevo almacén.\n\n" +
+    //            "¿Desea limpiar los detalles agregados?",
+    //            "Cambio de almacén",
+    //            MessageBoxButtons.YesNo,
+    //            MessageBoxIcon.Warning);
+
+    //        if (result == DialogResult.Yes)
+    //        {
+    //            _detalles.Clear();
+    //            RefrescarGrid();
+    //        }
+    //    }
+
+    //    _almacenOrigenSeleccionado = almacenItem.Id;
+    //    await CargarProductosDelAlmacenAsync(almacenItem.Id);
+    //}
+
+
+
+    // ============================================================
+    // CARGA DE PRODUCTOS DEL ALMACÉN
+    // ============================================================
+
+    private async void cmbAlmacenOrigen_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        // Prevenir que se dispare durante la carga inicial
+        if (!IsHandleCreated || DesignMode || _cargandoCombos) return;
+
+        var almacenItem = cmbAlmacenOrigen.SelectedItem as ComboItem;
+
+        if (almacenItem == null || almacenItem.Id <= 0)
+        {
+            LimpiarComboProductos();
+            return;
+        }
+
+        // Si ya había detalles y se cambia el almacén, preguntar
+        if (_detalles.Count > 0 && _almacenOrigenSeleccionado.HasValue
+            && _almacenOrigenSeleccionado.Value != almacenItem.Id)
+        {
+            var result = MessageBox.Show(
+                "Ha cambiado el almacén. Los productos ya agregados podrían no tener stock en el nuevo almacén.\n\n" +
+                "¿Desea limpiar los detalles agregados?",
+                "Cambio de almacén",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            if (result == DialogResult.Yes)
+            {
+                _detalles.Clear();
+                RefrescarGrid();
+            }
+        }
+
+        _almacenOrigenSeleccionado = almacenItem.Id;
+        await CargarProductosDelAlmacenAsync(almacenItem.Id);
+    }
+
+    private async Task CargarProductosDelAlmacenAsync(int almacenId)
+    {
+        try
+        {
+            lblEstadoProductos.Text = "⏳ Cargando productos...";
+            lblEstadoProductos.ForeColor = System.Drawing.Color.Blue;
+
+            // Limpiar combo
+            cmbProducto.DataSource = null;
+            cmbProducto.Items.Clear();
+            _productosDelAlmacen.Clear();
+            cmbProducto.Enabled = false;
+
+            // Consultar servicio
+            var result = await _movimientoService.GetProductosPorAlmacenAsync(almacenId);
+
+            if (!result.IsSuccess || result.Data == null)
+            {
+                lblEstadoProductos.Text = $"⚠️ {result.ErrorMessage}";
+                lblEstadoProductos.ForeColor = System.Drawing.Color.OrangeRed;
+                return;
+            }
+
+            _productosDelAlmacen = result.Data.ToList();
+
+            if (!_productosDelAlmacen.Any())
+            {
+                lblEstadoProductos.Text = "⚠️ Este almacén no tiene productos con stock";
+                lblEstadoProductos.ForeColor = System.Drawing.Color.OrangeRed;
+                return;
+            }
+
+            // Crear lista de items
+            var productosCombo = _productosDelAlmacen.Select(p => new ComboItem
+            {
+                Id = p.ProductoId,
+                Nombre = $"{p.Codigo} - {p.Nombre} [Stock: {p.StockActual} {p.UnidadAbreviatura}]"
+            }).ToList();
+
+            // Asignar con BindingSource (más confiable)
+            var bindingSource = new BindingSource();
+            bindingSource.DataSource = productosCombo;
+
+            cmbProducto.DataSource = bindingSource;
+            cmbProducto.DisplayMember = "Nombre";
+            cmbProducto.ValueMember = "Id";
+            cmbProducto.SelectedIndex = -1;
+            cmbProducto.Enabled = true;
+            cmbProducto.Refresh();
+
+            lblEstadoProductos.Text = $"✅ {_productosDelAlmacen.Count} producto(s) con stock disponible";
+            lblEstadoProductos.ForeColor = System.Drawing.Color.Green;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error al cargar productos: {ex.Message}", "Error",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+            lblEstadoProductos.Text = "❌ Error al cargar productos";
+            lblEstadoProductos.ForeColor = System.Drawing.Color.Red;
+        }
+    }
+
+    private void LimpiarComboProductos()
+    {
+        cmbProducto.DataSource = null;
+        cmbProducto.Items.Clear();
+        _productosDelAlmacen.Clear();
+        lblEstadoProductos.Text = "Seleccione primero un almacén";
+        lblEstadoProductos.ForeColor = System.Drawing.Color.Gray;
+    }
+
+    // ============================================================
+    // AGREGAR PRODUCTO AL DETALLE
+    // ============================================================
     private async void btnAgregarProducto_Click(object sender, EventArgs e)
     {
+        // Validaciones iniciales
+        if (cmbAlmacenOrigen.SelectedIndex < 0)
+        {
+            MessageBox.Show("Seleccione primero un almacén de origen", "Aviso",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
         if (cmbProducto.SelectedIndex < 0)
         {
             MessageBox.Show("Seleccione un producto", "Aviso",
@@ -252,49 +457,59 @@ public partial class FrmMovimientoEdit : Form
 
         var productoItem = cmbProducto.SelectedItem as ComboItem;
         int productoId = productoItem!.Id;
-        var producto = _productos.FirstOrDefault(p => p.Id == productoId);
+        var producto = _productosDelAlmacen.FirstOrDefault(p => p.ProductoId == productoId);
 
-        if (producto == null) return;
+        if (producto == null)
+        {
+            MessageBox.Show("Producto no encontrado en el almacén", "Aviso",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
 
-        // Verificar si ya existe
+        // Validar stock para SALIDA y TRASLADO
+        var tipoItem = cmbTipo.SelectedItem as ComboItem;
+        string tipo = tipoItem?.Nombre ?? "ENTRADA";
+
+        var cantidadExistente = _detalles.Where(d => d.ProductoId == productoId).Sum(d => d.Cantidad);
+        var cantidadTotal = cantidadExistente + numCantidad.Value;
+
+        if ((tipo == "SALIDA" || tipo == "TRASLADO") && cantidadTotal > producto.StockActual)
+        {
+            MessageBox.Show(
+                $"Stock insuficiente para '{producto.Nombre}'.\n\n" +
+                $"Stock disponible: {producto.StockActual} {producto.UnidadAbreviatura}\n" +
+                $"Cantidad solicitada: {cantidadTotal} {producto.UnidadAbreviatura}",
+                "Stock insuficiente",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
+        // Obtener precio automáticamente
+        var precio = await ObtenerPrecioProductoAsync(producto);
+
+        if (!precio.HasValue || precio.Value <= 0)
+        {
+            MessageBox.Show($"El producto '{producto.Nombre}' no tiene precio definido para este tipo de movimiento.",
+                "Sin precio", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
+        // Agregar o actualizar detalle
         var existente = _detalles.FirstOrDefault(d => d.ProductoId == productoId);
         if (existente != null)
         {
             existente.Cantidad += numCantidad.Value;
+            existente.PrecioUnitario = precio.Value;
         }
         else
         {
-            // Obtener precio según tipo
-            decimal precio = 0;
-            var tipoItem = cmbTipo.SelectedItem as ComboItem;
-            string tipo = tipoItem?.Nombre ?? "ENTRADA";
-
-            if (tipo == "ENTRADA")
-            {
-                precio = producto.PrecioCosto ?? 0;
-            }
-            else if (tipo == "SALIDA")
-            {
-                var tipoPrecioItem = cmbTipoPrecio.SelectedItem as ComboItem;
-                bool esMayorista = tipoPrecioItem?.Nombre == "MAYORISTA";
-
-                if (esMayorista && producto.PrecioVentaMayorista.HasValue)
-                    precio = producto.PrecioVentaMayorista.Value;
-                else
-                    precio = producto.PrecioVentaMinorista;
-            }
-            else if (tipo == "TRASLADO")
-            {
-                precio = producto.PrecioCosto ?? producto.PrecioVentaMinorista;
-            }
-
             _detalles.Add(new MovimientoDetalleDto
             {
                 ProductoId = productoId,
                 ProductoCodigo = producto.Codigo,
                 ProductoNombre = producto.Nombre,
                 Cantidad = numCantidad.Value,
-                PrecioUnitario = precio
+                PrecioUnitario = precio.Value
             });
         }
 
@@ -305,10 +520,73 @@ public partial class FrmMovimientoEdit : Form
         numCantidad.Value = 1;
     }
 
+    // ============================================================
+    // OBTENER PRECIO SEGÚN TIPO Y MOTIVO
+    // ============================================================
+    private async Task<decimal?> ObtenerPrecioProductoAsync(ProductoStockDto producto)
+    {
+        await Task.CompletedTask;
+
+        var tipoItem = cmbTipo.SelectedItem as ComboItem;
+        string tipo = tipoItem?.Nombre ?? "ENTRADA";
+
+        switch (tipo)
+        {
+            case "ENTRADA":
+                return producto.PrecioCosto ?? 0;
+
+            case "SALIDA":
+                var motivoItem = cmbMotivoSalida.SelectedItem as ComboItem;
+                string motivo = motivoItem?.Nombre ?? "VENTA";
+
+                switch (motivo)
+                {
+                    case "VENTA":
+                        var tipoPrecioItem = cmbTipoPrecio.SelectedItem as ComboItem;
+                        bool esMayorista = tipoPrecioItem?.Nombre == "MAYORISTA";
+                        if (esMayorista && producto.PrecioVentaMayorista.HasValue && producto.PrecioVentaMayorista > 0)
+                            return producto.PrecioVentaMayorista.Value;
+                        return producto.PrecioVentaMinorista;
+
+                    case "MERMA":
+                    case "DEVOLUCION":
+                    case "AJUSTE":
+                        // Usar precio de costo para valorizar
+                        return producto.PrecioCosto ?? producto.PrecioVentaMinorista;
+
+                    default:
+                        return producto.PrecioVentaMinorista;
+                }
+
+            case "TRASLADO":
+                return producto.PrecioCosto ?? producto.PrecioVentaMinorista;
+
+            default:
+                return 0;
+        }
+    }
+
+    private async Task ActualizarPreciosDetallesAsync()
+    {
+        foreach (var detalle in _detalles)
+        {
+            var producto = _productosDelAlmacen.FirstOrDefault(p => p.ProductoId == detalle.ProductoId);
+            if (producto != null)
+            {
+                var precio = await ObtenerPrecioProductoAsync(producto);
+                if (precio.HasValue)
+                    detalle.PrecioUnitario = precio.Value;
+            }
+        }
+        RefrescarGrid();
+    }
+
+    // ============================================================
+    // GRID
+    // ============================================================
     private void RefrescarGrid()
     {
         dgvDetalles.Rows.Clear();
-
         decimal total = 0;
 
         foreach (var d in _detalles)
@@ -342,35 +620,73 @@ public partial class FrmMovimientoEdit : Form
         }
     }
 
-    private async Task<decimal?> ObtenerPrecioProductoAsync(int productoId)
+    // ============================================================
+    // VISIBILIDAD Y UTILIDADES
+    // ============================================================
+    private void ActualizarVisibilidadPorTipo()
     {
         var tipoItem = cmbTipo.SelectedItem as ComboItem;
         string tipo = tipoItem?.Nombre ?? "ENTRADA";
 
-        var producto = _productos.FirstOrDefault(p => p.Id == productoId);
-        if (producto == null) return null;
+        // Destino solo visible en traslados
+        lblAlmacenDestino.Visible = tipo == "TRASLADO";
+        cmbAlmacenDestino.Visible = tipo == "TRASLADO";
 
-        switch (tipo)
+        // Etiqueta de origen
+        lblAlmacenOrigen.Text = tipo == "ENTRADA" ? "Almacén Destino:" : "Almacén Origen:";
+
+        // Motivo y tipo de precio solo en salidas
+        lblMotivoSalida.Visible = tipo == "SALIDA";
+        cmbMotivoSalida.Visible = tipo == "SALIDA";
+        lblTipoPrecio.Visible = tipo == "SALIDA";
+        cmbTipoPrecio.Visible = tipo == "SALIDA";
+
+        // Color del motivo
+        if (tipo == "SALIDA")
         {
-            case "ENTRADA":
-                return producto.PrecioCosto ?? 0;
+            var motivoItem = cmbMotivoSalida.SelectedItem as ComboItem;
+            string motivo = motivoItem?.Nombre ?? "VENTA";
 
-            case "SALIDA":
-                var tipoPrecioItem = cmbTipoPrecio.SelectedItem as ComboItem;
-                bool esMayorista = tipoPrecioItem?.Nombre == "MAYORISTA";
-
-                if (esMayorista && producto.PrecioVentaMayorista.HasValue)
-                    return producto.PrecioVentaMayorista.Value;
-                return producto.PrecioVentaMinorista;
-
-            case "TRASLADO":
-                return producto.PrecioCosto ?? producto.PrecioVentaMinorista;
-
-            default:
-                return 0;
+            switch (motivo)
+            {
+                case "VENTA":
+                    cmbMotivoSalida.BackColor = System.Drawing.Color.FromArgb(220, 255, 220);
+                    break;
+                case "MERMA":
+                    cmbMotivoSalida.BackColor = System.Drawing.Color.FromArgb(255, 220, 220);
+                    break;
+                case "DEVOLUCION":
+                    cmbMotivoSalida.BackColor = System.Drawing.Color.FromArgb(255, 245, 220);
+                    break;
+                case "AJUSTE":
+                    cmbMotivoSalida.BackColor = System.Drawing.Color.FromArgb(220, 240, 255);
+                    break;
+                default:
+                    cmbMotivoSalida.BackColor = System.Drawing.Color.White;
+                    break;
+            }
         }
     }
 
+    private void GenerarNumeroDocumento()
+    {
+        var tipoItem = cmbTipo.SelectedItem as ComboItem;
+        string tipo = tipoItem?.Nombre ?? "ENTRADA";
+
+        string prefijo = tipo switch
+        {
+            "ENTRADA" => "ENT",
+            "SALIDA" => "SAL",
+            "TRASLADO" => "TRA",
+            _ => "DOC"
+        };
+
+        txtNumeroDocumento.Text = $"{prefijo}-{DateTime.Now:yyyyMMddHHmmss}";
+    }
+
+    // ============================================================
+    // GUARDAR
+    // ============================================================
     private async void btnGuardar_Click(object sender, EventArgs e)
     {
         if (!ValidarFormulario()) return;
@@ -380,6 +696,7 @@ public partial class FrmMovimientoEdit : Form
 
         var origenItem = cmbAlmacenOrigen.SelectedItem as ComboItem;
         var destinoItem = cmbAlmacenDestino.SelectedItem as ComboItem;
+        var motivoItem = cmbMotivoSalida.SelectedItem as ComboItem;
 
         var dto = new MovimientoDto
         {
@@ -387,6 +704,7 @@ public partial class FrmMovimientoEdit : Form
             NumeroDocumento = txtNumeroDocumento.Text.Trim(),
             FechaMovimiento = dtpFecha.Value,
             Observacion = string.IsNullOrWhiteSpace(txtObservacion.Text) ? null : txtObservacion.Text.Trim(),
+            MotivoSalida = tipo == "SALIDA" ? motivoItem?.Nombre : null,
             AlmacenOrigenId = origenItem?.Id ?? 0,
             AlmacenDestinoId = tipo == "TRASLADO" ? destinoItem?.Id : null,
             Detalles = _detalles

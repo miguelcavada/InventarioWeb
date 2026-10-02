@@ -15,4 +15,5 @@ public interface IStockAlmacenRepository : IRepository<StockAlmacen>
     Task<IEnumerable<StockAlmacen>> GetStocksPorProductoAsync(int productoId);
     Task<IEnumerable<StockAlmacen>> GetStocksPorAlmacenAsync(int almacenId);
     Task<IEnumerable<StockAlmacen>> GetProductosStockBajoAsync(int almacenId);
+    Task<IEnumerable<StockAlmacen>> GetStocksConProductoPorAlmacenAsync(int almacenId);
 }

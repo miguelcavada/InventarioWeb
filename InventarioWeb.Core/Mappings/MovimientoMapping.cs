@@ -16,6 +16,7 @@ public static class MovimientoMapping
             NumeroDocumento = movimiento.NumeroDocumento,
             Observacion = movimiento.Observacion,
             FechaMovimiento = movimiento.FechaMovimiento,
+            MotivoSalida = movimiento.MotivoSalida,
             Total = movimiento.Total,
             AlmacenOrigenId = movimiento.AlmacenOrigenId,
             AlmacenOrigenNombre = movimiento.AlmacenOrigen?.Nombre,
@@ -36,6 +37,7 @@ public static class MovimientoMapping
             NumeroDocumento = dto.NumeroDocumento,
             Observacion = dto.Observacion,
             FechaMovimiento = dto.FechaMovimiento,
+            MotivoSalida = dto.MotivoSalida,
             AlmacenOrigenId = dto.AlmacenOrigenId,
             AlmacenDestinoId = dto.AlmacenDestinoId,
             Detalles = dto.Detalles?.Select(d => d.ToEntity()).ToList() ?? new List<MovimientoDetalle>()

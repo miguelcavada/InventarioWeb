@@ -38,21 +38,28 @@
             this.dtpFecha = new System.Windows.Forms.DateTimePicker();
             this.lblFechaConsulta = new System.Windows.Forms.Label();
             this.panelKPIs = new System.Windows.Forms.Panel();
-            this.lblValorInventario = new System.Windows.Forms.Label();
-            this.lblValorInventarioTitulo = new System.Windows.Forms.Label();
-            this.lblTotalSalidas = new System.Windows.Forms.Label();
-            this.lblTotalSalidasTitulo = new System.Windows.Forms.Label();
-            this.lblTotalEntradas = new System.Windows.Forms.Label();
-            this.lblTotalEntradasTitulo = new System.Windows.Forms.Label();
+            this.lblValorVentas = new System.Windows.Forms.Label();
+            this.lblValorVentasTitulo = new System.Windows.Forms.Label();
+            this.lblTotalDevoluciones = new System.Windows.Forms.Label();
+            this.lblTotalDevolucionesTitulo = new System.Windows.Forms.Label();
+            this.lblTotalMermas = new System.Windows.Forms.Label();
+            this.lblTotalMermasTitulo = new System.Windows.Forms.Label();
+            this.lblTotalVentas = new System.Windows.Forms.Label();
+            this.lblTotalVentasTitulo = new System.Windows.Forms.Label();
             this.lblTotalProductos = new System.Windows.Forms.Label();
             this.lblTotalProductosTitulo = new System.Windows.Forms.Label();
+            this.lblTotalEntradas = new System.Windows.Forms.Label();
+            this.lblTotalEntradasTitulo = new System.Windows.Forms.Label();
             this.dgvInventario = new System.Windows.Forms.DataGridView();
             this.colCodigo = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colProducto = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colUnidad = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colInicial = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colEntradas = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.colSalidas = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colVentas = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colMermas = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colDevoluciones = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.colOtrasSalidas = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colFinal = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPrecioMinorista = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colPrecioMayorista = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -81,7 +88,7 @@
             this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelTop.Location = new System.Drawing.Point(0, 0);
             this.panelTop.Name = "panelTop";
-            this.panelTop.Size = new System.Drawing.Size(1200, 90);
+            this.panelTop.Size = new System.Drawing.Size(1400, 90);
             this.panelTop.TabIndex = 0;
 
             this.lblTitulo.AutoSize = true;
@@ -111,7 +118,7 @@
             this.lblEstado.AutoSize = true;
             this.lblEstado.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.lblEstado.ForeColor = System.Drawing.Color.FromArgb(46, 196, 182);
-            this.lblEstado.Location = new System.Drawing.Point(15, 68);
+            this.lblEstado.Location = new System.Drawing.Point(700, 47);
             this.lblEstado.Name = "lblEstado";
             this.lblEstado.Size = new System.Drawing.Size(0, 15);
 
@@ -124,7 +131,7 @@
             this.panelFiltros.Location = new System.Drawing.Point(0, 90);
             this.panelFiltros.Name = "panelFiltros";
             this.panelFiltros.Padding = new System.Windows.Forms.Padding(15, 10, 15, 10);
-            this.panelFiltros.Size = new System.Drawing.Size(1200, 55);
+            this.panelFiltros.Size = new System.Drawing.Size(1400, 55);
             this.panelFiltros.TabIndex = 1;
 
             this.lblFechaConsulta.AutoSize = true;
@@ -154,79 +161,125 @@
 
             // ===== panelKPIs =====
             this.panelKPIs.BackColor = System.Drawing.Color.FromArgb(240, 240, 245);
-            this.panelKPIs.Controls.Add(this.lblValorInventario);
-            this.panelKPIs.Controls.Add(this.lblValorInventarioTitulo);
-            this.panelKPIs.Controls.Add(this.lblTotalSalidas);
-            this.panelKPIs.Controls.Add(this.lblTotalSalidasTitulo);
-            this.panelKPIs.Controls.Add(this.lblTotalEntradas);
-            this.panelKPIs.Controls.Add(this.lblTotalEntradasTitulo);
+            this.panelKPIs.Controls.Add(this.lblValorVentas);
+            this.panelKPIs.Controls.Add(this.lblValorVentasTitulo);
+            this.panelKPIs.Controls.Add(this.lblTotalDevoluciones);
+            this.panelKPIs.Controls.Add(this.lblTotalDevolucionesTitulo);
+            this.panelKPIs.Controls.Add(this.lblTotalMermas);
+            this.panelKPIs.Controls.Add(this.lblTotalMermasTitulo);
+            this.panelKPIs.Controls.Add(this.lblTotalVentas);
+            this.panelKPIs.Controls.Add(this.lblTotalVentasTitulo);
             this.panelKPIs.Controls.Add(this.lblTotalProductos);
             this.panelKPIs.Controls.Add(this.lblTotalProductosTitulo);
+            this.panelKPIs.Controls.Add(this.lblTotalEntradas);
+            this.panelKPIs.Controls.Add(this.lblTotalEntradasTitulo);
             this.panelKPIs.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelKPIs.Location = new System.Drawing.Point(0, 145);
             this.panelKPIs.Name = "panelKPIs";
-            this.panelKPIs.Size = new System.Drawing.Size(1200, 80);
+            this.panelKPIs.Size = new System.Drawing.Size(1400, 80);
             this.panelKPIs.TabIndex = 2;
 
             // KPI Productos
             this.lblTotalProductosTitulo.AutoSize = true;
-            this.lblTotalProductosTitulo.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.lblTotalProductosTitulo.Font = new System.Drawing.Font("Segoe UI", 8F);
             this.lblTotalProductosTitulo.ForeColor = System.Drawing.Color.Gray;
-            this.lblTotalProductosTitulo.Location = new System.Drawing.Point(30, 15);
-            this.lblTotalProductosTitulo.Size = new System.Drawing.Size(100, 15);
-            this.lblTotalProductosTitulo.Text = "Total Productos";
+            this.lblTotalProductosTitulo.Location = new System.Drawing.Point(20, 15);
+            this.lblTotalProductosTitulo.Name = "lblTotalProductosTitulo";
+            this.lblTotalProductosTitulo.Size = new System.Drawing.Size(80, 13);
+            this.lblTotalProductosTitulo.Text = "Productos";
 
             this.lblTotalProductos.AutoSize = true;
-            this.lblTotalProductos.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold);
+            this.lblTotalProductos.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
             this.lblTotalProductos.ForeColor = System.Drawing.Color.FromArgb(67, 97, 238);
-            this.lblTotalProductos.Location = new System.Drawing.Point(30, 35);
-            this.lblTotalProductos.Size = new System.Drawing.Size(40, 32);
+            this.lblTotalProductos.Location = new System.Drawing.Point(20, 35);
+            this.lblTotalProductos.Name = "lblTotalProductos";
+            this.lblTotalProductos.Size = new System.Drawing.Size(40, 30);
             this.lblTotalProductos.Text = "0";
 
             // KPI Entradas
             this.lblTotalEntradasTitulo.AutoSize = true;
-            this.lblTotalEntradasTitulo.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.lblTotalEntradasTitulo.Font = new System.Drawing.Font("Segoe UI", 8F);
             this.lblTotalEntradasTitulo.ForeColor = System.Drawing.Color.Gray;
-            this.lblTotalEntradasTitulo.Location = new System.Drawing.Point(230, 15);
-            this.lblTotalEntradasTitulo.Size = new System.Drawing.Size(100, 15);
-            this.lblTotalEntradasTitulo.Text = "Entradas del Día";
+            this.lblTotalEntradasTitulo.Location = new System.Drawing.Point(180, 15);
+            this.lblTotalEntradasTitulo.Name = "lblTotalEntradasTitulo";
+            this.lblTotalEntradasTitulo.Size = new System.Drawing.Size(90, 13);
+            this.lblTotalEntradasTitulo.Text = "Entradas";
 
             this.lblTotalEntradas.AutoSize = true;
-            this.lblTotalEntradas.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold);
+            this.lblTotalEntradas.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
             this.lblTotalEntradas.ForeColor = System.Drawing.Color.FromArgb(46, 196, 182);
-            this.lblTotalEntradas.Location = new System.Drawing.Point(230, 35);
-            this.lblTotalEntradas.Size = new System.Drawing.Size(40, 32);
+            this.lblTotalEntradas.Location = new System.Drawing.Point(180, 35);
+            this.lblTotalEntradas.Name = "lblTotalEntradas";
+            this.lblTotalEntradas.Size = new System.Drawing.Size(40, 30);
             this.lblTotalEntradas.Text = "0";
 
-            // KPI Salidas
-            this.lblTotalSalidasTitulo.AutoSize = true;
-            this.lblTotalSalidasTitulo.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.lblTotalSalidasTitulo.ForeColor = System.Drawing.Color.Gray;
-            this.lblTotalSalidasTitulo.Location = new System.Drawing.Point(430, 15);
-            this.lblTotalSalidasTitulo.Size = new System.Drawing.Size(100, 15);
-            this.lblTotalSalidasTitulo.Text = "Salidas del Día";
+            // KPI Ventas (NUEVO)
+            this.lblTotalVentasTitulo.AutoSize = true;
+            this.lblTotalVentasTitulo.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.lblTotalVentasTitulo.ForeColor = System.Drawing.Color.Gray;
+            this.lblTotalVentasTitulo.Location = new System.Drawing.Point(340, 15);
+            this.lblTotalVentasTitulo.Name = "lblTotalVentasTitulo";
+            this.lblTotalVentasTitulo.Size = new System.Drawing.Size(90, 13);
+            this.lblTotalVentasTitulo.Text = "Ventas";
 
-            this.lblTotalSalidas.AutoSize = true;
-            this.lblTotalSalidas.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold);
-            this.lblTotalSalidas.ForeColor = System.Drawing.Color.FromArgb(231, 29, 54);
-            this.lblTotalSalidas.Location = new System.Drawing.Point(430, 35);
-            this.lblTotalSalidas.Size = new System.Drawing.Size(40, 32);
-            this.lblTotalSalidas.Text = "0";
+            this.lblTotalVentas.AutoSize = true;
+            this.lblTotalVentas.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
+            this.lblTotalVentas.ForeColor = System.Drawing.Color.FromArgb(40, 167, 69);
+            this.lblTotalVentas.Location = new System.Drawing.Point(340, 35);
+            this.lblTotalVentas.Name = "lblTotalVentas";
+            this.lblTotalVentas.Size = new System.Drawing.Size(40, 30);
+            this.lblTotalVentas.Text = "0";
 
-            // KPI Valor
-            this.lblValorInventarioTitulo.AutoSize = true;
-            this.lblValorInventarioTitulo.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.lblValorInventarioTitulo.ForeColor = System.Drawing.Color.Gray;
-            this.lblValorInventarioTitulo.Location = new System.Drawing.Point(630, 15);
-            this.lblValorInventarioTitulo.Size = new System.Drawing.Size(100, 15);
-            this.lblValorInventarioTitulo.Text = "Valor Inventario";
+            // KPI Mermas (NUEVO)
+            this.lblTotalMermasTitulo.AutoSize = true;
+            this.lblTotalMermasTitulo.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.lblTotalMermasTitulo.ForeColor = System.Drawing.Color.Gray;
+            this.lblTotalMermasTitulo.Location = new System.Drawing.Point(500, 15);
+            this.lblTotalMermasTitulo.Name = "lblTotalMermasTitulo";
+            this.lblTotalMermasTitulo.Size = new System.Drawing.Size(90, 13);
+            this.lblTotalMermasTitulo.Text = "Mermas";
 
-            this.lblValorInventario.AutoSize = true;
-            this.lblValorInventario.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold);
-            this.lblValorInventario.ForeColor = System.Drawing.Color.FromArgb(255, 159, 28);
-            this.lblValorInventario.Location = new System.Drawing.Point(630, 35);
-            this.lblValorInventario.Size = new System.Drawing.Size(50, 32);
-            this.lblValorInventario.Text = "$0";
+            this.lblTotalMermas.AutoSize = true;
+            this.lblTotalMermas.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
+            this.lblTotalMermas.ForeColor = System.Drawing.Color.FromArgb(220, 53, 69);
+            this.lblTotalMermas.Location = new System.Drawing.Point(500, 35);
+            this.lblTotalMermas.Name = "lblTotalMermas";
+            this.lblTotalMermas.Size = new System.Drawing.Size(40, 30);
+            this.lblTotalMermas.Text = "0";
+
+            // KPI Devoluciones (NUEVO)
+            this.lblTotalDevolucionesTitulo.AutoSize = true;
+            this.lblTotalDevolucionesTitulo.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.lblTotalDevolucionesTitulo.ForeColor = System.Drawing.Color.Gray;
+            this.lblTotalDevolucionesTitulo.Location = new System.Drawing.Point(660, 15);
+            this.lblTotalDevolucionesTitulo.Name = "lblTotalDevolucionesTitulo";
+            this.lblTotalDevolucionesTitulo.Size = new System.Drawing.Size(100, 13);
+            this.lblTotalDevolucionesTitulo.Text = "Devoluciones";
+
+            this.lblTotalDevoluciones.AutoSize = true;
+            this.lblTotalDevoluciones.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
+            this.lblTotalDevoluciones.ForeColor = System.Drawing.Color.FromArgb(255, 193, 7);
+            this.lblTotalDevoluciones.Location = new System.Drawing.Point(660, 35);
+            this.lblTotalDevoluciones.Name = "lblTotalDevoluciones";
+            this.lblTotalDevoluciones.Size = new System.Drawing.Size(40, 30);
+            this.lblTotalDevoluciones.Text = "0";
+
+            // KPI Valor Ventas (NUEVO)
+            this.lblValorVentasTitulo.AutoSize = true;
+            this.lblValorVentasTitulo.Font = new System.Drawing.Font("Segoe UI", 8F);
+            this.lblValorVentasTitulo.ForeColor = System.Drawing.Color.Gray;
+            this.lblValorVentasTitulo.Location = new System.Drawing.Point(820, 15);
+            this.lblValorVentasTitulo.Name = "lblValorVentasTitulo";
+            this.lblValorVentasTitulo.Size = new System.Drawing.Size(120, 13);
+            this.lblValorVentasTitulo.Text = "Valor Vendido";
+
+            this.lblValorVentas.AutoSize = true;
+            this.lblValorVentas.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
+            this.lblValorVentas.ForeColor = System.Drawing.Color.FromArgb(40, 167, 69);
+            this.lblValorVentas.Location = new System.Drawing.Point(820, 35);
+            this.lblValorVentas.Name = "lblValorVentas";
+            this.lblValorVentas.Size = new System.Drawing.Size(50, 30);
+            this.lblValorVentas.Text = "$0";
 
             // ===== dgvInventario =====
             this.dgvInventario.AllowUserToAddRows = false;
@@ -236,12 +289,13 @@
             this.dgvInventario.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dgvInventario.ColumnHeadersDefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(26, 26, 46);
             this.dgvInventario.ColumnHeadersDefaultCellStyle.ForeColor = System.Drawing.Color.White;
-            this.dgvInventario.ColumnHeadersDefaultCellStyle.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.dgvInventario.ColumnHeadersDefaultCellStyle.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Bold);
             this.dgvInventario.ColumnHeadersHeight = 35;
             this.dgvInventario.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
                 this.colCodigo, this.colProducto, this.colUnidad,
-                this.colInicial, this.colEntradas, this.colSalidas, this.colFinal,
-                this.colPrecioMinorista, this.colPrecioMayorista, this.colValor});
+                this.colInicial, this.colEntradas,
+                this.colVentas, this.colMermas, this.colDevoluciones, this.colOtrasSalidas,
+                this.colFinal, this.colPrecioMinorista, this.colPrecioMayorista, this.colValor});
             this.dgvInventario.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvInventario.Location = new System.Drawing.Point(0, 225);
             this.dgvInventario.MultiSelect = false;
@@ -250,49 +304,61 @@
             this.dgvInventario.RowHeadersVisible = false;
             this.dgvInventario.RowTemplate.Height = 28;
             this.dgvInventario.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvInventario.Size = new System.Drawing.Size(1200, 355);
+            this.dgvInventario.Size = new System.Drawing.Size(1400, 355);
             this.dgvInventario.TabIndex = 3;
 
             // Columnas
             this.colCodigo.Name = "colCodigo";
             this.colCodigo.HeaderText = "Código";
-            this.colCodigo.FillWeight = 70;
+            this.colCodigo.FillWeight = 60;
 
             this.colProducto.Name = "colProducto";
             this.colProducto.HeaderText = "Producto";
-            this.colProducto.FillWeight = 180;
+            this.colProducto.FillWeight = 150;
 
             this.colUnidad.Name = "colUnidad";
             this.colUnidad.HeaderText = "Uni";
-            this.colUnidad.FillWeight = 50;
+            this.colUnidad.FillWeight = 40;
 
             this.colInicial.Name = "colInicial";
-            this.colInicial.HeaderText = "Exist. Inicial";
-            this.colInicial.FillWeight = 80;
+            this.colInicial.HeaderText = "Inicial";
+            this.colInicial.FillWeight = 55;
 
             this.colEntradas.Name = "colEntradas";
             this.colEntradas.HeaderText = "Entradas";
-            this.colEntradas.FillWeight = 70;
+            this.colEntradas.FillWeight = 55;
 
-            this.colSalidas.Name = "colSalidas";
-            this.colSalidas.HeaderText = "Salidas";
-            this.colSalidas.FillWeight = 70;
+            this.colVentas.Name = "colVentas";
+            this.colVentas.HeaderText = "Ventas";
+            this.colVentas.FillWeight = 55;
+
+            this.colMermas.Name = "colMermas";
+            this.colMermas.HeaderText = "Mermas";
+            this.colMermas.FillWeight = 55;
+
+            this.colDevoluciones.Name = "colDevoluciones";
+            this.colDevoluciones.HeaderText = "Devol.";
+            this.colDevoluciones.FillWeight = 55;
+
+            this.colOtrasSalidas.Name = "colOtrasSalidas";
+            this.colOtrasSalidas.HeaderText = "Otras";
+            this.colOtrasSalidas.FillWeight = 55;
 
             this.colFinal.Name = "colFinal";
-            this.colFinal.HeaderText = "Exist. Final";
-            this.colFinal.FillWeight = 80;
+            this.colFinal.HeaderText = "Final";
+            this.colFinal.FillWeight = 55;
 
             this.colPrecioMinorista.Name = "colPrecioMinorista";
-            this.colPrecioMinorista.HeaderText = "P. Minorista";
-            this.colPrecioMinorista.FillWeight = 90;
+            this.colPrecioMinorista.HeaderText = "P. Minor.";
+            this.colPrecioMinorista.FillWeight = 70;
 
             this.colPrecioMayorista.Name = "colPrecioMayorista";
-            this.colPrecioMayorista.HeaderText = "P. Mayorista";
-            this.colPrecioMayorista.FillWeight = 90;
+            this.colPrecioMayorista.HeaderText = "P. Mayor.";
+            this.colPrecioMayorista.FillWeight = 70;
 
             this.colValor.Name = "colValor";
-            this.colValor.HeaderText = "Valor Inventario";
-            this.colValor.FillWeight = 100;
+            this.colValor.HeaderText = "Valor Ventas";
+            this.colValor.FillWeight = 90;
 
             // ===== panelBottom =====
             this.panelBottom.BackColor = System.Drawing.Color.FromArgb(240, 240, 240);
@@ -300,7 +366,7 @@
             this.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panelBottom.Location = new System.Drawing.Point(0, 580);
             this.panelBottom.Name = "panelBottom";
-            this.panelBottom.Size = new System.Drawing.Size(1200, 30);
+            this.panelBottom.Size = new System.Drawing.Size(1400, 30);
             this.panelBottom.TabIndex = 4;
 
             this.lblTotal.AutoSize = true;
@@ -317,7 +383,7 @@
             this.panelBotones.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panelBotones.Location = new System.Drawing.Point(0, 610);
             this.panelBotones.Name = "panelBotones";
-            this.panelBotones.Size = new System.Drawing.Size(1200, 60);
+            this.panelBotones.Size = new System.Drawing.Size(1400, 60);
             this.panelBotones.TabIndex = 5;
 
             // btnCerrar
@@ -326,7 +392,7 @@
             this.btnCerrar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCerrar.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnCerrar.ForeColor = System.Drawing.Color.White;
-            this.btnCerrar.Location = new System.Drawing.Point(1050, 12);
+            this.btnCerrar.Location = new System.Drawing.Point(1250, 12);
             this.btnCerrar.Name = "btnCerrar";
             this.btnCerrar.Size = new System.Drawing.Size(130, 38);
             this.btnCerrar.TabIndex = 0;
@@ -340,7 +406,7 @@
             this.btnExportarExcel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnExportarExcel.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnExportarExcel.ForeColor = System.Drawing.Color.White;
-            this.btnExportarExcel.Location = new System.Drawing.Point(720, 12);
+            this.btnExportarExcel.Location = new System.Drawing.Point(920, 12);
             this.btnExportarExcel.Name = "btnExportarExcel";
             this.btnExportarExcel.Size = new System.Drawing.Size(160, 38);
             this.btnExportarExcel.TabIndex = 1;
@@ -354,7 +420,7 @@
             this.btnExportarPdf.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnExportarPdf.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
             this.btnExportarPdf.ForeColor = System.Drawing.Color.White;
-            this.btnExportarPdf.Location = new System.Drawing.Point(890, 12);
+            this.btnExportarPdf.Location = new System.Drawing.Point(1090, 12);
             this.btnExportarPdf.Name = "btnExportarPdf";
             this.btnExportarPdf.Size = new System.Drawing.Size(150, 38);
             this.btnExportarPdf.TabIndex = 2;
@@ -365,14 +431,14 @@
             // ===== FrmInventarioDiario =====
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1200, 670);
+            this.ClientSize = new System.Drawing.Size(1400, 670);
             this.Controls.Add(this.dgvInventario);
             this.Controls.Add(this.panelBottom);
             this.Controls.Add(this.panelBotones);
             this.Controls.Add(this.panelKPIs);
             this.Controls.Add(this.panelFiltros);
             this.Controls.Add(this.panelTop);
-            this.MinimumSize = new System.Drawing.Size(1000, 600);
+            this.MinimumSize = new System.Drawing.Size(1200, 600);
             this.Name = "FrmInventarioDiario";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Inventario Diario";
@@ -403,25 +469,38 @@
         private System.Windows.Forms.Label lblFechaConsulta;
         private System.Windows.Forms.DateTimePicker dtpFecha;
         private System.Windows.Forms.Button btnRefrescar;
+
+        // KPIs
         private System.Windows.Forms.Label lblTotalProductosTitulo;
         private System.Windows.Forms.Label lblTotalProductos;
         private System.Windows.Forms.Label lblTotalEntradasTitulo;
         private System.Windows.Forms.Label lblTotalEntradas;
-        private System.Windows.Forms.Label lblTotalSalidasTitulo;
-        private System.Windows.Forms.Label lblTotalSalidas;
-        private System.Windows.Forms.Label lblValorInventarioTitulo;
-        private System.Windows.Forms.Label lblValorInventario;
+        private System.Windows.Forms.Label lblTotalVentasTitulo;
+        private System.Windows.Forms.Label lblTotalVentas;
+        private System.Windows.Forms.Label lblTotalMermasTitulo;
+        private System.Windows.Forms.Label lblTotalMermas;
+        private System.Windows.Forms.Label lblTotalDevolucionesTitulo;
+        private System.Windows.Forms.Label lblTotalDevoluciones;
+        private System.Windows.Forms.Label lblValorVentasTitulo;
+        private System.Windows.Forms.Label lblValorVentas;
+
+        // Grid
         private System.Windows.Forms.DataGridView dgvInventario;
         private System.Windows.Forms.DataGridViewTextBoxColumn colCodigo;
         private System.Windows.Forms.DataGridViewTextBoxColumn colProducto;
         private System.Windows.Forms.DataGridViewTextBoxColumn colUnidad;
         private System.Windows.Forms.DataGridViewTextBoxColumn colInicial;
         private System.Windows.Forms.DataGridViewTextBoxColumn colEntradas;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colSalidas;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colVentas;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colMermas;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colDevoluciones;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colOtrasSalidas;
         private System.Windows.Forms.DataGridViewTextBoxColumn colFinal;
         private System.Windows.Forms.DataGridViewTextBoxColumn colPrecioMinorista;
         private System.Windows.Forms.DataGridViewTextBoxColumn colPrecioMayorista;
         private System.Windows.Forms.DataGridViewTextBoxColumn colValor;
+
+        // Footer
         private System.Windows.Forms.Label lblTotal;
         private System.Windows.Forms.Button btnExportarExcel;
         private System.Windows.Forms.Button btnExportarPdf;

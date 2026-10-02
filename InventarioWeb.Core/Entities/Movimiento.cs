@@ -18,6 +18,10 @@ public class Movimiento : BaseEntity
 
     public DateTime FechaMovimiento { get; set; } = DateTime.Now;
 
+    [StringLength(20)]
+    [Display(Name = "Motivo")]
+    public string? MotivoSalida { get; set; }
+
     // Para traslados entre almacenes
     public int AlmacenOrigenId { get; set; }
 

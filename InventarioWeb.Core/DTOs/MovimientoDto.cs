@@ -20,6 +20,9 @@ public class MovimientoDto
     [Display(Name = "Fecha")]
     public DateTime FechaMovimiento { get; set; } = DateTime.Now;
 
+    [Display(Name = "Motivo de Salida")]
+    public string? MotivoSalida { get; set; }
+
     public decimal Total { get; set; }
 
     [Required]

@@ -69,4 +69,18 @@ public class StockAlmacenRepository : Repository<StockAlmacen>, IStockAlmacenRep
             .Where(s => s.AlmacenId == almacenId && s.StockActual <= s.StockMinimo)
             .ToListAsync();
     }
+
+    public async Task<IEnumerable<StockAlmacen>> GetStocksConProductoPorAlmacenAsync(int almacenId)
+    {
+        return await _context.StockAlmacenes
+            .Include(s => s.Producto)
+                .ThenInclude(p => p!.Categoria)
+            .Include(s => s.Producto)
+                .ThenInclude(p => p!.UnidadMedida)
+            .Where(s => s.AlmacenId == almacenId && s.Activo)
+            .Where(s => s.Producto != null && s.Producto.Activo)
+            .Where(s => s.StockActual > 0)
+            .OrderBy(s => s.Producto!.Nombre)
+            .ToListAsync();
+    }
 }

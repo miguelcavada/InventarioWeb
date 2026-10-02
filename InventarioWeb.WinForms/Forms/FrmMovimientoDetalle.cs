@@ -26,6 +26,69 @@ public partial class FrmMovimientoDetalle : Form
         await CargarMovimientoAsync();
     }
 
+    //private async Task CargarMovimientoAsync()
+    //{
+    //    var result = await _movimientoService.GetMovimientoByIdAsync(MovimientoId);
+
+    //    if (!result.IsSuccess || result.Data == null)
+    //    {
+    //        MessageBox.Show(result.ErrorMessage ?? "Movimiento no encontrado",
+    //            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+    //        Close();
+    //        return;
+    //    }
+
+    //    _movimiento = result.Data;
+
+    //    Text = $"Movimiento - {_movimiento.NumeroDocumento}";
+    //    lblTitulo.Text = $"📋 {_movimiento.Tipo} - {_movimiento.NumeroDocumento}";
+
+    //    // Colorear el header según tipo
+    //    switch (_movimiento.Tipo)
+    //    {
+    //        case "ENTRADA":
+    //            panelTop.BackColor = System.Drawing.Color.FromArgb(46, 196, 182);
+    //            break;
+    //        case "SALIDA":
+    //            panelTop.BackColor = System.Drawing.Color.FromArgb(231, 29, 54);
+    //            break;
+    //        case "TRASLADO":
+    //            panelTop.BackColor = System.Drawing.Color.FromArgb(67, 97, 238);
+    //            break;
+    //    }
+
+    //    // Datos generales
+    //    lblTipoValor.Text = _movimiento.Tipo;
+    //    lblDocumentoValor.Text = _movimiento.NumeroDocumento;
+    //    lblFechaValor.Text = _movimiento.FechaMovimiento.ToString("dd/MM/yyyy HH:mm");
+    //    lblOrigenValor.Text = _movimiento.AlmacenOrigenNombre ?? "N/A";
+    //    lblDestinoValor.Text = _movimiento.AlmacenDestinoNombre ?? "-";
+    //    lblObservacionValor.Text = string.IsNullOrEmpty(_movimiento.Observacion) ? "-" : _movimiento.Observacion;
+
+    //    // Ocultar destino si no es traslado
+    //    if (_movimiento.Tipo != "TRASLADO")
+    //    {
+    //        lblDestinoTitulo.Visible = false;
+    //        lblDestinoValor.Visible = false;
+    //    }
+
+    //    // Cargar detalles
+    //    dgvDetalles.Rows.Clear();
+
+    //    foreach (var d in _movimiento.Detalles)
+    //    {
+    //        dgvDetalles.Rows.Add(
+    //            d.ProductoCodigo ?? "",
+    //            d.ProductoNombre ?? "",
+    //            d.Cantidad.ToString("N2"),
+    //            d.PrecioUnitario.ToString("C2"),
+    //            d.Subtotal.ToString("C2")
+    //        );
+    //    }
+
+    //    lblTotalValor.Text = _movimiento.Total.ToString("C2");
+    //}
+
     private async Task CargarMovimientoAsync()
     {
         var result = await _movimientoService.GetMovimientoByIdAsync(MovimientoId);
@@ -43,7 +106,6 @@ public partial class FrmMovimientoDetalle : Form
         Text = $"Movimiento - {_movimiento.NumeroDocumento}";
         lblTitulo.Text = $"📋 {_movimiento.Tipo} - {_movimiento.NumeroDocumento}";
 
-        // Colorear el header según tipo
         switch (_movimiento.Tipo)
         {
             case "ENTRADA":
@@ -57,7 +119,6 @@ public partial class FrmMovimientoDetalle : Form
                 break;
         }
 
-        // Datos generales
         lblTipoValor.Text = _movimiento.Tipo;
         lblDocumentoValor.Text = _movimiento.NumeroDocumento;
         lblFechaValor.Text = _movimiento.FechaMovimiento.ToString("dd/MM/yyyy HH:mm");
@@ -65,14 +126,26 @@ public partial class FrmMovimientoDetalle : Form
         lblDestinoValor.Text = _movimiento.AlmacenDestinoNombre ?? "-";
         lblObservacionValor.Text = string.IsNullOrEmpty(_movimiento.Observacion) ? "-" : _movimiento.Observacion;
 
-        // Ocultar destino si no es traslado
+        // NUEVO: Motivo
+        if (_movimiento.Tipo == "SALIDA" && !string.IsNullOrEmpty(_movimiento.MotivoSalida))
+        {
+            lblMotivoTitulo.Visible = true;
+            lblMotivoValor.Visible = true;
+            lblMotivoValor.Text = InventarioWeb.Core.Constants.MotivosSalida
+                .GetDescripcion(_movimiento.MotivoSalida);
+        }
+        else
+        {
+            lblMotivoTitulo.Visible = false;
+            lblMotivoValor.Visible = false;
+        }
+
         if (_movimiento.Tipo != "TRASLADO")
         {
             lblDestinoTitulo.Visible = false;
             lblDestinoValor.Visible = false;
         }
 
-        // Cargar detalles
         dgvDetalles.Rows.Clear();
 
         foreach (var d in _movimiento.Detalles)

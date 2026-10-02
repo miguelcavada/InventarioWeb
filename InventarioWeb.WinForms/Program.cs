@@ -1,5 +1,7 @@
 using InventarioWeb.Application.Services;
+using InventarioWeb.Core.Interfaces;
 using InventarioWeb.Infrastructure.Data;
+using InventarioWeb.Infrastructure.Repositories;
 using InventarioWeb.Infrastructure.Services;
 using InventarioWeb.WinForms.Forms;
 using InventarioWeb.WinForms.Services;
@@ -65,6 +67,7 @@ namespace InventarioWeb.WinForms
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IProductoService, ProductoService>();
             services.AddScoped<IMovimientoService, MovimientoService>();
+            services.AddScoped<IStockAlmacenRepository, StockAlmacenRepository>();
             services.AddScoped<IConsignacionService, ConsignacionService>();
             services.AddScoped<ICategoriaService, CategoriaService>();
             services.AddScoped<IAlmacenService, AlmacenService>();

@@ -11,6 +11,7 @@ public interface IMovimientoService
     Task<Result<MovimientoDto>> GetMovimientoByIdAsync(int id);
     Task<Result<MovimientoDto>> CreateMovimientoAsync(MovimientoDto dto);
     Task<Result<PrecioProductoDto>> ObtenerPrecioProductoAsync(int productoId, string tipo, string tipoPrecio = "MINORISTA");
+    Task<Result<IEnumerable<ProductoStockDto>>> GetProductosPorAlmacenAsync(int almacenId);
 }
 
 public class MovimientoService : IMovimientoService
@@ -433,6 +434,43 @@ public class MovimientoService : IMovimientoService
         catch (Exception ex)
         {
             return Result<PrecioProductoDto>.Failure($"Error al obtener precio: {ex.Message}");
+        }
+    }
+
+    public async Task<Result<IEnumerable<ProductoStockDto>>> GetProductosPorAlmacenAsync(int almacenId)
+    {
+        try
+        {
+            if (almacenId <= 0)
+                return Result<IEnumerable<ProductoStockDto>>.Failure("Debe seleccionar un almacén");
+
+            var stocks = await _unitOfWork.StockAlmacenes.GetStocksConProductoPorAlmacenAsync(almacenId);
+
+            var productos = stocks
+                .Where(s => s.Producto != null)
+                .Select(s => new ProductoStockDto
+                {
+                    ProductoId = s.ProductoId,
+                    Codigo = s.Producto!.Codigo ?? "",
+                    Nombre = s.Producto.Nombre ?? "",
+                    PrecioCosto = s.Producto.PrecioCosto,
+                    PrecioVentaMinorista = s.Producto.PrecioVentaMinorista,
+                    PrecioVentaMayorista = s.Producto.PrecioVentaMayorista,
+                    StockActual = s.StockActual,
+                    StockMinimo = s.StockMinimo,
+                    UnidadAbreviatura = s.Producto.UnidadMedida?.Abreviatura ?? "U",
+                    CategoriaNombre = s.Producto.Categoria?.Nombre
+                })
+                .ToList();
+
+            if (!productos.Any())
+                return Result<IEnumerable<ProductoStockDto>>.Failure("Este almacén no tiene productos con stock registrado");
+
+            return Result<IEnumerable<ProductoStockDto>>.Success(productos);
+        }
+        catch (Exception ex)
+        {
+            return Result<IEnumerable<ProductoStockDto>>.Failure($"Error al obtener productos: {ex.Message}");
         }
     }
 }

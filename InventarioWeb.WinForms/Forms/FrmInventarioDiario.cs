@@ -40,6 +40,109 @@ public partial class FrmInventarioDiario : Form
         await CargarInventarioAsync();
     }
 
+    //private async Task CargarInventarioAsync()
+    //{
+    //    dgvInventario.Rows.Clear();
+
+    //    var almacen = await _unitOfWork.Almacenes.GetAlmacenConStocksAsync(AlmacenId);
+
+    //    if (almacen == null)
+    //    {
+    //        MessageBox.Show("Almacén no encontrado", "Error",
+    //            MessageBoxButtons.OK, MessageBoxIcon.Error);
+    //        Close();
+    //        return;
+    //    }
+
+    //    var fechaConsulta = dtpFecha.Value.Date;
+    //    _resumen.Clear();
+
+    //    if (almacen.Stocks != null)
+    //    {
+    //        foreach (var stock in almacen.Stocks.OrderBy(s => s.Producto?.Nombre))
+    //        {
+    //            var producto = stock.Producto;
+    //            if (producto == null) continue;
+
+    //            var existenciaFinal = stock.StockActual;
+
+    //            // Movimientos del día
+    //            var movimientosDia = producto.MovimientosDetalle?
+    //                .Where(d => d.FechaCreacion.Date == fechaConsulta
+    //                         && d.Movimiento?.AlmacenOrigenId == almacen.Id)
+    //                .ToList() ?? new();
+
+    //            var entradasDia = (int)movimientosDia
+    //                .Where(d => d.Movimiento?.Tipo == "ENTRADA")
+    //                .Sum(d => d.Cantidad);
+
+    //            var salidasDia = (int)movimientosDia
+    //                .Where(d => d.Movimiento?.Tipo == "SALIDA")
+    //                .Sum(d => d.Cantidad);
+
+    //            var existenciaInicial = existenciaFinal - entradasDia + salidasDia;
+    //            var valorInventario = existenciaFinal * producto.PrecioVentaMinorista;
+
+    //            _resumen.Add(new InventarioDiarioResumenDto
+    //            {
+    //                ProductoId = producto.Id,
+    //                Codigo = producto.Codigo ?? "",
+    //                Producto = producto.Nombre ?? "",
+    //                Unidad = producto.UnidadMedida?.Abreviatura ?? "",
+    //                ExistenciaInicial = existenciaInicial,
+    //                Entradas = entradasDia,
+    //                Salidas = salidasDia,
+    //                ExistenciaFinal = existenciaFinal,
+    //                PrecioMinorista = producto.PrecioVentaMinorista,
+    //                PrecioMayorista = producto.PrecioVentaMayorista,
+    //                ValorInventario = valorInventario
+    //            });
+    //        }
+    //    }
+
+    //    // Llenar grid
+    //    foreach (var item in _resumen)
+    //    {
+    //        int index = dgvInventario.Rows.Add(
+    //            item.Codigo,
+    //            item.Producto,
+    //            item.Unidad,
+    //            item.ExistenciaInicial,
+    //            item.Entradas,
+    //            item.Salidas,
+    //            item.ExistenciaFinal,
+    //            item.PrecioMinorista.ToString("C2"),
+    //            item.PrecioMayorista?.ToString("C2") ?? "N/A",
+    //            item.ValorInventario.ToString("C2")
+    //        );
+
+    //        // Colorear según estado
+    //        if (item.ExistenciaFinal <= 0)
+    //        {
+    //            dgvInventario.Rows[index].DefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(255, 220, 220);
+    //        }
+    //        else if (item.Entradas > 0)
+    //        {
+    //            dgvInventario.Rows[index].Cells["colEntradas"].Style.BackColor = System.Drawing.Color.FromArgb(220, 255, 220);
+    //            dgvInventario.Rows[index].Cells["colEntradas"].Style.ForeColor = System.Drawing.Color.DarkGreen;
+    //        }
+
+    //        if (item.Salidas > 0)
+    //        {
+    //            dgvInventario.Rows[index].Cells["colSalidas"].Style.BackColor = System.Drawing.Color.FromArgb(255, 240, 220);
+    //            dgvInventario.Rows[index].Cells["colSalidas"].Style.ForeColor = System.Drawing.Color.DarkOrange;
+    //        }
+    //    }
+
+    //    // KPIs
+    //    lblTotalProductos.Text = _resumen.Count.ToString();
+    //    lblTotalEntradas.Text = _resumen.Sum(r => r.Entradas).ToString();
+    //    lblTotalSalidas.Text = _resumen.Sum(r => r.Salidas).ToString();
+    //    lblValorInventario.Text = _resumen.Sum(r => r.ValorInventario).ToString("C2");
+
+    //    lblTotal.Text = $"Mostrando {_resumen.Count} producto(s)";
+    //}
+
     private async Task CargarInventarioAsync()
     {
         dgvInventario.Rows.Clear();
@@ -57,6 +160,8 @@ public partial class FrmInventarioDiario : Form
         var fechaConsulta = dtpFecha.Value.Date;
         _resumen.Clear();
 
+        decimal totalVentas = 0;
+
         if (almacen.Stocks != null)
         {
             foreach (var stock in almacen.Stocks.OrderBy(s => s.Producto?.Nombre))
@@ -66,22 +171,30 @@ public partial class FrmInventarioDiario : Form
 
                 var existenciaFinal = stock.StockActual;
 
-                // Movimientos del día
-                var movimientosDia = producto.MovimientosDetalle?
+                var salidasDia = producto.MovimientosDetalle?
                     .Where(d => d.FechaCreacion.Date == fechaConsulta
-                             && d.Movimiento?.AlmacenOrigenId == almacen.Id)
+                             && d.Movimiento?.AlmacenOrigenId == almacen.Id
+                             && d.Movimiento?.Tipo == "SALIDA")
                     .ToList() ?? new();
 
-                var entradasDia = (int)movimientosDia
-                    .Where(d => d.Movimiento?.Tipo == "ENTRADA")
-                    .Sum(d => d.Cantidad);
+                var entradasDia = (int)(producto.MovimientosDetalle?
+                    .Where(d => d.FechaCreacion.Date == fechaConsulta
+                             && d.Movimiento?.AlmacenOrigenId == almacen.Id
+                             && d.Movimiento?.Tipo == "ENTRADA")
+                    .Sum(d => d.Cantidad) ?? 0);
 
-                var salidasDia = (int)movimientosDia
-                    .Where(d => d.Movimiento?.Tipo == "SALIDA")
-                    .Sum(d => d.Cantidad);
+                // Desglose por motivo
+                var ventas = (int)salidasDia.Where(d => d.Movimiento?.MotivoSalida == "VENTA").Sum(d => d.Cantidad);
+                var mermas = (int)salidasDia.Where(d => d.Movimiento?.MotivoSalida == "MERMA").Sum(d => d.Cantidad);
+                var devoluciones = (int)salidasDia.Where(d => d.Movimiento?.MotivoSalida == "DEVOLUCION").Sum(d => d.Cantidad);
+                var otrasSalidas = (int)salidasDia.Where(d => d.Movimiento?.MotivoSalida != "VENTA"
+                                                           && d.Movimiento?.MotivoSalida != "MERMA"
+                                                           && d.Movimiento?.MotivoSalida != "DEVOLUCION").Sum(d => d.Cantidad);
 
-                var existenciaInicial = existenciaFinal - entradasDia + salidasDia;
-                var valorInventario = existenciaFinal * producto.PrecioVentaMinorista;
+                var totalSalidas = ventas + mermas + devoluciones + otrasSalidas;
+                var existenciaInicial = existenciaFinal - entradasDia + totalSalidas;
+                var valorVentas = ventas * producto.PrecioVentaMinorista;
+                totalVentas += valorVentas;
 
                 _resumen.Add(new InventarioDiarioResumenDto
                 {
@@ -91,11 +204,15 @@ public partial class FrmInventarioDiario : Form
                     Unidad = producto.UnidadMedida?.Abreviatura ?? "",
                     ExistenciaInicial = existenciaInicial,
                     Entradas = entradasDia,
-                    Salidas = salidasDia,
+                    Ventas = ventas,           // ← NUEVO
+                    Mermas = mermas,           // ← NUEVO
+                    Devoluciones = devoluciones, // ← NUEVO
+                    OtrasSalidas = otrasSalidas, // ← NUEVO
+                    Salidas = totalSalidas,
                     ExistenciaFinal = existenciaFinal,
                     PrecioMinorista = producto.PrecioVentaMinorista,
                     PrecioMayorista = producto.PrecioVentaMayorista,
-                    ValorInventario = valorInventario
+                    ValorVentas = valorVentas  // ← NUEVO
                 });
             }
         }
@@ -104,41 +221,64 @@ public partial class FrmInventarioDiario : Form
         foreach (var item in _resumen)
         {
             int index = dgvInventario.Rows.Add(
-                item.Codigo,
-                item.Producto,
-                item.Unidad,
-                item.ExistenciaInicial,
-                item.Entradas,
-                item.Salidas,
-                item.ExistenciaFinal,
-                item.PrecioMinorista.ToString("C2"),
-                item.PrecioMayorista?.ToString("C2") ?? "N/A",
-                item.ValorInventario.ToString("C2")
+                item.Codigo,               // colCodigo
+                item.Producto,             // colProducto
+                item.Unidad,               // colUnidad
+                item.ExistenciaInicial,    // colInicial
+                item.Entradas,             // colEntradas
+                item.Ventas,               // colVentas
+                item.Mermas,               // colMermas
+                item.Devoluciones,         // colDevoluciones
+                item.OtrasSalidas,         // colOtrasSalidas
+                item.ExistenciaFinal,      // colFinal
+                item.PrecioMinorista.ToString("C2"),   // colPrecioMinorista
+                item.PrecioMayorista?.ToString("C2") ?? "N/A",  // colPrecioMayorista
+                item.ValorVentas.ToString("C2")        // colValor
             );
 
-            // Colorear según estado
-            if (item.ExistenciaFinal <= 0)
+            // Colorear ventas (verde)
+            if (item.Ventas > 0)
             {
-                dgvInventario.Rows[index].DefaultCellStyle.BackColor = System.Drawing.Color.FromArgb(255, 220, 220);
-            }
-            else if (item.Entradas > 0)
-            {
-                dgvInventario.Rows[index].Cells["colEntradas"].Style.BackColor = System.Drawing.Color.FromArgb(220, 255, 220);
-                dgvInventario.Rows[index].Cells["colEntradas"].Style.ForeColor = System.Drawing.Color.DarkGreen;
+                dgvInventario.Rows[index].Cells["colVentas"].Style.BackColor = System.Drawing.Color.FromArgb(220, 255, 220);
+                dgvInventario.Rows[index].Cells["colVentas"].Style.ForeColor = System.Drawing.Color.DarkGreen;
             }
 
-            if (item.Salidas > 0)
+            // Colorear mermas (rojo)
+            if (item.Mermas > 0)
             {
-                dgvInventario.Rows[index].Cells["colSalidas"].Style.BackColor = System.Drawing.Color.FromArgb(255, 240, 220);
-                dgvInventario.Rows[index].Cells["colSalidas"].Style.ForeColor = System.Drawing.Color.DarkOrange;
+                dgvInventario.Rows[index].Cells["colMermas"].Style.BackColor = System.Drawing.Color.FromArgb(255, 220, 220);
+                dgvInventario.Rows[index].Cells["colMermas"].Style.ForeColor = System.Drawing.Color.DarkRed;
+            }
+
+            // Colorear devoluciones (amarillo)
+            if (item.Devoluciones > 0)
+            {
+                dgvInventario.Rows[index].Cells["colDevoluciones"].Style.BackColor = System.Drawing.Color.FromArgb(255, 245, 220);
+                dgvInventario.Rows[index].Cells["colDevoluciones"].Style.ForeColor = System.Drawing.Color.DarkGoldenrod;
+            }
+
+            // Colorear otras salidas (azul)
+            if (item.OtrasSalidas > 0)
+            {
+                dgvInventario.Rows[index].Cells["colOtrasSalidas"].Style.BackColor = System.Drawing.Color.FromArgb(220, 240, 255);
+                dgvInventario.Rows[index].Cells["colOtrasSalidas"].Style.ForeColor = System.Drawing.Color.DarkBlue;
+            }
+
+            // Colorear existencia final si agotado
+            if (item.ExistenciaFinal <= 0)
+            {
+                dgvInventario.Rows[index].Cells["colFinal"].Style.BackColor = System.Drawing.Color.FromArgb(255, 200, 200);
+                dgvInventario.Rows[index].Cells["colFinal"].Style.ForeColor = System.Drawing.Color.DarkRed;
             }
         }
 
-        // KPIs
+        // KPIs actualizados
         lblTotalProductos.Text = _resumen.Count.ToString();
         lblTotalEntradas.Text = _resumen.Sum(r => r.Entradas).ToString();
-        lblTotalSalidas.Text = _resumen.Sum(r => r.Salidas).ToString();
-        lblValorInventario.Text = _resumen.Sum(r => r.ValorInventario).ToString("C2");
+        lblTotalVentas.Text = _resumen.Sum(r => r.Ventas).ToString();
+        lblTotalMermas.Text = _resumen.Sum(r => r.Mermas).ToString();
+        lblTotalDevoluciones.Text = _resumen.Sum(r => r.Devoluciones).ToString();
+        lblValorVentas.Text = totalVentas.ToString("C2");
 
         lblTotal.Text = $"Mostrando {_resumen.Count} producto(s)";
     }

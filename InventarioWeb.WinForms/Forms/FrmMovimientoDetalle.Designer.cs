@@ -56,6 +56,9 @@
             this.btnExportarPdf = new System.Windows.Forms.Button();
             this.btnCerrar = new System.Windows.Forms.Button();
 
+            this.lblMotivoTitulo = new System.Windows.Forms.Label();
+            this.lblMotivoValor = new System.Windows.Forms.Label();
+
             this.panelTop.SuspendLayout();
             this.panelInfo.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvDetalles)).BeginInit();
@@ -94,6 +97,8 @@
             this.panelInfo.Controls.Add(this.lblDocumentoTitulo);
             this.panelInfo.Controls.Add(this.lblTipoValor);
             this.panelInfo.Controls.Add(this.lblTipoTitulo);
+            this.panelInfo.Controls.Add(this.lblMotivoTitulo);
+            this.panelInfo.Controls.Add(this.lblMotivoValor);
             this.panelInfo.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelInfo.Location = new System.Drawing.Point(0, 60);
             this.panelInfo.Name = "panelInfo";
@@ -181,6 +186,21 @@
             this.lblDestinoValor.Name = "lblDestinoValor";
             this.lblDestinoValor.Size = new System.Drawing.Size(50, 19);
             this.lblDestinoValor.Text = "-";
+
+            // Motivo
+            this.lblMotivoTitulo.AutoSize = true;
+            this.lblMotivoTitulo.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
+            this.lblMotivoTitulo.Location = new System.Drawing.Point(lblLeft, y);
+            this.lblMotivoTitulo.Name = "lblMotivoTitulo";
+            this.lblMotivoTitulo.Size = new System.Drawing.Size(50, 15);
+            this.lblMotivoTitulo.Text = "Motivo:";
+
+            this.lblMotivoValor.AutoSize = true;
+            this.lblMotivoValor.Font = new System.Drawing.Font("Segoe UI", 10F);
+            this.lblMotivoValor.Location = new System.Drawing.Point(valLeft, y - 2);
+            this.lblMotivoValor.Name = "lblMotivoValor";
+            this.lblMotivoValor.Size = new System.Drawing.Size(50, 19);
+            this.lblMotivoValor.Text = "-";            
 
             y += 35;
 
@@ -360,6 +380,9 @@
         private System.Windows.Forms.Label lblTotalValor;
         private System.Windows.Forms.Button btnExportarPdf;
         private System.Windows.Forms.Button btnCerrar;
+
+        private System.Windows.Forms.Label lblMotivoTitulo;
+        private System.Windows.Forms.Label lblMotivoValor;
 
         #endregion
     }
