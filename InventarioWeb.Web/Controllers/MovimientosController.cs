@@ -43,27 +43,6 @@ public class MovimientosController : Controller
         });
     }
 
-    //[HttpPost]
-    //[ValidateAntiForgeryToken]
-    //public async Task<IActionResult> Create(MovimientoDto movimientoDto)
-    //{
-    //    if (ModelState.IsValid)
-    //    {
-    //        var result = await _movimientoService.CreateMovimientoAsync(movimientoDto);
-
-    //        if (result.IsSuccess)
-    //        {
-    //            TempData["Mensaje"] = result.SuccessMessage;
-    //            return RedirectToAction(nameof(Index));
-    //        }
-
-    //        ModelState.AddModelError("", result.ErrorMessage!);
-    //    }
-
-    //    await CargarListasAsync();
-    //    return View(movimientoDto);
-    //}
-
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(MovimientoDto movimientoDto)
@@ -129,5 +108,32 @@ public class MovimientosController : Controller
             unidad = result.Data.Unidad,
             stockActual = result.Data.StockActual
         });
+    }
+
+    [HttpGet]
+    public async Task<JsonResult> GetProductosPorAlmacen(int almacenId)
+    {
+        if (almacenId <= 0)
+            return Json(new { success = false, message = "Almacén no válido" });
+
+        var result = await _movimientoService.GetProductosPorAlmacenAsync(almacenId);
+
+        if (result.IsFailure)
+            return Json(new { success = false, message = result.ErrorMessage });
+
+        var productos = result.Data!.Select(p => new
+        {
+            id = p.ProductoId,
+            codigo = p.Codigo,
+            nombre = p.Nombre,
+            stock = p.StockActual,
+            unidad = p.UnidadAbreviatura,
+            precioCosto = p.PrecioCosto ?? 0,
+            precioMinorista = p.PrecioVentaMinorista,
+            precioMayorista = p.PrecioVentaMayorista ?? 0,
+            display = $"{p.Codigo} - {p.Nombre} [Stock: {p.StockActual} {p.UnidadAbreviatura}]"
+        });
+
+        return Json(new { success = true, data = productos });
     }
 }

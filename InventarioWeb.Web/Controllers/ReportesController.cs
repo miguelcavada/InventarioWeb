@@ -148,6 +148,60 @@ public class ReportesController : Controller
     }
 
     // GET: Reportes/InventarioDiario
+    //public async Task<IActionResult> InventarioDiario(int almacenId, DateTime? fecha = null)
+    //{
+    //    if (!fecha.HasValue) fecha = DateTime.Today;
+
+    //    var almacen = await _unitOfWork.Almacenes.GetAlmacenConStocksAsync(almacenId);
+    //    if (almacen == null) return NotFound();
+
+    //    ViewBag.AlmacenId = almacenId;
+    //    ViewBag.AlmacenNombre = almacen.Nombre;
+    //    ViewBag.Fecha = fecha.Value;
+
+    //    // Preparar datos para la vista
+    //    var resumen = new List<InventarioDiarioResumenDto>();
+
+    //    if (almacen.Stocks != null)
+    //    {
+    //        foreach (var stock in almacen.Stocks.OrderBy(s => s.Producto?.Nombre))
+    //        {
+    //            var producto = stock.Producto;
+    //            if (producto == null) continue;
+
+    //            var existenciaFinal = stock.StockActual;
+
+    //            var movimientosDia = producto.MovimientosDetalle?
+    //                .Where(d => d.FechaCreacion.Date == fecha.Value.Date
+    //                         && d.Movimiento?.AlmacenOrigenId == almacen.Id)
+    //                .ToList() ?? new();
+
+    //            var entradasDia = (int)movimientosDia.Where(d => d.Movimiento?.Tipo == "ENTRADA").Sum(d => d.Cantidad);
+    //            var salidasDia = (int)movimientosDia.Where(d => d.Movimiento?.Tipo == "SALIDA").Sum(d => d.Cantidad);
+    //            var existenciaInicial = existenciaFinal - entradasDia + salidasDia;
+
+    //            resumen.Add(new InventarioDiarioResumenDto
+    //            {
+    //                ProductoId = producto.Id,
+    //                Codigo = producto.Codigo,
+    //                Producto = producto.Nombre,
+    //                Unidad = producto.UnidadMedida?.Abreviatura ?? "",
+    //                ExistenciaInicial = existenciaInicial,
+    //                Entradas = entradasDia,
+    //                Salidas = salidasDia,
+    //                ExistenciaFinal = existenciaFinal,
+    //                PrecioMinorista = producto.PrecioVentaMinorista,
+    //                PrecioMayorista = producto.PrecioVentaMayorista,
+    //                ValorInventario = existenciaFinal * producto.PrecioVentaMinorista
+    //            });
+    //        }
+    //    }
+
+    //    return View(resumen);
+    //}
+
+    // GET: Reportes/InventarioDiarioExcel
+
     public async Task<IActionResult> InventarioDiario(int almacenId, DateTime? fecha = null)
     {
         if (!fecha.HasValue) fecha = DateTime.Today;
@@ -159,7 +213,6 @@ public class ReportesController : Controller
         ViewBag.AlmacenNombre = almacen.Nombre;
         ViewBag.Fecha = fecha.Value;
 
-        // Preparar datos para la vista
         var resumen = new List<InventarioDiarioResumenDto>();
 
         if (almacen.Stocks != null)
@@ -171,14 +224,28 @@ public class ReportesController : Controller
 
                 var existenciaFinal = stock.StockActual;
 
-                var movimientosDia = producto.MovimientosDetalle?
+                var salidasDia = producto.MovimientosDetalle?
                     .Where(d => d.FechaCreacion.Date == fecha.Value.Date
-                             && d.Movimiento?.AlmacenOrigenId == almacen.Id)
+                             && d.Movimiento?.AlmacenOrigenId == almacen.Id
+                             && d.Movimiento?.Tipo == "SALIDA")
                     .ToList() ?? new();
 
-                var entradasDia = (int)movimientosDia.Where(d => d.Movimiento?.Tipo == "ENTRADA").Sum(d => d.Cantidad);
-                var salidasDia = (int)movimientosDia.Where(d => d.Movimiento?.Tipo == "SALIDA").Sum(d => d.Cantidad);
-                var existenciaInicial = existenciaFinal - entradasDia + salidasDia;
+                var entradasDia = (int)(producto.MovimientosDetalle?
+                    .Where(d => d.FechaCreacion.Date == fecha.Value.Date
+                             && d.Movimiento?.AlmacenOrigenId == almacen.Id
+                             && d.Movimiento?.Tipo == "ENTRADA")
+                    .Sum(d => d.Cantidad) ?? 0);
+
+                var ventas = (int)salidasDia.Where(d => d.Movimiento?.MotivoSalida == "VENTA").Sum(d => d.Cantidad);
+                var mermas = (int)salidasDia.Where(d => d.Movimiento?.MotivoSalida == "MERMA").Sum(d => d.Cantidad);
+                var devoluciones = (int)salidasDia.Where(d => d.Movimiento?.MotivoSalida == "DEVOLUCION").Sum(d => d.Cantidad);
+                var otrasSalidas = (int)salidasDia.Where(d => d.Movimiento?.MotivoSalida != "VENTA"
+                                                           && d.Movimiento?.MotivoSalida != "MERMA"
+                                                           && d.Movimiento?.MotivoSalida != "DEVOLUCION").Sum(d => d.Cantidad);
+
+                var totalSalidas = ventas + mermas + devoluciones + otrasSalidas;
+                var existenciaInicial = existenciaFinal - entradasDia + totalSalidas;
+                var valorVentas = ventas * producto.PrecioVentaMinorista;
 
                 resumen.Add(new InventarioDiarioResumenDto
                 {
@@ -188,11 +255,15 @@ public class ReportesController : Controller
                     Unidad = producto.UnidadMedida?.Abreviatura ?? "",
                     ExistenciaInicial = existenciaInicial,
                     Entradas = entradasDia,
-                    Salidas = salidasDia,
+                    Ventas = ventas,
+                    Mermas = mermas,
+                    Devoluciones = devoluciones,
+                    OtrasSalidas = otrasSalidas,
+                    Salidas = totalSalidas,
                     ExistenciaFinal = existenciaFinal,
                     PrecioMinorista = producto.PrecioVentaMinorista,
                     PrecioMayorista = producto.PrecioVentaMayorista,
-                    ValorInventario = existenciaFinal * producto.PrecioVentaMinorista
+                    ValorVentas = valorVentas
                 });
             }
         }
@@ -200,7 +271,6 @@ public class ReportesController : Controller
         return View(resumen);
     }
 
-    // GET: Reportes/InventarioDiarioExcel
     public async Task<IActionResult> InventarioDiarioExcel(int almacenId, DateTime? fecha = null)
     {
         if (!fecha.HasValue) fecha = DateTime.Today;

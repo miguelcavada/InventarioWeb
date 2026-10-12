@@ -38,6 +38,28 @@
                     }
                 </div>
 
+                @if (esSalida && !string.IsNullOrEmpty(Model.MotivoSalida))
+                {
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <strong>Motivo:</strong>
+                            @{
+                                var motivoBadge = Model.MotivoSalida switch
+                                {
+                                    "VENTA" => "bg-success",
+                                    "MERMA" => "bg-danger",
+                                    "DEVOLUCION" => "bg-warning",
+                                    "AJUSTE" => "bg-info",
+                                    _ => "bg-secondary"
+                                };
+                            }
+                            <span class="badge @motivoBadge fs-6">
+                                @InventarioWeb.Core.Constants.MotivosSalida.GetDescripcion(Model.MotivoSalida)
+                            </span>
+                        </div>
+                    </div>
+                }
+
                 @if (!string.IsNullOrEmpty(Model.Observacion))
                 {
                     <div class="alert alert-info">

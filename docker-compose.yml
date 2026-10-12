@@ -1,0 +1,6 @@
+services:
+  inventarioweb.web:
+    image: ${DOCKER_REGISTRY-}inventariowebweb
+    build:
+      context: .
+      dockerfile: InventarioWeb.Web\Dockerfile

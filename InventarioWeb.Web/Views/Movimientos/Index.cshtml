@@ -59,6 +59,7 @@
                     <tr>
                         <th>Documento</th>
                         <th>Tipo</th>
+                        <th>Motivo</th>
                         <th>Origen</th>
                         <th>Destino</th>
                         <th>Fecha</th>
@@ -92,16 +93,33 @@
                                         break;
                                 }
                             </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.MotivoSalida))
+                                {
+                                    var motivoBadge = item.MotivoSalida switch
+                                    {
+                                        "VENTA" => "bg-success",
+                                        "MERMA" => "bg-danger",
+                                        "DEVOLUCION" => "bg-warning",
+                                        "AJUSTE" => "bg-info",
+                                        _ => "bg-secondary"
+                                    };
+                                    <span class="badge @motivoBadge">
+                                        @InventarioWeb.Core.Constants.MotivosSalida.GetDescripcion(item.MotivoSalida)
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small">-</span>
+                                }
+                            </td>
                             <td><small>@item.AlmacenOrigenNombre</small></td>
                             <td><small>@item.AlmacenDestinoNombre</small></td>
                             <td>@item.FechaMovimiento.ToString("dd/MM/yyyy HH:mm")</td>
-                            <td>@item.Observacion</td>
-                            <td class="text-end">
-                                <strong>@item.Total.ToString("C2")</strong>
-                            </td>
+                            <td><small>@item.Observacion</small></td>
+                            <td class="text-end"><strong>@item.Total.ToString("C2")</strong></td>
                             <td class="text-center">
-                                <a asp-action="Details" asp-route-id="@item.Id"
-                                   class="btn btn-info btn-sm">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">
                                     <i class="bi bi-eye"></i> Ver
                                 </a>
                             </td>
