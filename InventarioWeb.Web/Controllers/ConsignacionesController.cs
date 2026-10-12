@@ -98,4 +98,31 @@ public class ConsignacionesController : Controller
         var almacenes = await _unitOfWork.Almacenes.GetAlmacenesActivosAsync();
         ViewBag.Almacenes = new SelectList(almacenes, "Id", "Nombre");
     }
+
+    [HttpGet]
+    public async Task<JsonResult> GetProductosPorAlmacen(int almacenId)
+    {
+        if (almacenId <= 0)
+            return Json(new { success = false, message = "Almacén no válido" });
+
+        var result = await _consignacionService.GetProductosPorAlmacenAsync(almacenId);
+
+        if (result.IsFailure)
+            return Json(new { success = false, message = result.ErrorMessage });
+
+        var productos = result.Data!.Select(p => new
+        {
+            id = p.ProductoId,
+            codigo = p.Codigo,
+            nombre = p.Nombre,
+            stock = p.StockActual,
+            unidad = p.UnidadAbreviatura,
+            precioCosto = p.PrecioCosto ?? 0,
+            precioMinorista = p.PrecioVentaMinorista,
+            precioMayorista = p.PrecioVentaMayorista ?? 0,
+            display = $"{p.Codigo} - {p.Nombre} [Stock: {p.StockActual} {p.UnidadAbreviatura}]"
+        });
+
+        return Json(new { success = true, data = productos });
+    }
 }

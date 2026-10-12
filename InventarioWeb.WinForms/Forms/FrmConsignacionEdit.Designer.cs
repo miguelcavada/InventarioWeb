@@ -56,6 +56,11 @@
             this.lblCantidad = new System.Windows.Forms.Label();
             this.cmbProducto = new System.Windows.Forms.ComboBox();
             this.lblProducto = new System.Windows.Forms.Label();
+
+            this.lblEstadoProductos = new System.Windows.Forms.Label();
+            this.txtStockInfo = new System.Windows.Forms.TextBox();
+            this.lblStockInfoTitulo = new System.Windows.Forms.Label();
+
             this.panelBotones = new System.Windows.Forms.Panel();
             this.btnGuardar = new System.Windows.Forms.Button();
             this.btnCancelar = new System.Windows.Forms.Button();
@@ -141,6 +146,7 @@
             this.cmbAlmacen.Name = "cmbAlmacen";
             this.cmbAlmacen.Size = new System.Drawing.Size(250, 23);
             this.cmbAlmacen.TabIndex = 2;
+            this.cmbAlmacen.SelectedIndexChanged += new System.EventHandler(this.cmbAlmacen_SelectedIndexChanged);
 
             y += 40;
 
@@ -221,8 +227,11 @@
             this.panelDetalle.Size = new System.Drawing.Size(950, 340);
             this.panelDetalle.TabIndex = 3;
 
-            // panelAgregar
+            // ===== panelAgregar =====
+            this.panelAgregar.Controls.Add(this.lblEstadoProductos);
             this.panelAgregar.Controls.Add(this.btnAgregarProducto);
+            this.panelAgregar.Controls.Add(this.txtStockInfo);
+            this.panelAgregar.Controls.Add(this.lblStockInfoTitulo);
             this.panelAgregar.Controls.Add(this.numCantidad);
             this.panelAgregar.Controls.Add(this.lblCantidad);
             this.panelAgregar.Controls.Add(this.cmbProducto);
@@ -230,28 +239,34 @@
             this.panelAgregar.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelAgregar.Location = new System.Drawing.Point(20, 10);
             this.panelAgregar.Name = "panelAgregar";
-            this.panelAgregar.Size = new System.Drawing.Size(910, 60);
+            this.panelAgregar.Size = new System.Drawing.Size(910, 90);
             this.panelAgregar.TabIndex = 0;
 
+            // lblProducto
             this.lblProducto.AutoSize = true;
-            this.lblProducto.Location = new System.Drawing.Point(0, 20);
+            this.lblProducto.Location = new System.Drawing.Point(0, 10);
             this.lblProducto.Name = "lblProducto";
             this.lblProducto.Size = new System.Drawing.Size(60, 15);
             this.lblProducto.Text = "Producto:";
 
+            // cmbProducto
             this.cmbProducto.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbProducto.Location = new System.Drawing.Point(70, 17);
+            this.cmbProducto.Location = new System.Drawing.Point(0, 30);
             this.cmbProducto.Name = "cmbProducto";
-            this.cmbProducto.Size = new System.Drawing.Size(350, 23);
+            this.cmbProducto.Size = new System.Drawing.Size(400, 23);
             this.cmbProducto.TabIndex = 0;
+            this.cmbProducto.SelectedIndexChanged += new System.EventHandler(this.cmbProducto_SelectedIndexChanged);
 
+            // lblCantidad
             this.lblCantidad.AutoSize = true;
-            this.lblCantidad.Location = new System.Drawing.Point(440, 20);
+            this.lblCantidad.Location = new System.Drawing.Point(420, 10);
             this.lblCantidad.Name = "lblCantidad";
             this.lblCantidad.Size = new System.Drawing.Size(60, 15);
             this.lblCantidad.Text = "Cantidad:";
 
-            this.numCantidad.Location = new System.Drawing.Point(510, 17);
+            // numCantidad
+            this.numCantidad.Enabled = false;
+            this.numCantidad.Location = new System.Drawing.Point(420, 30);
             this.numCantidad.Maximum = 9999999;
             this.numCantidad.Minimum = 1;
             this.numCantidad.Name = "numCantidad";
@@ -259,16 +274,43 @@
             this.numCantidad.TabIndex = 1;
             this.numCantidad.Value = 1;
 
+            // lblStockInfoTitulo
+            this.lblStockInfoTitulo.AutoSize = true;
+            this.lblStockInfoTitulo.Location = new System.Drawing.Point(540, 10);
+            this.lblStockInfoTitulo.Name = "lblStockInfoTitulo";
+            this.lblStockInfoTitulo.Size = new System.Drawing.Size(40, 15);
+            this.lblStockInfoTitulo.Text = "Stock:";
+
+            // txtStockInfo
+            this.txtStockInfo.Enabled = false;
+            this.txtStockInfo.Location = new System.Drawing.Point(540, 30);
+            this.txtStockInfo.Name = "txtStockInfo";
+            this.txtStockInfo.ReadOnly = true;
+            this.txtStockInfo.Size = new System.Drawing.Size(120, 23);
+            this.txtStockInfo.TabIndex = 2;
+            this.txtStockInfo.BackColor = System.Drawing.Color.White;
+
+            // btnAgregarProducto
             this.btnAgregarProducto.BackColor = System.Drawing.Color.FromArgb(46, 196, 182);
+            this.btnAgregarProducto.Enabled = false;
             this.btnAgregarProducto.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAgregarProducto.ForeColor = System.Drawing.Color.White;
-            this.btnAgregarProducto.Location = new System.Drawing.Point(625, 15);
+            this.btnAgregarProducto.Location = new System.Drawing.Point(680, 28);
             this.btnAgregarProducto.Name = "btnAgregarProducto";
-            this.btnAgregarProducto.Size = new System.Drawing.Size(85, 28);
-            this.btnAgregarProducto.TabIndex = 2;
-            this.btnAgregarProducto.Text = "➕ Agregar";
+            this.btnAgregarProducto.Size = new System.Drawing.Size(150, 28);
+            this.btnAgregarProducto.TabIndex = 3;
+            this.btnAgregarProducto.Text = "➕ Agregar Producto";
             this.btnAgregarProducto.UseVisualStyleBackColor = false;
             this.btnAgregarProducto.Click += new System.EventHandler(this.btnAgregarProducto_Click);
+
+            // lblEstadoProductos
+            this.lblEstadoProductos.AutoSize = true;
+            this.lblEstadoProductos.Font = new System.Drawing.Font("Segoe UI", 8F, System.Drawing.FontStyle.Italic);
+            this.lblEstadoProductos.ForeColor = System.Drawing.Color.Gray;
+            this.lblEstadoProductos.Location = new System.Drawing.Point(0, 65);
+            this.lblEstadoProductos.Name = "lblEstadoProductos";
+            this.lblEstadoProductos.Size = new System.Drawing.Size(300, 13);
+            this.lblEstadoProductos.Text = "Seleccione primero un almacén";
 
             // dgvDetalles
             this.dgvDetalles.AllowUserToAddRows = false;
@@ -279,14 +321,14 @@
             this.dgvDetalles.ColumnHeadersDefaultCellStyle.ForeColor = System.Drawing.Color.White;
             this.dgvDetalles.ColumnHeadersHeight = 30;
             this.dgvDetalles.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dgvDetalles.Location = new System.Drawing.Point(20, 70);
+            this.dgvDetalles.Location = new System.Drawing.Point(20, 100);
             this.dgvDetalles.MultiSelect = false;
             this.dgvDetalles.Name = "dgvDetalles";
             this.dgvDetalles.ReadOnly = true;
             this.dgvDetalles.RowHeadersVisible = false;
             this.dgvDetalles.RowTemplate.Height = 28;
             this.dgvDetalles.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvDetalles.Size = new System.Drawing.Size(910, 230);
+            this.dgvDetalles.Size = new System.Drawing.Size(910, 210);
             this.dgvDetalles.TabIndex = 1;
             this.dgvDetalles.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvDetalles_CellContentClick);
 
@@ -397,6 +439,10 @@
         private System.Windows.Forms.Label lblTotal;
         private System.Windows.Forms.Button btnGuardar;
         private System.Windows.Forms.Button btnCancelar;
+
+        private System.Windows.Forms.Label lblEstadoProductos;
+        private System.Windows.Forms.TextBox txtStockInfo;
+        private System.Windows.Forms.Label lblStockInfoTitulo;
 
         #endregion
     }

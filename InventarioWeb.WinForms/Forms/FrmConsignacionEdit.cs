@@ -14,69 +14,76 @@ public partial class FrmConsignacionEdit : Form
 {
     private readonly IConsignacionService _consignacionService;
     private readonly IAlmacenService _almacenService;
-    private readonly IProductoService _productoService;
 
     public ModoEdicion Modo { get; set; } = ModoEdicion.Nuevo;
 
     private List<AlmacenDto> _almacenes = new();
-    private List<ProductoDto> _productos = new();
+    private List<ProductoStockDto> _productosDelAlmacen = new();
     private List<ConsignacionDetalleDto> _detalles = new();
+
+    private bool _cargandoCombos = false;
+    private int? _almacenSeleccionado = null;
 
     public FrmConsignacionEdit(
         IConsignacionService consignacionService,
-        IAlmacenService almacenService,
-        IProductoService productoService)
+        IAlmacenService almacenService)
     {
         InitializeComponent();
         _consignacionService = consignacionService;
         _almacenService = almacenService;
-        _productoService = productoService;
     }
 
+    // ============================================================
+    // LOAD
+    // ============================================================
     private async void FrmConsignacionEdit_Load(object sender, EventArgs e)
     {
-        await CargarCombosAsync();
+        await CargarCombosBaseAsync();
 
         dtpFecha.Value = DateTime.Now;
         GenerarNumeroConsignacion();
         ConfigurarGridDetalles();
+
+        // Estado inicial
+        LimpiarComboProductos();
     }
 
-    private async Task CargarCombosAsync()
+    // ============================================================
+    // CARGA DE COMBOS BASE
+    // ============================================================
+    private async Task CargarCombosBaseAsync()
     {
-        // Almacenes
-        var almResult = await _almacenService.GetAlmacenesAsync();
-        if (almResult.IsSuccess && almResult.Data != null)
-        {
-            _almacenes = almResult.Data.Where(a => a.Activo).ToList();
+        _cargandoCombos = true;
 
-            cmbAlmacen.DataSource = _almacenes.Select(a => new ComboItem
+        try
+        {
+            // Almacenes
+            var almResult = await _almacenService.GetAlmacenesAsync();
+            if (almResult.IsSuccess && almResult.Data != null)
             {
-                Id = a.Id,
-                Nombre = $"{a.Nombre} ({(a.Tipo == "MERCADO" ? "Mercado" : "Almacén")})"
-            }).ToList();
-            cmbAlmacen.DisplayMember = "Nombre";
-            cmbAlmacen.ValueMember = "Id";
-            cmbAlmacen.SelectedIndex = -1;
+                _almacenes = almResult.Data.Where(a => a.Activo).ToList();
+
+                var almacenesCombo = _almacenes.Select(a => new ComboItem
+                {
+                    Id = a.Id,
+                    Nombre = $"{a.Nombre} ({(a.Tipo == "MERCADO" ? "Mercado" : "Almacén")})"
+                }).ToList();
+
+                cmbAlmacen.DataSource = almacenesCombo;
+                cmbAlmacen.DisplayMember = "Nombre";
+                cmbAlmacen.ValueMember = "Id";
+                cmbAlmacen.SelectedIndex = -1;
+            }
         }
-
-        // Productos
-        var prodResult = await _productoService.GetProductosAsync();
-        if (prodResult.IsSuccess && prodResult.Data != null)
+        finally
         {
-            _productos = prodResult.Data.Where(p => p.Activo).ToList();
-
-            cmbProducto.DataSource = _productos.Select(p => new ComboItem
-            {
-                Id = p.Id,
-                Nombre = $"{p.Codigo} - {p.Nombre}"
-            }).ToList();
-            cmbProducto.DisplayMember = "Nombre";
-            cmbProducto.ValueMember = "Id";
-            cmbProducto.SelectedIndex = -1;
+            _cargandoCombos = false;
         }
     }
 
+    // ============================================================
+    // GRID DE DETALLES
+    // ============================================================
     private void ConfigurarGridDetalles()
     {
         dgvDetalles.AutoGenerateColumns = false;
@@ -93,21 +100,21 @@ public partial class FrmConsignacionEdit : Form
         {
             Name = "colProducto",
             HeaderText = "Producto",
-            Width = 250
+            Width = 280
         });
 
         dgvDetalles.Columns.Add(new DataGridViewTextBoxColumn
         {
             Name = "colCantidad",
             HeaderText = "Cantidad",
-            Width = 100
+            Width = 90
         });
 
         dgvDetalles.Columns.Add(new DataGridViewTextBoxColumn
         {
             Name = "colPrecio",
-            HeaderText = "Precio Unitario",
-            Width = 120
+            HeaderText = "Precio Unit.",
+            Width = 110
         });
 
         dgvDetalles.Columns.Add(new DataGridViewTextBoxColumn
@@ -127,13 +134,163 @@ public partial class FrmConsignacionEdit : Form
         });
     }
 
-    private void GenerarNumeroConsignacion()
+    // ============================================================
+    // EVENTO: CAMBIO DE ALMACÉN
+    // ============================================================
+    private async void cmbAlmacen_SelectedIndexChanged(object sender, EventArgs e)
     {
-        txtNumeroConsignacion.Text = $"CONS-{DateTime.Now:yyyyMMddHHmmss}";
+        // Prevenir durante carga inicial
+        if (!IsHandleCreated || DesignMode || _cargandoCombos) return;
+
+        var almacenItem = cmbAlmacen.SelectedItem as ComboItem;
+
+        if (almacenItem == null || almacenItem.Id <= 0)
+        {
+            LimpiarComboProductos();
+            return;
+        }
+
+        // Si ya hay detalles y cambia el almacén, preguntar
+        if (_detalles.Count > 0 && _almacenSeleccionado.HasValue
+            && _almacenSeleccionado.Value != almacenItem.Id)
+        {
+            var result = MessageBox.Show(
+                "Ha cambiado el almacén.\n\n" +
+                "Los productos ya agregados podrían no tener stock en el nuevo almacén.\n\n" +
+                "¿Desea limpiar los detalles agregados?",
+                "Cambio de almacén",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            if (result == DialogResult.Yes)
+            {
+                _detalles.Clear();
+                RefrescarGrid();
+            }
+        }
+
+        _almacenSeleccionado = almacenItem.Id;
+        await CargarProductosDelAlmacenAsync(almacenItem.Id);
     }
 
+    // ============================================================
+    // CARGA DE PRODUCTOS DEL ALMACÉN
+    // ============================================================
+    private async Task CargarProductosDelAlmacenAsync(int almacenId)
+    {
+        try
+        {
+            lblEstadoProductos.Text = "⏳ Cargando productos...";
+            lblEstadoProductos.ForeColor = System.Drawing.Color.Blue;
+
+            // Limpiar combo
+            cmbProducto.DataSource = null;
+            cmbProducto.Items.Clear();
+            _productosDelAlmacen.Clear();
+            cmbProducto.Enabled = false;
+
+            // Consultar servicio
+            var result = await _consignacionService.GetProductosPorAlmacenAsync(almacenId);
+
+            if (!result.IsSuccess || result.Data == null)
+            {
+                lblEstadoProductos.Text = $"⚠️ {result.ErrorMessage}";
+                lblEstadoProductos.ForeColor = System.Drawing.Color.OrangeRed;
+                return;
+            }
+
+            _productosDelAlmacen = result.Data.ToList();
+
+            if (!_productosDelAlmacen.Any())
+            {
+                lblEstadoProductos.Text = "⚠️ Este almacén no tiene productos con stock";
+                lblEstadoProductos.ForeColor = System.Drawing.Color.OrangeRed;
+                return;
+            }
+
+            // Crear items del combo con stock visible
+            var productosCombo = _productosDelAlmacen.Select(p => new ComboItem
+            {
+                Id = p.ProductoId,
+                Nombre = $"{p.Codigo} - {p.Nombre} [Stock: {p.StockActual} {p.UnidadAbreviatura}]"
+            }).ToList();
+
+            // BindingSource para asegurar el refresco
+            var bindingSource = new BindingSource();
+            bindingSource.DataSource = productosCombo;
+
+            cmbProducto.DataSource = bindingSource;
+            cmbProducto.DisplayMember = "Nombre";
+            cmbProducto.ValueMember = "Id";
+            cmbProducto.SelectedIndex = -1;
+            cmbProducto.Enabled = true;
+            cmbProducto.Refresh();
+
+            lblEstadoProductos.Text = $"✅ {_productosDelAlmacen.Count} producto(s) con stock disponible";
+            lblEstadoProductos.ForeColor = System.Drawing.Color.Green;
+
+            // Habilitar controles
+            numCantidad.Enabled = true;
+            btnAgregarProducto.Enabled = true;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error al cargar productos: {ex.Message}",
+                "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            lblEstadoProductos.Text = "❌ Error al cargar productos";
+            lblEstadoProductos.ForeColor = System.Drawing.Color.Red;
+        }
+    }
+
+    private void LimpiarComboProductos()
+    {
+        cmbProducto.DataSource = null;
+        cmbProducto.Items.Clear();
+        cmbProducto.Items.Add("-- Seleccione primero un almacén --");
+        cmbProducto.Enabled = false;
+        _productosDelAlmacen.Clear();
+
+        numCantidad.Enabled = false;
+        numCantidad.Value = 1;
+        txtStockInfo.Text = "";
+        btnAgregarProducto.Enabled = false;
+
+        lblEstadoProductos.Text = "Seleccione primero un almacén";
+        lblEstadoProductos.ForeColor = System.Drawing.Color.Gray;
+    }
+
+    // ============================================================
+    // EVENTO: CAMBIO DE PRODUCTO (Mostrar stock)
+    // ============================================================
+    private void cmbProducto_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        var productoItem = cmbProducto.SelectedItem as ComboItem;
+
+        if (productoItem == null || productoItem.Id <= 0)
+        {
+            txtStockInfo.Text = "";
+            return;
+        }
+
+        var producto = _productosDelAlmacen.FirstOrDefault(p => p.ProductoId == productoItem.Id);
+        if (producto != null)
+        {
+            txtStockInfo.Text = $"{producto.StockActual} {producto.UnidadAbreviatura}";
+        }
+    }
+
+    // ============================================================
+    // AGREGAR PRODUCTO
+    // ============================================================
     private void btnAgregarProducto_Click(object sender, EventArgs e)
     {
+        if (cmbAlmacen.SelectedIndex < 0)
+        {
+            MessageBox.Show("Seleccione primero un almacén", "Aviso",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
         if (cmbProducto.SelectedIndex < 0)
         {
             MessageBox.Show("Seleccione un producto", "Aviso",
@@ -150,11 +307,34 @@ public partial class FrmConsignacionEdit : Form
 
         var productoItem = cmbProducto.SelectedItem as ComboItem;
         int productoId = productoItem!.Id;
-        var producto = _productos.FirstOrDefault(p => p.Id == productoId);
+        var producto = _productosDelAlmacen.FirstOrDefault(p => p.ProductoId == productoId);
 
-        if (producto == null) return;
+        if (producto == null)
+        {
+            MessageBox.Show("Producto no encontrado", "Aviso",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
 
-        // Verificar si ya existe
+        // Validar stock disponible
+        var cantidadExistente = _detalles
+            .Where(d => d.ProductoId == productoId)
+            .Sum(d => d.CantidadEntregada);
+
+        var cantidadTotal = cantidadExistente + (int)numCantidad.Value;
+
+        if (cantidadTotal > producto.StockActual)
+        {
+            MessageBox.Show(
+                $"Stock insuficiente para '{producto.Nombre}'.\n\n" +
+                $"Stock disponible: {producto.StockActual} {producto.UnidadAbreviatura}\n" +
+                $"Cantidad solicitada: {cantidadTotal}",
+                "Stock insuficiente",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
+        // Agregar o actualizar detalle
         var existente = _detalles.FirstOrDefault(d => d.ProductoId == productoId);
         if (existente != null)
         {
@@ -176,10 +356,15 @@ public partial class FrmConsignacionEdit : Form
 
         RefrescarGrid();
 
+        // Limpiar campos
         cmbProducto.SelectedIndex = -1;
         numCantidad.Value = 1;
+        txtStockInfo.Text = "";
     }
 
+    // ============================================================
+    // GRID
+    // ============================================================
     private void RefrescarGrid()
     {
         dgvDetalles.Rows.Clear();
@@ -217,6 +402,17 @@ public partial class FrmConsignacionEdit : Form
         }
     }
 
+    // ============================================================
+    // UTILIDADES
+    // ============================================================
+    private void GenerarNumeroConsignacion()
+    {
+        txtNumeroConsignacion.Text = $"CONS-{DateTime.Now:yyyyMMddHHmmss}";
+    }
+
+    // ============================================================
+    // GUARDAR
+    // ============================================================
     private async void btnGuardar_Click(object sender, EventArgs e)
     {
         if (!ValidarFormulario()) return;
@@ -228,9 +424,12 @@ public partial class FrmConsignacionEdit : Form
             NumeroConsignacion = txtNumeroConsignacion.Text.Trim(),
             FechaEntrega = dtpFecha.Value,
             VendedorNombre = txtVendedorNombre.Text.Trim(),
-            VendedorContacto = string.IsNullOrWhiteSpace(txtVendedorContacto.Text) ? null : txtVendedorContacto.Text.Trim(),
-            VendedorTelefono = string.IsNullOrWhiteSpace(txtVendedorTelefono.Text) ? null : txtVendedorTelefono.Text.Trim(),
-            Observaciones = string.IsNullOrWhiteSpace(txtObservaciones.Text) ? null : txtObservaciones.Text.Trim(),
+            VendedorContacto = string.IsNullOrWhiteSpace(txtVendedorContacto.Text)
+                ? null : txtVendedorContacto.Text.Trim(),
+            VendedorTelefono = string.IsNullOrWhiteSpace(txtVendedorTelefono.Text)
+                ? null : txtVendedorTelefono.Text.Trim(),
+            Observaciones = string.IsNullOrWhiteSpace(txtObservaciones.Text)
+                ? null : txtObservaciones.Text.Trim(),
             AlmacenOrigenId = almacenItem?.Id ?? 0,
             Estado = "PENDIENTE",
             Detalles = _detalles
@@ -297,7 +496,8 @@ public partial class FrmConsignacionEdit : Form
     {
         if (_detalles.Count > 0)
         {
-            var confirm = MessageBox.Show("¿Cancelar? Se perderán los cambios no guardados.",
+            var confirm = MessageBox.Show(
+                "¿Cancelar? Se perderán los cambios no guardados.",
                 "Confirmar", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (confirm != DialogResult.Yes) return;
         }

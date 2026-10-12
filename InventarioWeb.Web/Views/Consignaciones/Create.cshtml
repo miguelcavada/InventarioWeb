@@ -4,15 +4,18 @@
 }
 
 <div class="row">
-    <div class="col-md-10 mx-auto">
+    <div class="col-md-11 mx-auto">
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Nueva Consignación</h4>
+                <h4 class="mb-0">
+                    <i class="bi bi-box-arrow-right"></i> Nueva Consignación
+                </h4>
             </div>
             <div class="card-body">
                 <form asp-action="Create" id="formConsignacion">
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-                    
+
+                    <!-- Datos generales -->
                     <div class="row mb-3">
                         <div class="col-md-4">
                             <label asp-for="NumeroConsignacion" class="form-label"></label>
@@ -25,16 +28,18 @@
                             <span asp-validation-for="FechaEntrega" class="text-danger"></span>
                         </div>
                         <div class="col-md-4">
-                            <label asp-for="AlmacenOrigenId" class="form-label">Almacén Origen</label>
-                            <select asp-for="AlmacenOrigenId" class="form-select" asp-items="ViewBag.Almacenes" required>
-                                <option value="">-- Seleccione --</option>
+                            <label asp-for="AlmacenOrigenId" class="form-label">Almacén Origen <span class="text-danger">*</span></label>
+                            <select asp-for="AlmacenOrigenId" class="form-select" asp-items="ViewBag.Almacenes" required id="cmbAlmacenOrigen">
+                                <option value="">-- Seleccione un almacén --</option>
                             </select>
+                            <span asp-validation-for="AlmacenOrigenId" class="text-danger"></span>
                         </div>
                     </div>
 
+                    <!-- Datos del vendedor -->
                     <div class="row mb-3">
                         <div class="col-md-4">
-                            <label asp-for="VendedorNombre" class="form-label"></label>
+                            <label asp-for="VendedorNombre" class="form-label">Vendedor</label>
                             <input asp-for="VendedorNombre" class="form-control" placeholder="Nombre del vendedor" required />
                             <span asp-validation-for="VendedorNombre" class="text-danger"></span>
                         </div>
@@ -50,46 +55,57 @@
 
                     <div class="mb-3">
                         <label asp-for="Observaciones" class="form-label"></label>
-                        <textarea asp-for="Observaciones" class="form-control" rows="2" placeholder="Observaciones..."></textarea>
+                        <textarea asp-for="Observaciones" class="form-control" rows="2"
+                                  placeholder="Observaciones sobre la consignación..."></textarea>
                     </div>
 
                     <hr />
-                    <h5>Productos a Consignar</h5>
-                    
-                    <div id="detallesContainer">
-                        <div class="detalle-item mb-3 border p-3 rounded">
-                            <div class="row g-2">
+                    <h5><i class="bi bi-list-check"></i> Productos a Consignar</h5>
+
+                    <div id="estadoProductos" class="alert alert-secondary">
+                        <i class="bi bi-info-circle"></i>
+                        Seleccione un almacén para cargar los productos disponibles.
+                    </div>
+
+                    <!-- Área para agregar productos -->
+                    <div class="card bg-light mb-3">
+                        <div class="card-body">
+                            <div class="row g-2 align-items-end">
                                 <div class="col-md-5">
-                                    <label class="form-label">Producto</label>
-                                    <select name="Detalles[0].ProductoId" class="form-select producto-select" required>
-                                        <option value="">-- Seleccione --</option>
-                                        @foreach (var item in ViewBag.Productos)
-                                        {
-                                            <option value="@item.Value">@item.Text</option>
-                                        }
+                                    <label class="form-label small">Producto</label>
+                                    <select id="cmbProducto" class="form-select" disabled>
+                                        <option value="">-- Seleccione primero un almacén --</option>
                                     </select>
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">Cantidad</label>
-                                    <input name="Detalles[0].CantidadEntregada" class="form-control" type="number" min="1" required />
+                                <div class="col-md-2">
+                                    <label class="form-label small">Cantidad</label>
+                                    <input id="txtCantidad" class="form-control" type="number" min="1" value="1" disabled />
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label small">Stock</label>
+                                    <input id="txtStockInfo" class="form-control bg-white" readonly disabled />
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="form-label">Precio Unitario</label>
-                                    <input name="Detalles[0].PrecioUnitario" class="form-control" type="number" step="0.01" required />
-                                </div>
-                                <div class="col-md-1">
-                                    <label class="form-label">&nbsp;</label>
-                                    <button type="button" class="btn btn-danger btn-remove-detalle d-none">
-                                        <i class="bi bi-trash"></i>
+                                    <button type="button" id="btnAgregarProducto" class="btn btn-success w-100" disabled>
+                                        <i class="bi bi-plus-circle"></i> Agregar Producto
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <button type="button" id="btnAgregarDetalle" class="btn btn-outline-secondary mb-3">
-                        <i class="bi bi-plus-circle"></i> Agregar Producto
-                    </button>
+                    <!-- Detalles agregados -->
+                    <div id="detallesContainer">
+                        <!-- Los detalles se agregan dinámicamente -->
+                    </div>
+
+                    <div class="alert alert-info d-none" id="sinDetalles">
+                        <i class="bi bi-info-circle"></i> No hay productos agregados a la consignación.
+                    </div>
+
+                    <div class="text-end mb-3">
+                        <h4>Total: <span id="totalConsignacion" class="text-success">$0.00</span></h4>
+                    </div>
 
                     <hr />
                     <div class="d-flex justify-content-between">
@@ -109,48 +125,262 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        let detalleIndex = 1;
+        let detalleIndex = 0;
+        let productosDelAlmacen = [];
 
-        function toggleRemoveButtons() {
-            const items = $('.detalle-item');
-            items.find('.btn-remove-detalle').toggleClass('d-none', items.length === 1);
-        }
+        $(document).ready(function() {
+            // Cargar productos cuando cambia el almacén
+            $('#cmbAlmacenOrigen').change(function() {
+                const almacenId = $(this).val();
 
-        $('#btnAgregarDetalle').click(function() {
-            const template = `
-                <div class="detalle-item mb-3 border p-3 rounded">
-                    <div class="row g-2">
-                        <div class="col-md-5">
-                            <select name="Detalles[${detalleIndex}].ProductoId" class="form-select" required>
-                                <option value="">-- Seleccione --</option>
-                                @foreach (var item in ViewBag.Productos)
-                                {
-                                    <option value="@item.Value">@item.Text</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <input name="Detalles[${detalleIndex}].CantidadEntregada" class="form-control" type="number" min="1" required />
-                        </div>
-                        <div class="col-md-3">
-                            <input name="Detalles[${detalleIndex}].PrecioUnitario" class="form-control" type="number" step="0.01" required />
-                        </div>
-                        <div class="col-md-1">
-                            <button type="button" class="btn btn-danger btn-remove-detalle">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>`;
-            
-            $('#detallesContainer').append(template);
-            detalleIndex++;
-            toggleRemoveButtons();
+                if (!almacenId) {
+                    resetComboProductos();
+                    return;
+                }
+
+                cargarProductosPorAlmacen(almacenId);
+            });
+
+            // Mostrar stock al seleccionar producto
+            $('#cmbProducto').change(function() {
+                const productoId = parseInt($(this).val());
+                const producto = productosDelAlmacen.find(p => p.id === productoId);
+
+                if (producto) {
+                    $('#txtStockInfo').val(`${producto.stock} ${producto.unidad}`);
+                } else {
+                    $('#txtStockInfo').val('');
+                }
+            });
+
+            // Agregar producto
+            $('#btnAgregarProducto').click(agregarProductoAlDetalle);
+
+            // Enter en cantidad
+            $('#txtCantidad').keypress(function(e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    agregarProductoAlDetalle();
+                }
+            });
+
+            // Eliminar detalle
+            $(document).on('click', '.btn-remove-detalle', function() {
+                $(this).closest('.detalle-item').remove();
+                actualizarSubtotales();
+                toggleSinDetalles();
+            });
         });
 
-        $(document).on('click', '.btn-remove-detalle', function() {
-            $(this).closest('.detalle-item').remove();
-            toggleRemoveButtons();
+        // ============================================================
+        // CARGAR PRODUCTOS POR ALMACÉN
+        // ============================================================
+        function cargarProductosPorAlmacen(almacenId) {
+            $('#estadoProductos')
+                .removeClass('alert-secondary alert-success alert-warning alert-danger')
+                .addClass('alert-info')
+                .html('<i class="bi bi-hourglass-split"></i> Cargando productos...');
+
+            $.ajax({
+                url: '@Url.Action("GetProductosPorAlmacen", "Consignaciones")',
+                type: 'GET',
+                data: { almacenId: almacenId },
+                success: function(response) {
+                    if (!response.success) {
+                        $('#estadoProductos')
+                            .removeClass('alert-info alert-success')
+                            .addClass('alert-warning')
+                            .html(`<i class="bi bi-exclamation-triangle"></i> ${response.message}`);
+                        resetComboProductos();
+                        return;
+                    }
+
+                    productosDelAlmacen = response.data;
+
+                    if (productosDelAlmacen.length === 0) {
+                        $('#estadoProductos')
+                            .removeClass('alert-info alert-success')
+                            .addClass('alert-warning')
+                            .html('<i class="bi bi-exclamation-triangle"></i> Este almacén no tiene productos con stock.');
+                        resetComboProductos();
+                        return;
+                    }
+
+                    // Llenar combo
+                    let options = '<option value="">-- Seleccione un producto --</option>';
+                    productosDelAlmacen.forEach(p => {
+                        options += `<option value="${p.id}">${p.display}</option>`;
+                    });
+
+                    $('#cmbProducto').html(options).prop('disabled', false);
+                    $('#txtCantidad').prop('disabled', false);
+                    $('#btnAgregarProducto').prop('disabled', false);
+
+                    $('#estadoProductos')
+                        .removeClass('alert-info alert-warning')
+                        .addClass('alert-success')
+                        .html(`<i class="bi bi-check-circle"></i> ${productosDelAlmacen.length} producto(s) con stock disponible.`);
+                },
+                error: function() {
+                    $('#estadoProductos')
+                        .removeClass('alert-info alert-success')
+                        .addClass('alert-danger')
+                        .html('<i class="bi bi-exclamation-triangle"></i> Error al cargar productos.');
+                    resetComboProductos();
+                }
+            });
+        }
+
+        function resetComboProductos() {
+            $('#cmbProducto').html('<option value="">-- Seleccione primero un almacén --</option>').prop('disabled', true);
+            $('#txtCantidad').prop('disabled', true).val(1);
+            $('#txtStockInfo').val('');
+            $('#btnAgregarProducto').prop('disabled', true);
+            productosDelAlmacen = [];
+        }
+
+        // ============================================================
+        // AGREGAR PRODUCTO AL DETALLE
+        // ============================================================
+        function agregarProductoAlDetalle() {
+            const productoId = parseInt($('#cmbProducto').val());
+            const cantidad = parseInt($('#txtCantidad').val());
+
+            if (!productoId) {
+                Swal.fire('Aviso', 'Seleccione un producto', 'warning');
+                return;
+            }
+
+            if (!cantidad || cantidad <= 0) {
+                Swal.fire('Aviso', 'Ingrese una cantidad válida', 'warning');
+                return;
+            }
+
+            const producto = productosDelAlmacen.find(p => p.id === productoId);
+            if (!producto) return;
+
+            // Validar stock disponible
+            const cantidadExistente = calcularCantidadExistente(productoId);
+            const cantidadTotal = cantidadExistente + cantidad;
+
+            if (cantidadTotal > producto.stock) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Stock insuficiente',
+                    html: `
+                        <strong>${producto.nombre}</strong><br><br>
+                        Stock disponible: <b>${producto.stock} ${producto.unidad}</b><br>
+                        Cantidad solicitada: <b>${cantidadTotal}</b>
+                    `
+                });
+                return;
+            }
+
+            // Verificar si ya existe
+            const existente = $(`.detalle-item input[name$=".ProductoId"][value="${productoId}"]`).closest('.detalle-item');
+
+            if (existente.length > 0) {
+                // Actualizar cantidad
+                const cantidadInput = existente.find('.cantidad-input');
+                const nuevaCantidad = parseInt(cantidadInput.val()) + cantidad;
+                cantidadInput.val(nuevaCantidad);
+
+                // Actualizar subtotal
+                const precio = parseFloat(existente.find('.precio-input').val());
+                existente.find('.subtotal-input').val('$' + (nuevaCantidad * precio).toFixed(2));
+            } else {
+                // Precio de venta minorista (para consignaciones)
+                const precio = producto.precioMinorista;
+                const subtotal = cantidad * precio;
+
+                const template = `
+                    <div class="detalle-item mb-2 border rounded p-2">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-md-1 text-center">
+                                <i class="bi bi-box-seam text-primary fs-5"></i>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="hidden" name="Detalles[${detalleIndex}].ProductoId" value="${producto.id}" />
+                                <strong>${producto.codigo}</strong><br>
+                                <small class="text-muted">${producto.nombre}</small>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="small text-muted">Cantidad</label>
+                                <input name="Detalles[${detalleIndex}].CantidadEntregada"
+                                       class="form-control form-control-sm cantidad-input"
+                                       type="number" min="1" value="${cantidad}" readonly />
+                            </div>
+                            <div class="col-md-2">
+                                <label class="small text-muted">Precio</label>
+                                <input name="Detalles[${detalleIndex}].PrecioUnitario"
+                                       class="form-control form-control-sm precio-input"
+                                       type="number" step="0.01" value="${precio.toFixed(2)}" readonly />
+                                <small class="text-muted" style="font-size: 0.7rem;">Minorista</small>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="small text-muted">Subtotal</label>
+                                <input class="form-control form-control-sm subtotal-input bg-light"
+                                       value="$${subtotal.toFixed(2)}" readonly />
+                            </div>
+                            <div class="col-md-1 text-end">
+                                <button type="button" class="btn btn-danger btn-sm btn-remove-detalle">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+
+                $('#detallesContainer').append(template);
+                detalleIndex++;
+            }
+
+            // Limpiar
+            $('#cmbProducto').val('');
+            $('#txtCantidad').val(1);
+            $('#txtStockInfo').val('');
+
+            actualizarSubtotales();
+            toggleSinDetalles();
+        }
+
+        function calcularCantidadExistente(productoId) {
+            let total = 0;
+            $('.detalle-item').each(function() {
+                const id = parseInt($(this).find('input[name$=".ProductoId"]').val());
+                if (id === productoId) {
+                    total += parseInt($(this).find('.cantidad-input').val()) || 0;
+                }
+            });
+            return total;
+        }
+
+        function actualizarSubtotales() {
+            let total = 0;
+            $('.detalle-item').each(function() {
+                const cantidad = parseFloat($(this).find('.cantidad-input').val()) || 0;
+                const precio = parseFloat($(this).find('.precio-input').val()) || 0;
+                const subtotal = cantidad * precio;
+                $(this).find('.subtotal-input').val('$' + subtotal.toFixed(2));
+                total += subtotal;
+            });
+            $('#totalConsignacion').text('$' + total.toFixed(2));
+        }
+
+        function toggleSinDetalles() {
+            if ($('.detalle-item').length === 0) {
+                $('#sinDetalles').removeClass('d-none');
+            } else {
+                $('#sinDetalles').addClass('d-none');
+            }
+        }
+
+        // Validar antes de enviar
+        $('#formConsignacion').submit(function(e) {
+            if ($('.detalle-item').length === 0) {
+                e.preventDefault();
+                Swal.fire('Aviso', 'Debe agregar al menos un producto', 'warning');
+                return false;
+            }
         });
     </script>
 }
