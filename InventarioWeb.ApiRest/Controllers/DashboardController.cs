@@ -1,6 +1,5 @@
 using InventarioWeb.Application.Services;
 using Microsoft.AspNetCore.Mvc;
-using InventarioWeb.Infrastructure.Services;
 
 namespace InventarioWeb.ApiRest.Controllers;
 

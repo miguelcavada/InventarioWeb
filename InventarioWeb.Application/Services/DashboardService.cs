@@ -1,7 +1,7 @@
 ﻿using InventarioWeb.Application.Common;
 using InventarioWeb.Core.DTOs;
 
-namespace InventarioWeb.Infrastructure.Services;
+namespace InventarioWeb.Application.Services;
 
 public interface IDashboardService
 {
