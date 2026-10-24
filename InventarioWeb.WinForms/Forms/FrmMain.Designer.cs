@@ -1,17 +1,36 @@
-﻿
-namespace InventarioWeb.WinForms.Forms
+﻿namespace InventarioWeb.WinForms.Forms
 {
     partial class FrmMain
     {
-        /// <summary>
-        /// Required designer variable.
-        /// </summary>
         private System.ComponentModel.IContainer components = null;
+        private System.Windows.Forms.MenuStrip menuStrip;
+        private System.Windows.Forms.ToolStripMenuItem menuInicio;
+        private System.Windows.Forms.ToolStripMenuItem menuProductos;
+        private System.Windows.Forms.ToolStripMenuItem menuProductosLista;
+        private System.Windows.Forms.ToolStripMenuItem menuProductosNuevo;
+        private System.Windows.Forms.ToolStripMenuItem menuProductosCategorias;
+        private System.Windows.Forms.ToolStripMenuItem menuProductosUnidades;
+        private System.Windows.Forms.ToolStripMenuItem menuAlmacenes;
+        private System.Windows.Forms.ToolStripMenuItem menuAlmacenesLista;
+        private System.Windows.Forms.ToolStripMenuItem menuAlmacenesNuevo;
+        private System.Windows.Forms.ToolStripMenuItem menuMovimientos;
+        private System.Windows.Forms.ToolStripMenuItem menuMovimientosHistorial;
+        private System.Windows.Forms.ToolStripMenuItem menuMovimientosEntrada;
+        private System.Windows.Forms.ToolStripMenuItem menuMovimientosSalida;
+        private System.Windows.Forms.ToolStripMenuItem menuConsignaciones;
+        private System.Windows.Forms.ToolStripMenuItem menuProveedores;
+        private System.Windows.Forms.ToolStripMenuItem menuReportes;
+        private System.Windows.Forms.ToolStripMenuItem menuGraficos;
+        private System.Windows.Forms.ToolStripMenuItem menuAdministracion;
+        private System.Windows.Forms.ToolStripMenuItem menuAdminUsuarios;
+        private System.Windows.Forms.ToolStripMenuItem menuSesion;
+        private System.Windows.Forms.ToolStripMenuItem menuSesionUsuario;
+        private System.Windows.Forms.ToolStripMenuItem menuSesionSalir;
+        private System.Windows.Forms.ToolStripSeparator menuSeparator1;
+        private System.Windows.Forms.ToolStripSeparator menuSeparator2;
+        private System.Windows.Forms.ToolStripSeparator menuSeparator3;
+        private System.Windows.Forms.ToolStripSeparator menuSeparator4;
 
-        /// <summary>
-        /// Clean up any resources being used.
-        /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -21,292 +40,231 @@ namespace InventarioWeb.WinForms.Forms
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
-            this.panelMenu = new System.Windows.Forms.Panel();
-            this.panelContenido = new System.Windows.Forms.Panel();
-            this.panelTop = new System.Windows.Forms.Panel();
-            this.lblTitulo = new System.Windows.Forms.Label();
-            this.lblUsuario = new System.Windows.Forms.Label();
-            this.btnSalir = new System.Windows.Forms.Button();
-            this.btnProductos = new System.Windows.Forms.Button();
-            this.btnAlmacenes = new System.Windows.Forms.Button();
-            this.btnMovimientos = new System.Windows.Forms.Button();
-            this.btnConsignaciones = new System.Windows.Forms.Button();
-            this.btnProveedores = new System.Windows.Forms.Button();
-            this.btnReportes = new System.Windows.Forms.Button();
-            this.btnUsuarios = new System.Windows.Forms.Button();
-            this.btnCategorias = new System.Windows.Forms.Button();
-            this.btnUnidades = new System.Windows.Forms.Button();
-            this.btnGraficos = new System.Windows.Forms.Button();
-            this.panelMenu.SuspendLayout();
-            this.panelTop.SuspendLayout();
-            this.SuspendLayout();
+            this.menuStrip = new System.Windows.Forms.MenuStrip();
+            this.menuInicio = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuProductos = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuProductosLista = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuProductosNuevo = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuProductosCategorias = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuProductosUnidades = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuAlmacenes = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuAlmacenesLista = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuAlmacenesNuevo = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuMovimientos = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuMovimientosHistorial = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuMovimientosEntrada = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuMovimientosSalida = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuConsignaciones = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuProveedores = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuReportes = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuGraficos = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuAdministracion = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuAdminUsuarios = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.menuSesion = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuSesionUsuario = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuSesionSalir = new System.Windows.Forms.ToolStripMenuItem();
 
-            // ===== panelMenu =====
-            this.panelMenu.BackColor = System.Drawing.Color.FromArgb(26, 26, 46);
-            this.panelMenu.Controls.Add(this.btnCategorias);
-            this.panelMenu.Controls.Add(this.btnUnidades);
-            this.panelMenu.Controls.Add(this.btnUsuarios);
-            this.panelMenu.Controls.Add(this.btnReportes);
-            this.panelMenu.Controls.Add(this.btnProveedores);
-            this.panelMenu.Controls.Add(this.btnConsignaciones);
-            this.panelMenu.Controls.Add(this.btnMovimientos);
-            this.panelMenu.Controls.Add(this.btnAlmacenes);
-            this.panelMenu.Controls.Add(this.btnProductos);
-            this.panelMenu.Controls.Add(this.btnGraficos);
-            this.panelMenu.Dock = System.Windows.Forms.DockStyle.Left;
-            this.panelMenu.Location = new System.Drawing.Point(0, 0);
-            this.panelMenu.Name = "panelMenu";
-            this.panelMenu.Size = new System.Drawing.Size(220, 600);
-            this.panelMenu.TabIndex = 0;
+            // menuStrip
+            this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                this.menuInicio,
+                this.menuProductos,
+                this.menuAlmacenes,
+                this.menuMovimientos,
+                this.menuConsignaciones,
+                this.menuProveedores,
+                this.menuReportes,
+                this.menuGraficos,
+                this.menuAdministracion,
+                this.menuSesion});
+            this.menuStrip.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip.Name = "menuStrip";
+            this.menuStrip.Size = new System.Drawing.Size(1200, 24);
+            this.menuStrip.TabIndex = 0;
+            this.menuStrip.BackColor = System.Drawing.Color.FromArgb(26, 26, 46);
+            this.menuStrip.ForeColor = System.Drawing.Color.White;
+            this.menuStrip.Font = new System.Drawing.Font("Segoe UI", 9.5F);
 
-            // ===== panelTop =====
-            this.panelTop.BackColor = System.Drawing.Color.FromArgb(67, 97, 238);
-            this.panelTop.Controls.Add(this.btnSalir);
-            this.panelTop.Controls.Add(this.lblUsuario);
-            this.panelTop.Controls.Add(this.lblTitulo);
-            this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panelTop.Location = new System.Drawing.Point(220, 0);
-            this.panelTop.Name = "panelTop";
-            this.panelTop.Size = new System.Drawing.Size(780, 60);
-            this.panelTop.TabIndex = 1;
+            // menuInicio
+            this.menuInicio.Name = "menuInicio";
+            this.menuInicio.Size = new System.Drawing.Size(80, 20);
+            this.menuInicio.Text = "🏠 Inicio";
+            this.menuInicio.Click += new System.EventHandler(this.MenuInicio_Click);
 
-            // ===== lblTitulo =====
-            this.lblTitulo.AutoSize = true;
-            this.lblTitulo.Font = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
-            this.lblTitulo.ForeColor = System.Drawing.Color.White;
-            this.lblTitulo.Location = new System.Drawing.Point(15, 18);
-            this.lblTitulo.Name = "lblTitulo";
-            this.lblTitulo.Size = new System.Drawing.Size(200, 25);
-            this.lblTitulo.TabIndex = 0;
-            this.lblTitulo.Text = "Sistema de Inventario";
+            // menuProductos
+            this.menuProductos.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                this.menuProductosLista,
+                this.menuProductosNuevo,
+                this.menuSeparator1,
+                this.menuProductosCategorias,
+                this.menuProductosUnidades});
+            this.menuProductos.Name = "menuProductos";
+            this.menuProductos.Size = new System.Drawing.Size(90, 20);
+            this.menuProductos.Text = "📦 Productos";
 
-            // ===== lblUsuario =====
-            this.lblUsuario.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblUsuario.AutoSize = true;
-            this.lblUsuario.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.lblUsuario.ForeColor = System.Drawing.Color.White;
-            this.lblUsuario.Location = new System.Drawing.Point(450, 22);
-            this.lblUsuario.Name = "lblUsuario";
-            this.lblUsuario.Size = new System.Drawing.Size(100, 19);
-            this.lblUsuario.TabIndex = 1;
-            this.lblUsuario.Text = "Usuario: Admin";
-            this.lblUsuario.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // menuProductosLista
+            this.menuProductosLista.Name = "menuProductosLista";
+            this.menuProductosLista.Size = new System.Drawing.Size(180, 22);
+            this.menuProductosLista.Text = "Lista de Productos";
+            this.menuProductosLista.Click += new System.EventHandler(this.MenuProductosLista_Click);
 
-            // ===== btnSalir =====
-            this.btnSalir.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSalir.BackColor = System.Drawing.Color.FromArgb(231, 29, 54);
-            this.btnSalir.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSalir.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.btnSalir.ForeColor = System.Drawing.Color.White;
-            this.btnSalir.Location = new System.Drawing.Point(680, 15);
-            this.btnSalir.Name = "btnSalir";
-            this.btnSalir.Size = new System.Drawing.Size(85, 32);
-            this.btnSalir.TabIndex = 2;
-            this.btnSalir.Text = "Salir";
-            this.btnSalir.UseVisualStyleBackColor = false;
-            this.btnSalir.Click += new System.EventHandler(this.btnSalir_Click);
+            // menuProductosNuevo
+            this.menuProductosNuevo.Name = "menuProductosNuevo";
+            this.menuProductosNuevo.Size = new System.Drawing.Size(180, 22);
+            this.menuProductosNuevo.Text = "Nuevo Producto";
+            this.menuProductosNuevo.Click += new System.EventHandler(this.MenuProductosNuevo_Click);
 
-            // ===== panelContenido =====
-            this.panelContenido.BackColor = System.Drawing.Color.FromArgb(248, 249, 250);
-            this.panelContenido.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelContenido.Location = new System.Drawing.Point(220, 60);
-            this.panelContenido.Name = "panelContenido";
-            this.panelContenido.Size = new System.Drawing.Size(780, 540);
-            this.panelContenido.TabIndex = 2;
+            // menuSeparator1
+            this.menuSeparator1.Name = "menuSeparator1";
+            this.menuSeparator1.Size = new System.Drawing.Size(177, 6);
 
-            // ===== btnProductos =====
-            this.btnProductos.BackColor = System.Drawing.Color.Transparent;
-            this.btnProductos.FlatAppearance.BorderSize = 0;
-            this.btnProductos.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnProductos.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnProductos.ForeColor = System.Drawing.Color.White;
-            this.btnProductos.Location = new System.Drawing.Point(0, 20);
-            this.btnProductos.Name = "btnProductos";
-            this.btnProductos.Size = new System.Drawing.Size(220, 45);
-            this.btnProductos.TabIndex = 0;
-            this.btnProductos.Text = "  📦  Productos";
-            this.btnProductos.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnProductos.UseVisualStyleBackColor = false;
-            this.btnProductos.Click += new System.EventHandler(this.btnProductos_Click);
+            // menuProductosCategorias
+            this.menuProductosCategorias.Name = "menuProductosCategorias";
+            this.menuProductosCategorias.Size = new System.Drawing.Size(180, 22);
+            this.menuProductosCategorias.Text = "Categorías";
+            this.menuProductosCategorias.Click += new System.EventHandler(this.MenuProductosCategorias_Click);
 
-            // ===== btnAlmacenes =====
-            this.btnAlmacenes.BackColor = System.Drawing.Color.Transparent;
-            this.btnAlmacenes.FlatAppearance.BorderSize = 0;
-            this.btnAlmacenes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAlmacenes.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnAlmacenes.ForeColor = System.Drawing.Color.White;
-            this.btnAlmacenes.Location = new System.Drawing.Point(0, 70);
-            this.btnAlmacenes.Name = "btnAlmacenes";
-            this.btnAlmacenes.Size = new System.Drawing.Size(220, 45);
-            this.btnAlmacenes.TabIndex = 1;
-            this.btnAlmacenes.Text = "  🏪  Almacenes";
-            this.btnAlmacenes.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnAlmacenes.UseVisualStyleBackColor = false;
-            this.btnAlmacenes.Click += new System.EventHandler(this.btnAlmacenes_Click);
+            // menuProductosUnidades
+            this.menuProductosUnidades.Name = "menuProductosUnidades";
+            this.menuProductosUnidades.Size = new System.Drawing.Size(180, 22);
+            this.menuProductosUnidades.Text = "Unidades de Medida";
+            this.menuProductosUnidades.Click += new System.EventHandler(this.MenuProductosUnidades_Click);
 
-            // ===== btnMovimientos =====
-            this.btnMovimientos.BackColor = System.Drawing.Color.Transparent;
-            this.btnMovimientos.FlatAppearance.BorderSize = 0;
-            this.btnMovimientos.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMovimientos.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnMovimientos.ForeColor = System.Drawing.Color.White;
-            this.btnMovimientos.Location = new System.Drawing.Point(0, 120);
-            this.btnMovimientos.Name = "btnMovimientos";
-            this.btnMovimientos.Size = new System.Drawing.Size(220, 45);
-            this.btnMovimientos.TabIndex = 2;
-            this.btnMovimientos.Text = "  ↔️  Movimientos";
-            this.btnMovimientos.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnMovimientos.UseVisualStyleBackColor = false;
-            this.btnMovimientos.Click += new System.EventHandler(this.btnMovimientos_Click);
+            // menuAlmacenes
+            this.menuAlmacenes.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                this.menuAlmacenesLista,
+                this.menuAlmacenesNuevo});
+            this.menuAlmacenes.Name = "menuAlmacenes";
+            this.menuAlmacenes.Size = new System.Drawing.Size(95, 20);
+            this.menuAlmacenes.Text = "🏪 Almacenes";
 
-            // ===== btnConsignaciones =====
-            this.btnConsignaciones.BackColor = System.Drawing.Color.Transparent;
-            this.btnConsignaciones.FlatAppearance.BorderSize = 0;
-            this.btnConsignaciones.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnConsignaciones.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnConsignaciones.ForeColor = System.Drawing.Color.White;
-            this.btnConsignaciones.Location = new System.Drawing.Point(0, 170);
-            this.btnConsignaciones.Name = "btnConsignaciones";
-            this.btnConsignaciones.Size = new System.Drawing.Size(220, 45);
-            this.btnConsignaciones.TabIndex = 3;
-            this.btnConsignaciones.Text = "  🤝  Consignaciones";
-            this.btnConsignaciones.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnConsignaciones.UseVisualStyleBackColor = false;
-            this.btnConsignaciones.Click += new System.EventHandler(this.btnConsignaciones_Click);
+            // menuAlmacenesLista
+            this.menuAlmacenesLista.Name = "menuAlmacenesLista";
+            this.menuAlmacenesLista.Size = new System.Drawing.Size(180, 22);
+            this.menuAlmacenesLista.Text = "Lista de Almacenes";
+            this.menuAlmacenesLista.Click += new System.EventHandler(this.MenuAlmacenesLista_Click);
 
-            // ===== btnCategorias =====
-            this.btnCategorias.BackColor = System.Drawing.Color.Transparent;
-            this.btnCategorias.FlatAppearance.BorderSize = 0;
-            this.btnCategorias.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCategorias.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnCategorias.ForeColor = System.Drawing.Color.White;
-            this.btnCategorias.Location = new System.Drawing.Point(0, 220);
-            this.btnCategorias.Name = "btnCategorias";
-            this.btnCategorias.Size = new System.Drawing.Size(220, 45);
-            this.btnCategorias.TabIndex = 7;
-            this.btnCategorias.Text = "  🏷️  Categorías";
-            this.btnCategorias.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnCategorias.UseVisualStyleBackColor = false;
-            this.btnCategorias.Click += new System.EventHandler(this.btnCategorias_Click);
+            // menuAlmacenesNuevo
+            this.menuAlmacenesNuevo.Name = "menuAlmacenesNuevo";
+            this.menuAlmacenesNuevo.Size = new System.Drawing.Size(180, 22);
+            this.menuAlmacenesNuevo.Text = "Nuevo Almacén";
+            this.menuAlmacenesNuevo.Click += new System.EventHandler(this.MenuAlmacenesNuevo_Click);
 
-            // ===== btnUnidades =====
-            this.btnUnidades.BackColor = System.Drawing.Color.Transparent;
-            this.btnUnidades.FlatAppearance.BorderSize = 0;
-            this.btnUnidades.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnUnidades.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnUnidades.ForeColor = System.Drawing.Color.White;
-            this.btnUnidades.Location = new System.Drawing.Point(0, 270);
-            this.btnUnidades.Name = "btnUnidades";
-            this.btnUnidades.Size = new System.Drawing.Size(220, 45);
-            this.btnUnidades.TabIndex = 8;
-            this.btnUnidades.Text = "  📏  Unidades";
-            this.btnUnidades.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnUnidades.UseVisualStyleBackColor = false;
-            this.btnUnidades.Click += new System.EventHandler(this.btnUnidades_Click);
+            // menuMovimientos
+            this.menuMovimientos.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                this.menuMovimientosHistorial,
+                this.menuSeparator2,
+                this.menuMovimientosEntrada,
+                this.menuMovimientosSalida});
+            this.menuMovimientos.Name = "menuMovimientos";
+            this.menuMovimientos.Size = new System.Drawing.Size(105, 20);
+            this.menuMovimientos.Text = "↔️ Movimientos";
 
-            // ===== btnProveedores =====
-            this.btnProveedores.BackColor = System.Drawing.Color.Transparent;
-            this.btnProveedores.FlatAppearance.BorderSize = 0;
-            this.btnProveedores.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnProveedores.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnProveedores.ForeColor = System.Drawing.Color.White;
-            this.btnProveedores.Location = new System.Drawing.Point(0, 320);
-            this.btnProveedores.Name = "btnProveedores";
-            this.btnProveedores.Size = new System.Drawing.Size(220, 45);
-            this.btnProveedores.TabIndex = 4;
-            this.btnProveedores.Text = "  🚚  Proveedores";
-            this.btnProveedores.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnProveedores.UseVisualStyleBackColor = false;
-            this.btnProveedores.Click += new System.EventHandler(this.btnProveedores_Click);
+            // menuMovimientosHistorial
+            this.menuMovimientosHistorial.Name = "menuMovimientosHistorial";
+            this.menuMovimientosHistorial.Size = new System.Drawing.Size(180, 22);
+            this.menuMovimientosHistorial.Text = "Historial";
+            this.menuMovimientosHistorial.Click += new System.EventHandler(this.MenuMovimientosHistorial_Click);
 
-            // ===== btnReportes =====
-            this.btnReportes.BackColor = System.Drawing.Color.Transparent;
-            this.btnReportes.FlatAppearance.BorderSize = 0;
-            this.btnReportes.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnReportes.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnReportes.ForeColor = System.Drawing.Color.White;
-            this.btnReportes.Location = new System.Drawing.Point(0, 370);
-            this.btnReportes.Name = "btnReportes";
-            this.btnReportes.Size = new System.Drawing.Size(220, 45);
-            this.btnReportes.TabIndex = 5;
-            this.btnReportes.Text = "  📊  Reportes";
-            this.btnReportes.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnReportes.UseVisualStyleBackColor = false;
-            this.btnReportes.Click += new System.EventHandler(this.btnReportes_Click);
+            // menuSeparator2
+            this.menuSeparator2.Name = "menuSeparator2";
+            this.menuSeparator2.Size = new System.Drawing.Size(177, 6);
 
-            // ===== btnUsuarios =====
-            this.btnUsuarios.BackColor = System.Drawing.Color.Transparent;
-            this.btnUsuarios.FlatAppearance.BorderSize = 0;
-            this.btnUsuarios.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnUsuarios.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnUsuarios.ForeColor = System.Drawing.Color.White;
-            this.btnUsuarios.Location = new System.Drawing.Point(0, 420);
-            this.btnUsuarios.Name = "btnUsuarios";
-            this.btnUsuarios.Size = new System.Drawing.Size(220, 45);
-            this.btnUsuarios.TabIndex = 6;
-            this.btnUsuarios.Text = "  👥  Usuarios";
-            this.btnUsuarios.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnUsuarios.UseVisualStyleBackColor = false;
-            this.btnUsuarios.Click += new System.EventHandler(this.btnUsuarios_Click);
+            // menuMovimientosEntrada
+            this.menuMovimientosEntrada.Name = "menuMovimientosEntrada";
+            this.menuMovimientosEntrada.Size = new System.Drawing.Size(180, 22);
+            this.menuMovimientosEntrada.Text = "Nueva Entrada";
+            this.menuMovimientosEntrada.Click += new System.EventHandler(this.MenuMovimientosEntrada_Click);
 
-            this.btnGraficos.BackColor = System.Drawing.Color.Transparent;
-            this.btnGraficos.FlatAppearance.BorderSize = 0;
-            this.btnGraficos.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnGraficos.Font = new System.Drawing.Font("Segoe UI", 10F);
-            this.btnGraficos.ForeColor = System.Drawing.Color.White;
-            this.btnGraficos.Location = new System.Drawing.Point(0, 470);
-            this.btnGraficos.Name = "btnGraficos";
-            this.btnGraficos.Size = new System.Drawing.Size(220, 45);
-            this.btnGraficos.TabIndex = 10;
-            this.btnGraficos.Text = "  📈  Gráficos";
-            this.btnGraficos.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnGraficos.UseVisualStyleBackColor = false;
-            this.btnGraficos.Click += new System.EventHandler(this.btnGraficos_Click);
+            // menuMovimientosSalida
+            this.menuMovimientosSalida.Name = "menuMovimientosSalida";
+            this.menuMovimientosSalida.Size = new System.Drawing.Size(180, 22);
+            this.menuMovimientosSalida.Text = "Nueva Salida";
+            this.menuMovimientosSalida.Click += new System.EventHandler(this.MenuMovimientosSalida_Click);
 
-            // ===== FrmMain =====
+            // menuConsignaciones
+            this.menuConsignaciones.Name = "menuConsignaciones";
+            this.menuConsignaciones.Size = new System.Drawing.Size(115, 20);
+            this.menuConsignaciones.Text = "🤝 Consignaciones";
+            this.menuConsignaciones.Click += new System.EventHandler(this.MenuConsignaciones_Click);
+
+            // menuProveedores
+            this.menuProveedores.Name = "menuProveedores";
+            this.menuProveedores.Size = new System.Drawing.Size(100, 20);
+            this.menuProveedores.Text = "🚚 Proveedores";
+            this.menuProveedores.Click += new System.EventHandler(this.MenuProveedores_Click);
+
+            // menuSeparator3
+            this.menuSeparator3.Name = "menuSeparator3";
+            this.menuSeparator3.Size = new System.Drawing.Size(177, 6);
+
+            // menuReportes
+            this.menuReportes.Name = "menuReportes";
+            this.menuReportes.Size = new System.Drawing.Size(85, 20);
+            this.menuReportes.Text = "📊 Reportes";
+            this.menuReportes.Click += new System.EventHandler(this.MenuReportes_Click);
+
+            // menuGraficos
+            this.menuGraficos.Name = "menuGraficos";
+            this.menuGraficos.Size = new System.Drawing.Size(80, 20);
+            this.menuGraficos.Text = "📈 Gráficos";
+            this.menuGraficos.Click += new System.EventHandler(this.MenuGraficos_Click);
+
+            // menuAdministracion
+            this.menuAdministracion.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                this.menuAdminUsuarios});
+            this.menuAdministracion.Name = "menuAdministracion";
+            this.menuAdministracion.Size = new System.Drawing.Size(70, 20);
+            this.menuAdministracion.Text = "⚙️ Admin";
+
+            // menuAdminUsuarios
+            this.menuAdminUsuarios.Name = "menuAdminUsuarios";
+            this.menuAdminUsuarios.Size = new System.Drawing.Size(180, 22);
+            this.menuAdminUsuarios.Text = "Usuarios";
+            this.menuAdminUsuarios.Click += new System.EventHandler(this.MenuAdminUsuarios_Click);
+
+            // menuSesion
+            this.menuSesion.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.menuSesion.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+                this.menuSesionUsuario,
+                this.menuSeparator4,
+                this.menuSesionSalir});
+            this.menuSesion.Name = "menuSesion";
+            this.menuSesion.Size = new System.Drawing.Size(120, 20);
+            this.menuSesion.Text = "👤 Usuario";
+
+            // menuSesionUsuario
+            this.menuSesionUsuario.Enabled = false;
+            this.menuSesionUsuario.Name = "menuSesionUsuario";
+            this.menuSesionUsuario.Size = new System.Drawing.Size(180, 22);
+            this.menuSesionUsuario.Text = "Usuario";
+
+            // menuSeparator4
+            this.menuSeparator4.Name = "menuSeparator4";
+            this.menuSeparator4.Size = new System.Drawing.Size(177, 6);
+
+            // menuSesionSalir
+            this.menuSesionSalir.Name = "menuSesionSalir";
+            this.menuSesionSalir.Size = new System.Drawing.Size(180, 22);
+            this.menuSesionSalir.Text = "Cerrar Sesión";
+            this.menuSesionSalir.Click += new System.EventHandler(this.MenuSesionSalir_Click);
+
+            // FrmMain
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1000, 600);
-            this.Controls.Add(this.panelContenido);
-            this.Controls.Add(this.panelTop);
-            this.Controls.Add(this.panelMenu);
-            this.MinimumSize = new System.Drawing.Size(800, 500);
+            this.ClientSize = new System.Drawing.Size(1200, 700);
+            this.Controls.Add(this.menuStrip);
+            this.MainMenuStrip = this.menuStrip;
             this.Name = "FrmMain";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Sistema de Inventario - Principal";
+            this.Text = "Sistema de Inventario - Dashboard";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.FrmMain_Load);
-            this.panelMenu.ResumeLayout(false);
-            this.panelTop.ResumeLayout(false);
-            this.panelTop.PerformLayout();
-            this.ResumeLayout(false);
         }
-
-        private System.Windows.Forms.Panel panelMenu;
-        private System.Windows.Forms.Panel panelContenido;
-        private System.Windows.Forms.Panel panelTop;
-        private System.Windows.Forms.Label lblTitulo;
-        private System.Windows.Forms.Label lblUsuario;
-        private System.Windows.Forms.Button btnSalir;
-        private System.Windows.Forms.Button btnProductos;
-        private System.Windows.Forms.Button btnAlmacenes;
-        private System.Windows.Forms.Button btnMovimientos;
-        private System.Windows.Forms.Button btnConsignaciones;
-        private System.Windows.Forms.Button btnProveedores;
-        private System.Windows.Forms.Button btnReportes;
-        private System.Windows.Forms.Button btnUsuarios;
-        private System.Windows.Forms.Button btnCategorias;
-        private System.Windows.Forms.Button btnUnidades;
-        private System.Windows.Forms.Button btnGraficos;
-
-        #endregion
     }
 }

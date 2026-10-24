@@ -10,7 +10,7 @@ public class DashboardData
     public int TotalTraslados { get; set; }
     public int TotalAlmacenes { get; set; }
     public decimal ValorInventario { get; set; }
-    public List<UltimoMovimientoDto> UltimosMovimientos { get; set; } = new();
+    public IEnumerable<UltimoMovimientoDto> UltimosMovimientos { get; set; } = [];
 }
 
 public class UltimoMovimientoDto
